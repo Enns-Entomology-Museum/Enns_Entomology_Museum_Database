@@ -22,5 +22,5 @@
 # enabled on GitHub Pages — otherwise reloading a taxon page directly in
 # the browser returns a 404.
 
-base_url: /taxonpages/
+base_url: /Enns_Entomology_Museum_Database/
 hash_mode: true
