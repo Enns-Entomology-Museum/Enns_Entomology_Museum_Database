@@ -22,28 +22,47 @@
         >
       </article>
 
-      <article class="eem-card eem-way eem-way-dark">
-        <p class="eem-kicker !text-[color:var(--eem-gold)]">Funds</p>
-        <h2 class="eem-display text-3xl mt-3 text-white">Support the Enns Endowment</h2>
+      <article
+        id="friends"
+        class="eem-card eem-way eem-way-dark"
+        :class="{ glow: focusGive }"
+      >
+        <p class="eem-kicker !text-[color:var(--eem-gold)]">Friends of the Museum</p>
+        <h2 class="eem-display text-3xl mt-3 text-white">Become a Friend of the Museum</h2>
         <p class="mt-3 leading-relaxed text-white/80">
-          Gifts to the Enns Endowment pay for cabinets and drawers, digitization, student positions and outreach — the
-          things that keep a collection alive and open.
+          Gifts of any size support the Enns Endowment: cabinets and drawers, digitization, student positions and
+          outreach — the things that keep a collection alive and open. Friends hear first about new acquisitions,
+          events and behind-the-scenes visits.
         </p>
-        <div class="mt-6 flex flex-wrap gap-3">
+        <div class="mt-6 flex flex-wrap items-center gap-3">
           <a
             v-if="info.givingUrl"
             :href="info.givingUrl"
             target="_blank"
             rel="noopener"
             class="eem-btn eem-btn-gold"
-            >Give online ↗</a
+            >Donate online ↗</a
           >
+          <template v-else>
+            <span
+              class="eem-btn eem-btn-gold opacity-60 cursor-not-allowed"
+              aria-disabled="true"
+              >Donate online</span
+            >
+            <span class="eem-soon">Coming soon</span>
+          </template>
           <a
-            :href="mailto('Supporting the Enns Endowment')"
+            :href="mailto('Becoming a Friend of the Enns Museum')"
             class="eem-btn eem-btn-line !border-white !text-white"
             >Contact the director</a
           >
         </div>
+        <p
+          v-if="!info.givingUrl"
+          class="mt-4 text-sm text-white/60"
+        >
+          Online giving opens soon. To give now, please write to the director.
+        </p>
       </article>
     </section>
 
@@ -107,11 +126,23 @@
 </template>
 
 <script setup>
+import { computed, nextTick, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
 
 useHead({ title: 'Donate — Enns Entomology Museum' })
+
+const route = useRoute()
+const focusGive = computed(() => !!route.query.give)
+async function showFriends() {
+  if (!focusGive.value) return
+  await nextTick()
+  document.getElementById('friends')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+onMounted(showFriends)
+watch(() => route.query.give, showFriends)
 
 const email = info.email || info.director.email
 const mailto = (subject) => `mailto:${email}?subject=${encodeURIComponent(subject)}`
@@ -137,6 +168,18 @@ const steps = [
   flex-direction: column;
   padding: 2rem;
   border-top: 4px solid #000;
+}
+.eem-soon {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--eem-gold);
+  color: var(--eem-gold);
+}
+.eem-way.glow {
+  box-shadow: 0 0 0 4px var(--eem-gold);
 }
 .eem-way-dark {
   background: #000;

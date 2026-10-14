@@ -117,8 +117,24 @@
                   >{{ initials(p.name) }}</span
                 >
                 <div class="min-w-0 flex-1">
-                  <p class="font-bold leading-tight">{{ p.name }}</p>
-                  <p class="text-sm eem-muted mt-0.5">{{ p.title || p.careerStage }}</p>
+                  <p class="font-bold leading-tight">
+                    {{ p.name }}<span
+                      v-if="p.deceased"
+                      class="eem-muted font-normal"
+                      title="In memoriam"
+                    >
+                      †</span
+                    >
+                  </p>
+                  <p class="text-sm eem-muted mt-0.5">
+                    {{ p.historical ? [p.formerRole, [p.startYear, p.endYear].filter(Boolean).join('–')].filter(Boolean).join(', ') : p.title || p.careerStage }}
+                  </p>
+                  <p
+                    v-if="p.deceased && (p.born || p.died)"
+                    class="text-xs eem-muted"
+                  >
+                    In memoriam · {{ p.born || '?' }}–{{ p.died || '?' }}
+                  </p>
                   <p class="text-sm mt-0.5">{{ cleanAff(p.affiliation) }}</p>
                   <p
                     v-if="p.note"
@@ -155,7 +171,7 @@
                       >Website</a
                     >
                     <span
-                      v-if="p.startYear"
+                      v-if="p.startYear && !p.historical"
                       class="eem-muted font-normal"
                       >with the museum since {{ p.startYear }}</span
                     >
@@ -165,22 +181,39 @@
             </ul>
           </div>
 
-          <div
-            v-if="points.length"
-            class="mt-12"
-          >
-            <h3 class="eem-group">Where they are</h3>
-            <EemMap
-              class="mt-4"
-              :points="points"
-              height="360px"
-            />
-          </div>
-
           <p class="mt-6 text-xs eem-muted">
             Only people who chose to appear publicly are listed. Updated {{ updated }}.
           </p>
         </template>
+      </div>
+    </section>
+
+    <!-- Live community network: map, table, timeline and visitors -->
+    <section class="container mx-auto box-border px-4 py-16">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eem-kicker">Community map</p>
+          <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Our network and visitors</h2>
+          <p class="mt-2 eem-muted max-w-2xl">
+            Everyone connected to the museum, on a map and in a table, with how the community has grown over time and
+            the schools, classes and groups that have visited. Use the Map / List switch inside to change view.
+          </p>
+        </div>
+        <a
+          :href="NETWORK"
+          target="_blank"
+          rel="noopener"
+          class="eem-btn eem-btn-line"
+          >Open full screen ↗</a
+        >
+      </div>
+      <div class="eem-network mt-6">
+        <iframe
+          :src="NETWORK"
+          title="Enns Entomology Museum community map and visitors"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+        />
       </div>
     </section>
   </div>
@@ -189,7 +222,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
-import EemMap from './components/EemMap.vue'
 import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
 
@@ -266,10 +298,12 @@ onMounted(async () => {
 const GROUPS = [
   { key: 'team', label: 'Museum team' },
   { key: 'students', label: 'Students' },
-  { key: 'collab', label: 'Research associates & collaborators' }
+  { key: 'collab', label: 'Research associates & collaborators' },
+  { key: 'former', label: 'Former staff & in memoriam' }
 ]
 
 function groupOf(p) {
+  if (p.historical) return 'former'
   if (p.staff || /technician|curator|collection manager/i.test(p.title || '')) return 'team'
   if (/research associate|collaborator/i.test(p.role || '')) return 'collab'
   if (/student|mentee/i.test(`${p.role} ${p.careerStage}`)) return 'students'
@@ -282,21 +316,6 @@ const groups = computed(() =>
     people: data.value.people.filter((p) => groupOf(p) === g.key).sort((a, b) => (a.staff === b.staff ? 0 : a.staff ? -1 : 1))
   })).filter((g) => g.people.length)
 )
-
-const points = computed(() => {
-  const byPlace = new Map()
-  data.value.people.forEach((p) => {
-    if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return
-    const k = `${p.lat.toFixed(3)},${p.lng.toFixed(3)}`
-    if (!byPlace.has(k)) byPlace.set(k, { lat: p.lat, lng: p.lng, city: p.city, names: [] })
-    byPlace.get(k).names.push(p.name)
-  })
-  return [...byPlace.values()].map((x) => ({
-    lat: x.lat,
-    lng: x.lng,
-    html: `<b>${x.city || ''}</b><br>${x.names.join('<br>')}`
-  }))
-})
 
 const updated = computed(() => {
   const d = new Date(data.value.updated)
@@ -316,6 +335,18 @@ function initials(n = '') {
 </script>
 
 <style scoped>
+.eem-network {
+  border: 1px solid var(--eem-rule);
+  border-top: 4px solid #000;
+  background: var(--eem-card);
+}
+.eem-network iframe {
+  display: block;
+  width: 100%;
+  height: min(80vh, 760px);
+  min-height: 560px;
+  border: 0;
+}
 .eem-path {
   display: flex;
   flex-direction: column;

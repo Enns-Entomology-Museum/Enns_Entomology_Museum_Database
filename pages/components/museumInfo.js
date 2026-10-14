@@ -20,7 +20,9 @@ export default {
     email: 'davide.dalpos@missouri.edu'
   },
 
-  // Online giving page for the Enns Endowment (leave empty to hide the button)
+  // Online giving page for "Friends of the Museum" donations.
+  // While empty, every Donate button leads to the Donate page, which says online giving opens soon.
+  // Paste the University's giving link here when it is ready.
   givingUrl: '',
 
   // GBIF. The collection is already registered in GRSciColl; add the dataset key

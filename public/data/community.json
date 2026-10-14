@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12T19:40:59.431Z",
-  "count": 8,
+  "updated": "2026-10-13T15:46:45.203Z",
+  "count": 13,
   "people": [
     {
       "name": "Davide Dal Pos",
@@ -170,11 +170,21 @@
       "careerStage": "Ph.D. student",
       "role": "Student / mentee",
       "staff": false,
-      "taxa": [],
+      "taxa": [
+        "Coleoptera",
+        "Hemiptera",
+        "Lepidoptera",
+        "Orthoptera",
+        "Diptera",
+        "Hymenoptera",
+        "Neuroptera"
+      ],
       "interactions": [
-        "Visited the collection",
         "Research using the collection",
-        "Identified specimens"
+        "Identified specimens",
+        "Donated specimens",
+        "Visited the collection",
+        "Outreach or education"
       ],
       "startYear": 2021,
       "ongoing": true,
@@ -209,6 +219,141 @@
       "lng": -92.329703,
       "title": "",
       "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Elizabeth Lumley",
+      "affiliation": "University of Missouri",
+      "careerStage": "Master's student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Lepidoptera",
+        "Hemiptera",
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Identified specimens",
+        "Borrowed specimens (loan)",
+        "Donated specimens",
+        "Visited the collection",
+        "Research using the collection"
+      ],
+      "startYear": 2025,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Lauren Diepenbrock",
+      "affiliation": "University of Florida",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Coleoptera",
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Identified specimens"
+      ],
+      "startYear": 2009,
+      "ongoing": true,
+      "city": "Lake Alfred",
+      "country": "United States",
+      "lat": 28.091963,
+      "lng": -81.7234114,
+      "title": "Associate Professor of Entomology & Extension Specialist",
+      "orcid": "0000-0003-2942-2066",
+      "website": "https://crec.ifas.ufl.edu/people/faculty/lauren-diepenbrock/",
+      "note": "Coccinellid community composition"
+    },
+    {
+      "name": "Johanna Schmitz",
+      "affiliation": "University of Missouri",
+      "careerStage": "Ph.D. student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Hymenoptera"
+      ],
+      "interactions": [
+        "Outreach or education"
+      ],
+      "startYear": 2007,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "0009-0008-4563-2411",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Emily Althoff",
+      "affiliation": "University of Missouri",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Coleoptera",
+        "Hymenoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Taught with the collection",
+        "Visited the collection",
+        "Used images or data",
+        "Borrowed specimens (loan)",
+        "Donated specimens",
+        "Outreach or education"
+      ],
+      "startYear": 2018,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "236",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Assistant Extension Professor",
+      "orcid": "",
+      "website": "",
+      "note": "Asian Needle ant effects on native ant populations"
+    },
+    {
+      "name": "Kyle Paddock",
+      "affiliation": "University of Missouri",
+      "careerStage": "Postdoc",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Coleoptera",
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Taught with the collection",
+        "Identified specimens",
+        "Visited the collection",
+        "Donated specimens",
+        "Outreach or education"
+      ],
+      "startYear": 2018,
+      "ongoing": false,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "0000-0003-1066-8912",
       "website": "",
       "note": ""
     }

@@ -1,6 +1,31 @@
 <template>
   <footer class="eem-footer print:hidden">
     <div class="eem-footer-band" />
+    <div class="eem-friends">
+      <div class="container mx-auto box-border px-4 py-7 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+        <div class="flex-1">
+          <p class="eem-display text-xl text-[color:var(--eem-gold)]">Become a Friend of the Museum</p>
+          <p class="text-sm text-white/70 mt-1 max-w-2xl">
+            Your gift buys drawers and cabinets, digitizes specimens, pays student positions and brings insects to
+            schools across Missouri.
+          </p>
+        </div>
+        <a
+          v-if="info.givingUrl"
+          :href="info.givingUrl"
+          target="_blank"
+          rel="noopener"
+          class="eem-friends-btn"
+          >Donate ↗</a
+        >
+        <RouterLink
+          v-else
+          :to="{ path: '/donate', query: { give: 1 } }"
+          class="eem-friends-btn"
+          >Donate</RouterLink
+        >
+      </div>
+    </div>
     <div class="container mx-auto box-border px-4 pt-12 pb-8">
       <div class="grid grid-cols-2 gap-x-6 gap-y-10 md:grid-cols-12">
         <div class="col-span-2 md:col-span-5">
@@ -178,5 +203,27 @@ const year = new Date().getFullYear()
   border: 1px solid var(--eem-gold);
   color: var(--eem-gold) !important;
   font-weight: 700;
+}
+.eem-friends {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.eem-friends-btn {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 0.75rem 1.6rem;
+  background: var(--eem-gold);
+  color: #000 !important;
+  font-weight: 800;
+  border: 2px solid var(--eem-gold);
+  white-space: nowrap;
+}
+.eem-friends-btn:hover {
+  background: transparent;
+  color: var(--eem-gold) !important;
+}
+@media (min-width: 768px) {
+  .eem-friends-btn {
+    align-self: center;
+  }
 }
 </style>

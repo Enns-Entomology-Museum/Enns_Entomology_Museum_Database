@@ -226,7 +226,7 @@ import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
 import EemMap from './components/EemMap.vue'
 import EemSpecimenImages from './components/EemSpecimenImages.vue'
-import { collectorsOf, normCat, useLoans } from './components/useEem.js'
+import { collectorsOf, findByCatalog, normCat, useLoans } from './components/useEem.js'
 
 const loans = useLoans()
 const route = useRoute()
@@ -246,20 +246,9 @@ async function load() {
   rec.value = null
   if (!cat.value) return
   loading.value = true
-  // Accept "108", "EEM108" or the full "EEM000000108"
-  const digits = cat.value.replace(/\D/g, '')
-  const candidates = [cat.value.toUpperCase()]
-  if (digits) candidates.push(`EEM${digits.padStart(9, '0')}`)
+  // Accept "108", "EEM108", "EEM000000108" or "EEM 000000108"
   try {
-    for (const c of [...new Set(candidates)]) {
-      const { data } = await makeAPIRequest.get('/dwc_occurrences.json', {
-        params: { catalogNumber: c, per: 1 }
-      })
-      if (Array.isArray(data) && data.length) {
-        rec.value = data[0]
-        break
-      }
-    }
+    rec.value = await findByCatalog(cat.value)
   } catch {
     rec.value = null
   } finally {

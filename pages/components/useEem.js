@@ -193,3 +193,30 @@ export function useSpecimenImages() {
     .finally(() => (imgState.loaded = true))
   return imgState
 }
+
+// ── Catalog number lookup ────────────────────────────────────────────────
+// Some catalog numbers were created as "EEM 000000001" (with a space) before the
+// namespace changed to "EEM000000001". Look up every spelling so both work.
+export function catalogVariants(text = '') {
+  const t = String(text).trim()
+  const out = [t.toUpperCase()]
+  const digits = t.replace(/\D/g, '')
+  if (digits && /^(eem)?[\s.-]*\d{1,9}$/i.test(t)) {
+    const n = digits.padStart(9, '0')
+    out.push(`EEM${n}`, `EEM ${n}`)
+  }
+  return [...new Set(out.filter(Boolean))]
+}
+
+export async function findByCatalog(text) {
+  const variants = catalogVariants(text)
+  const results = await Promise.all(
+    variants.map((c) =>
+      makeAPIRequest
+        .get('/dwc_occurrences.json', { params: { catalogNumber: c, per: 1 } })
+        .then(({ data }) => (Array.isArray(data) && data[0]) || null)
+        .catch(() => null)
+    )
+  )
+  return results.find(Boolean) || null
+}

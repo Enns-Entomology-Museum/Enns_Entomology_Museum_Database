@@ -92,6 +92,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { makeAPIRequest } from '@/utils/request'
+import { findByCatalog } from './useEem.js'
 
 defineProps({
   id: { type: String, default: 'eem-usearch' },
@@ -112,7 +113,7 @@ const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<'
 // "108", "EEM108", "eem 000000108" → "EEM000000108"
 function catalogFrom(text) {
   const t = text.trim()
-  if (!/^(eem)?[\s-]*\d{1,9}$/i.test(t)) return null
+  if (!/^(eem)?[\s.-]*\d{1,9}$/i.test(t)) return null
   return `EEM${t.replace(/\D/g, '').padStart(9, '0')}`
 }
 
@@ -134,12 +135,7 @@ async function search() {
   const cat = catalogFrom(text)
 
   const [specimen, taxa] = await Promise.all([
-    cat
-      ? makeAPIRequest
-          .get('/dwc_occurrences.json', { params: { catalogNumber: cat, per: 1 } })
-          .then(({ data }) => data?.[0] || null)
-          .catch(() => null)
-      : Promise.resolve(null),
+    cat ? findByCatalog(text) : Promise.resolve(null),
     /^\d+$/.test(text)
       ? Promise.resolve([])
       : makeAPIRequest
