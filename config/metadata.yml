@@ -3,8 +3,10 @@
 
 metadata:
   - name: description
-    content: TaxonPages is a tool to serve taxon pages.
+    content: The Enns Entomology Museum at the University of Missouri — insect collection database, digitized specimen records, loans and visits.
   - name: keywords
-    content: taxonpages, species, sfg
+    content: Enns Entomology Museum, University of Missouri, Mizzou, insect collection, entomology, specimens, natural history collection, TaxonWorks
   - name: robots
     content: follow
+  - name: theme-color
+    content: '#000000'

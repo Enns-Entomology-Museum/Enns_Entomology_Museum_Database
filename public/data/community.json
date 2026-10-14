@@ -1,0 +1,216 @@
+{
+  "updated": "2026-10-12T19:40:59.431Z",
+  "count": 8,
+  "people": [
+    {
+      "name": "Davide Dal Pos",
+      "affiliation": "University of Missouri",
+      "careerStage": "Museum or collection staff",
+      "role": "Museum staff",
+      "staff": true,
+      "taxa": [
+        "Hymenoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Curation or collection management",
+        "Identified specimens",
+        "Donated specimens",
+        "Mentored or trained at the museum",
+        "Co-authored with museum staff",
+        "Taught with the collection"
+      ],
+      "startYear": null,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Director of the Enns Entomology Museum",
+      "orcid": "0000-0002-9122-934X",
+      "website": "https://davidedalpos.com/",
+      "note": "Working with Ichneumonidae"
+    },
+    {
+      "name": "Alessandra Pandolfi",
+      "affiliation": "University of Missouri",
+      "careerStage": "Other",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Visited the collection",
+        "Mentored or trained at the museum",
+        "Co-authored with museum staff",
+        "Curation or collection management"
+      ],
+      "startYear": 2026,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Assistant Technician",
+      "orcid": "0000-0001-8353-243X",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Lily Hart",
+      "affiliation": "University of Illinois",
+      "careerStage": "Master's student",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Plecoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Visited the collection",
+        "Curation or collection management",
+        "Identified specimens",
+        "Borrowed specimens (loan)"
+      ],
+      "startYear": 2026,
+      "ongoing": true,
+      "city": "Champaign",
+      "country": "United States",
+      "lat": 40.0761545,
+      "lng": -88.2233134,
+      "title": "Graduate Research Assistant & Insect Collection Assistant",
+      "orcid": "0000-0002-2906-1849",
+      "website": "",
+      "note": "The Stoneflies of Arkansas: building a museum specimen dataset and phylogeny to assess Species of Greatest Conservation Need"
+    },
+    {
+      "name": "Sage DeLong",
+      "affiliation": "University of Missouri - Columbia",
+      "careerStage": "Ph.D. student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Taught with the collection",
+        "Visited the collection",
+        "Borrowed specimens (loan)",
+        "Mentored or trained at the museum"
+      ],
+      "startYear": 2026,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "0009-0004-2273-1661",
+      "website": "https://sageadelong.weebly.com/",
+      "note": "Belostomatidae of Missouri"
+    },
+    {
+      "name": "Debbie Finke",
+      "affiliation": "University of Missouri",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Hymenoptera",
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Taught with the collection",
+        "Visited the collection",
+        "Outreach or education"
+      ],
+      "startYear": 2007,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Professor",
+      "orcid": "0000-0001-8291-1964",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Stephany Bautista",
+      "affiliation": "University of missouri",
+      "careerStage": "Master's student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Lepidoptera",
+        "Hymenoptera",
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Outreach or education",
+        "Taught with the collection"
+      ],
+      "startYear": 2025,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Leah Gastonguay",
+      "affiliation": "University of Missouri",
+      "careerStage": "Ph.D. student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [],
+      "interactions": [
+        "Visited the collection",
+        "Research using the collection",
+        "Identified specimens"
+      ],
+      "startYear": 2021,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Ph.D. Candidate",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Lily Landre",
+      "affiliation": "University of Missouri",
+      "careerStage": "Master's student",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Visited the collection",
+        "Outreach or education",
+        "Borrowed specimens (loan)"
+      ],
+      "startYear": 2025,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    }
+  ]
+}

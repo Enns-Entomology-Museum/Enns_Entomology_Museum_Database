@@ -1,0 +1,34 @@
+# Taxon page panel layout — Enns Entomology Museum
+
+taxa_page:
+  overview:
+    panels:
+      - - - panel:eem-specimens
+          - panel:gallery
+          - panel:nomenclature
+          - panel:type
+          - panel:type-specimen
+
+        - - panel:map
+          - panel:eem-catalogue-of-life
+          - panel:descendants
+          - panel:keys
+          - panel:statistics
+
+  gbif:
+    label: GBIF
+    panels:
+      - - - panel:eem-gbif
+
+  inaturalist:
+    label: iNaturalist
+    panels:
+      - - - panel:eem-inaturalist
+
+  references:
+    panels:
+      - - - panel:references-cited
+
+  biological_associations:
+    panels:
+      - - - panel:biological-associations

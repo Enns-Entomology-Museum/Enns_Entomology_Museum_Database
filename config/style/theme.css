@@ -1,66 +1,214 @@
 /*
+  Enns Entomology Museum — University of Missouri
+  Mizzou black & gold, with warm limestone neutrals (Francis Quadrangle columns).
+*/
 :root {
-  --tp-primary: rgb(8, 47, 73);
-  --tp-primary-content: rgb(240, 249, 255);
-  --tp-secondary: rgb(2, 132, 199);
-  --tp-secondary-content: rgb(255, 255, 255);
-  --tp-success: rgb(34, 197, 94);
-  --tp-warning: rgb(245, 158, 11);
-  --tp-danger: rgb(239, 68, 68);
+  --tp-primary: rgb(0, 0, 0);
+  --tp-primary-content: rgb(255, 255, 255);
+  --tp-secondary: rgb(140, 100, 10);
+  --tp-secondary-content: rgb(0, 0, 0);
+  --tp-success: rgb(46, 125, 50);
+  --tp-warning: rgb(241, 184, 45);
+  --tp-danger: rgb(190, 40, 40);
   --tp-base-foreground: rgb(255, 255, 255);
-  --tp-base-background: rgb(248, 251, 253);
-  --tp-base-muted: rgb(230, 238, 245);
-  --tp-base-soft: rgb(98, 113, 128);
-  --tp-base-lighter: rgb(52, 68, 83);
-  --tp-base-border: rgb(212, 222, 232);
-  --tp-base-content: rgb(12, 30, 48);
-  --tp-card-shadow: rgba(8, 47, 73, 0.08);
-  --tp-card-border: rgba(52, 68, 83, 0.10);
+  --tp-base-background: rgb(247, 245, 240);
+  --tp-base-muted: rgb(234, 230, 220);
+  --tp-base-soft: rgb(102, 98, 90);
+  --tp-base-lighter: rgb(56, 54, 50);
+  --tp-base-border: rgb(220, 214, 200);
+  --tp-base-content: rgb(17, 17, 17);
+  --tp-card-shadow: rgba(0, 0, 0, 0.06);
+  --tp-card-border: rgba(0, 0, 0, 0.1);
   --tp-shadow-sm: rgba(0, 0, 0, 0.2);
-  --tp-tree-line: rgb(156, 174, 188);
-  --tp-footer-background: rgb(4, 30, 50);
-  --tp-footer-content: rgb(240, 249, 255);
-  --tp-footer-link: rgb(148, 168, 184);
-  --tp-footer-link-hover: rgb(212, 222, 232);
-  --tp-footer-border: rgb(32, 56, 76);
-  --tp-map-georeference: rgb(239, 68, 68);
-  --tp-map-aggregate: rgb(22, 130, 50);
-  --tp-map-asserted: rgb(249, 115, 22);
+  --tp-tree-line: rgb(170, 162, 145);
+  --tp-footer-background: rgb(0, 0, 0);
+  --tp-footer-content: rgb(255, 255, 255);
+  --tp-footer-link: rgb(200, 195, 185);
+  --tp-footer-link-hover: rgb(241, 184, 45);
+  --tp-footer-border: rgb(45, 45, 45);
+  --tp-map-georeference: rgb(196, 140, 10);
+  --tp-map-aggregate: rgb(60, 60, 60);
+  --tp-map-asserted: rgb(241, 184, 45);
   --tp-map-asserted-absent: rgb(106, 81, 163);
-  --tp-map-type-material: rgb(51, 136, 255);
-  --tp-map-collection-object: rgb(219, 39, 119);
-  --tp-map-field-occurrence: rgb(49, 163, 84);
-  --tp-scrollbar-thumb: rgb(156, 174, 188);
-  --tp-scrollbar-track: rgb(230, 238, 245);
+  --tp-map-type-material: rgb(51, 112, 200);
+  --tp-map-collection-object: rgb(196, 140, 10);
+  --tp-map-field-occurrence: rgb(46, 125, 50);
+  --tp-scrollbar-thumb: rgb(170, 162, 145);
+  --tp-scrollbar-track: rgb(234, 230, 220);
   --tp-map-shape-opacity: 0.5;
-  --tp-map-marker-opacity: 0.75;
+  --tp-map-marker-opacity: 0.8;
+
+  /* EEM palette for the custom pages */
+  --eem-gold: #f1b82d;
+  --eem-gold-deep: #8c640a;
+  --eem-black: #000000;
+  --eem-ink: #111111;
+  --eem-ink-soft: #5c5850;
+  --eem-paper: #f7f5f0;
+  --eem-paper-2: #ece8de;
+  --eem-card: #ffffff;
+  --eem-rule: #dcd6c8;
 }
 
 .dark {
-  --tp-primary: rgb(6, 32, 52);
-  --tp-primary-content: rgb(224, 242, 254);
-  --tp-secondary: rgb(56, 189, 248);
-  --tp-secondary-content: rgb(6, 32, 52);
-  --tp-success: rgb(34, 180, 82);
-  --tp-warning: rgb(234, 140, 16);
-  --tp-danger: rgb(220, 56, 56);
-  --tp-base-background: rgb(8, 18, 30);
-  --tp-base-foreground: rgb(14, 28, 46);
-  --tp-base-muted: rgb(24, 42, 62);
-  --tp-base-soft: rgb(148, 168, 184);
-  --tp-base-lighter: rgb(198, 214, 226);
-  --tp-base-border: rgb(36, 56, 76);
-  --tp-base-content: rgb(230, 242, 250);
-  --tp-card-shadow: rgba(0, 0, 0, 0.30);
-  --tp-card-border: rgba(148, 168, 184, 0.1);
-  --tp-shadow-sm: rgba(0, 0, 0, 0.4);
-  --tp-tree-line: rgb(148, 168, 184);
-  --tp-footer-background: rgb(4, 10, 20);
-  --tp-footer-content: rgb(230, 242, 250);
-  --tp-footer-link: rgb(148, 168, 184);
-  --tp-footer-link-hover: rgb(198, 214, 226);
-  --tp-footer-border: rgb(36, 56, 76);
-  --tp-scrollbar-thumb: rgb(98, 113, 128);
-  --tp-scrollbar-track: rgb(14, 28, 46);
+  --tp-primary: rgb(0, 0, 0);
+  --tp-primary-content: rgb(255, 255, 255);
+  --tp-secondary: rgb(241, 184, 45);
+  --tp-secondary-content: rgb(0, 0, 0);
+  --tp-base-background: rgb(14, 14, 13);
+  --tp-base-foreground: rgb(26, 26, 24);
+  --tp-base-muted: rgb(40, 39, 36);
+  --tp-base-soft: rgb(170, 165, 155);
+  --tp-base-lighter: rgb(215, 210, 200);
+  --tp-base-border: rgb(52, 51, 47);
+  --tp-base-content: rgb(240, 237, 230);
+  --tp-card-shadow: rgba(0, 0, 0, 0.3);
+  --tp-card-border: rgba(255, 255, 255, 0.08);
+  --tp-footer-background: rgb(0, 0, 0);
+  --tp-footer-border: rgb(40, 40, 40);
+  --tp-scrollbar-thumb: rgb(90, 88, 82);
+  --tp-scrollbar-track: rgb(26, 26, 24);
+
+  --eem-gold-deep: #f1b82d;
+  --eem-ink: #f0ede6;
+  --eem-ink-soft: #aaa59b;
+  --eem-paper: #0e0e0d;
+  --eem-paper-2: #1a1a18;
+  --eem-card: #1d1d1b;
+  --eem-rule: #34332f;
 }
- */
+
+/* ---------- Header: black bar with a gold rule ---------- */
+.tp-header {
+  min-height: 3.75rem !important;
+  border-bottom: 4px solid var(--eem-gold);
+  box-shadow: none !important;
+}
+.tp-header > .container > a > span {
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.tp-header-nav a.router-link-exact-active,
+.tp-header-nav a.router-link-active {
+  color: var(--eem-gold) !important;
+}
+.tp-header-nav a:hover {
+  color: var(--eem-gold) !important;
+}
+
+/* ---------- Shared EEM blocks ---------- */
+.eem {
+  background: var(--eem-paper);
+  color: var(--eem-ink);
+}
+.eem *,
+.eem *::before,
+.eem *::after {
+  box-sizing: border-box;
+}
+.eem-display {
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+}
+.eem-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--eem-gold-deep);
+}
+.eem-kicker::before {
+  content: '';
+  width: 1.6rem;
+  height: 3px;
+  background: var(--eem-gold);
+}
+.eem-muted {
+  color: var(--eem-ink-soft);
+}
+.eem-rule {
+  border-color: var(--eem-rule);
+}
+.eem-card {
+  background: var(--eem-card);
+  border: 1px solid var(--eem-rule);
+  border-radius: 4px;
+}
+.eem-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.25rem;
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  border-radius: 2px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.eem-btn-gold {
+  background: var(--eem-gold);
+  color: #000 !important;
+}
+.eem-btn-gold:hover {
+  background: #ffcf5c;
+}
+.eem-btn-line {
+  border: 2px solid currentColor;
+}
+.eem-btn-line:hover {
+  background: var(--eem-gold);
+  border-color: var(--eem-gold);
+  color: #000 !important;
+}
+.eem-link {
+  color: var(--eem-gold-deep) !important;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--eem-gold);
+  text-underline-offset: 3px;
+}
+.eem-link:hover {
+  color: var(--eem-ink) !important;
+}
+.eem-skel {
+  display: inline-block;
+  min-width: 3ch;
+  border-radius: 2px;
+  color: transparent !important;
+  background: linear-gradient(90deg, var(--eem-paper-2), var(--eem-rule), var(--eem-paper-2));
+  background-size: 200% 100%;
+  animation: eem-shimmer 1.2s linear infinite;
+}
+@keyframes eem-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .tp-header > .container > a > span {
+    font-size: 0.82rem;
+  }
+  .tp-header > .container > a > img {
+    height: 2.1rem;
+    margin-right: 0.5rem;
+  }
+}
+
+/* Gold accent edges on cards */
+.eem-accent-l {
+  border-left: 4px solid var(--eem-gold) !important;
+}
+.eem-accent-t {
+  border-top: 4px solid var(--eem-gold) !important;
+}

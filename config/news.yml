@@ -1,0 +1,16 @@
+# News — written in TaxonWorks (Project → News, set to public) and shown on /news and on the home page
+news_module:
+  index_page:
+    news_per_page: 10
+    pinned_news_id: []
+    layout: 'cards'
+    show_date: true
+
+  news_page:
+    show_date: true
+    show_author: true
+
+  widget:
+    news_count: 3
+    show_date: true
+    show_content: true
