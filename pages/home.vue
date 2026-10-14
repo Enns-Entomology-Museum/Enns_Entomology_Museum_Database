@@ -73,6 +73,9 @@
       </div>
     </section>
 
+    <!-- Missouri checklist -->
+    <EemMissouriBand />
+
     <!-- What's in the drawers + map -->
     <section class="container mx-auto box-border px-4 py-16 sm:py-20 grid lg:grid-cols-12 gap-12">
       <div class="lg:col-span-5">
@@ -214,6 +217,7 @@
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import EemMap from './components/EemMap.vue'
+import EemMissouriBand from './components/EemMissouriBand.vue'
 import EemNews from './components/EemNews.vue'
 import EemPhotos from './components/EemPhotos.vue'
 import EemSearch from './components/EemSearch.vue'

@@ -76,6 +76,12 @@
               class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 !text-base-content hover:underline"
             >
               <span class="eem-cat">{{ r.catalogNumber || '—' }}</span>
+              <span
+                v-if="r.associatedMedia"
+                class="eem-photo-tag"
+                title="This specimen has photos"
+                >Photo</span
+              >
               <span>{{ place(r) }}</span>
               <span class="text-base-soft">{{ r.eventDate || '' }}</span>
               <span
@@ -166,6 +172,16 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.eem-photo-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0 0.35rem;
+  background: #000;
+  color: #f1b82d;
+  align-self: center;
+}
 .eem-season {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));

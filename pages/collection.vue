@@ -215,6 +215,11 @@
             >Collectors</RouterLink
           >
           <RouterLink
+            to="/library"
+            class="eem-btn eem-btn-line"
+            >Library</RouterLink
+          >
+          <RouterLink
             to="/tree"
             class="eem-btn eem-btn-line"
             >Taxonomic tree</RouterLink

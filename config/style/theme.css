@@ -212,3 +212,44 @@
 .eem-accent-t {
   border-top: 4px solid var(--eem-gold) !important;
 }
+
+/* Missouri checklist: the one header link styled as a call to action */
+.tp-header-nav > div > div > a[href$='/missouri'] {
+  border: 2px solid var(--eem-gold);
+  color: var(--eem-gold) !important;
+  padding: 0.3rem 0.75rem !important;
+  border-radius: 2px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tp-header-nav > div > div > a[href$='/missouri']:hover,
+.tp-header-nav > div > div > a[href$='/missouri'].router-link-active {
+  background: var(--eem-gold);
+  color: #000 !important;
+}
+
+/* Keep the header on one line on small laptops (the menu has 8 items) */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .tp-header-nav > div {
+    gap: 0.95rem;
+  }
+  .tp-header > .container > a > span {
+    font-size: 0.92rem;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1119px) {
+  .tp-header > .container > a > span {
+    display: none;
+  }
+}
+
+/* Collection dropdown */
+.tp-header-nav [role='menu'] {
+  border-radius: 2px !important;
+  border-top: 3px solid var(--eem-gold);
+  min-width: 12rem !important;
+}
+.tp-header-nav [role='menu'] a:hover,
+.tp-header-nav [role='menu'] a.router-link-active {
+  background: #fdf3d6 !important;
+}

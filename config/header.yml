@@ -4,17 +4,22 @@
 header_logo_url: /images/mu-mark.png
 header_logo_text: 'Enns Entomology Museum'
 header_links:
-  - label: Home
-    link: /
-
   - label: Collection
-    link: /collection
-
-  - label: Browse
-    link: /tree
+    submenu:
+      - label: Holdings
+        link: /collection
+      - label: Highlights
+        link: /highlights
+      - label: Taxonomic tree
+        link: /tree
+      - label: Collectors
+        link: /collectors
 
   - label: Specimens
     link: /resources/tw/filter/dwc_otus
+
+  - label: Library
+    link: /library
 
   - label: News
     link: /news
@@ -22,8 +27,11 @@ header_links:
   - label: People
     link: /people
 
-  - label: Visit & loans
+  - label: Visit
     link: /visit
 
   - label: About
     link: /about
+
+  - label: Missouri Checklist
+    link: /missouri

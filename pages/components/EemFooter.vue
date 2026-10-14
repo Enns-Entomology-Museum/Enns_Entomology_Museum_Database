@@ -33,7 +33,7 @@
             <li><RouterLink to="/collection" class="eem-footer-link">Holdings</RouterLink></li>
             <li><RouterLink to="/tree" class="eem-footer-link">Taxonomic tree</RouterLink></li>
             <li><RouterLink to="/highlights" class="eem-footer-link">Highlights</RouterLink></li>
-            <li><RouterLink to="/missouri" class="eem-footer-link">Missouri checklist</RouterLink></li>
+            <li><RouterLink to="/missouri" class="eem-footer-link">Insects of Missouri</RouterLink></li>
             <li><RouterLink to="/collectors" class="eem-footer-link">Collectors</RouterLink></li>
             <li><RouterLink to="/resources/tw/filter/dwc_otus" class="eem-footer-link">Search specimens</RouterLink></li>
             <li><RouterLink to="/resources/tw/filter/bibliography" class="eem-footer-link">Publications</RouterLink></li>
@@ -51,6 +51,7 @@
             <li><RouterLink to="/people" class="eem-footer-link">Students &amp; collaborators</RouterLink></li>
             <li><RouterLink to="/outreach" class="eem-footer-link">Outreach requests</RouterLink></li>
             <li><RouterLink to="/donate" class="eem-footer-link">Donate</RouterLink></li>
+            <li><RouterLink to="/library" class="eem-footer-link">Library</RouterLink></li>
             <li><RouterLink to="/about" class="eem-footer-link">About</RouterLink></li>
           </ul>
         </nav>

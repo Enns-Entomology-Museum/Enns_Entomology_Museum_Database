@@ -130,7 +130,12 @@
           </div>
         </div>
 
-        <aside class="lg:col-span-5">
+        <aside class="lg:col-span-5 space-y-5">
+          <EemSpecimenImages
+            :collection-object-id="rec.dwc_occurrence_object_type === 'CollectionObject' ? rec.dwc_occurrence_object_id : null"
+            :catalog-number="rec.catalogNumber"
+            :title="name"
+          />
           <div
             v-if="point"
             class="eem-card p-2"
@@ -220,6 +225,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
 import EemMap from './components/EemMap.vue'
+import EemSpecimenImages from './components/EemSpecimenImages.vue'
 import { collectorsOf, normCat, useLoans } from './components/useEem.js'
 
 const loans = useLoans()

@@ -5,6 +5,9 @@ on:
     branches:
       - main
   workflow_dispatch:
+  # Rebuild once a month so the GBIF Missouri checklist stays current
+  schedule:
+    - cron: '17 6 1 * *'
 
 concurrency:
   group: "pages"
@@ -28,6 +31,12 @@ jobs:
       # and guarantee every deploy uses the latest published version.
       - name: Install latest TaxonPages version
         run: npm install @sfgrp/taxonpages
+
+      # Downloads the list of insect species recorded in Missouri from GBIF
+      # (public/data/gbif-missouri.json). Never fails the build: if GBIF is
+      # unreachable, the copy already in the repository is used.
+      - name: Refresh GBIF Missouri checklist
+        run: node scripts/gbif-missouri.mjs
 
       - name: Build public view
         run: npm run build
