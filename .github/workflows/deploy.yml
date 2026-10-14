@@ -5,7 +5,7 @@ on:
     branches:
       - main
   workflow_dispatch:
-  # Rebuild once a month so the GBIF Missouri checklist stays current
+  # Rebuild once a month so the GBIF Missouri checklist and loan totals stay current
   schedule:
     - cron: '17 6 1 * *'
 
@@ -37,6 +37,17 @@ jobs:
       # unreachable, the copy already in the repository is used.
       - name: Refresh GBIF Missouri checklist
         run: node scripts/gbif-missouri.mjs
+
+      # Exports loan totals (loans, specimens per loan, taxa) from TaxonWorks to
+      # public/data/loans-summary.json. Loans are not in the public API, so this
+      # uses the repository secret TW_USER_TOKEN (a personal TaxonWorks API token).
+      # Only totals are written — no names, addresses or e-mails. Never fails the
+      # build: without the secret, or on any error, the site shows basic counts.
+      - name: Refresh loans summary
+        run: node scripts/tw-loans.mjs
+        env:
+          TW_USER_TOKEN: ${{ secrets.TW_USER_TOKEN }}
+          TW_PROJECT_ID: '101'
 
       - name: Build public view
         run: npm run build

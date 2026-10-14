@@ -10,7 +10,8 @@
     "serve": "taxonpages serve",
     "preview": "taxonpages preview",
     "setup": "taxonpages setup",
-    "data:gbif": "node scripts/gbif-missouri.mjs"
+    "data:gbif": "node scripts/gbif-missouri.mjs",
+    "data:loans": "node scripts/tw-loans.mjs"
   },
   "dependencies": {
     "@sfgrp/taxonpages": "latest"

@@ -137,8 +137,8 @@
             <p class="eem-kicker">Loans</p>
             <h2 class="eem-display mt-3 text-3xl">Specimens at work</h2>
             <p class="mt-2 eem-muted max-w-2xl">
-              Specimens travel to researchers around the world for study. These numbers count loans recorded since
-              the museum started digitizing.
+              Specimens travel to researchers around the world for study. These numbers count loans recorded in the
+              museum’s database, including bulk loans of unsorted material.
             </p>
           </div>
           <RouterLink
@@ -151,20 +151,26 @@
         <dl class="eem-loan-stats mt-8">
           <div>
             <dt>Loans</dt>
-            <dd>{{ fmt(eem.stats['Loans']) }}</dd>
+            <dd>{{ fmt(ls.data ? ls.data.totals.loans : eem.stats['Loans']) }}</dd>
           </div>
           <div>
             <dt>Specimens loaned</dt>
-            <dd>{{ fmt(loans.everLoaned) }}</dd>
+            <dd>{{ fmt(ls.data ? ls.data.totals.specimens : loans.everLoaned) }}</dd>
           </div>
           <div>
             <dt>Out on loan now</dt>
-            <dd>{{ loans.loaded ? fmt(loans.items.length) : '—' }}</dd>
+            <dd v-if="ls.data">
+              {{ fmt(ls.data.totals.openSpecimens) }}
+              <span class="block text-xs font-normal eem-muted">in {{ ls.data.totals.openLoans }} loan{{ ls.data.totals.openLoans === 1 ? '' : 's' }}</span>
+            </dd>
+            <dd v-else>{{ loans.loaded ? fmt(loans.items.length) : '—' }}</dd>
           </div>
         </dl>
 
+        <EemLoanHistory />
+
         <div
-          v-if="loanTaxa.length"
+          v-if="!ls.data && loanTaxa.length"
           class="mt-8"
         >
           <h3 class="text-sm font-bold uppercase tracking-wider eem-muted">Currently on loan</h3>
@@ -240,12 +246,14 @@ import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
-import { ORDER_NAMES, collectorsOf, countBy, fmt, useEem, useLoans } from './components/useEem.js'
+import EemLoanHistory from './components/EemLoanHistory.vue'
+import { ORDER_NAMES, collectorsOf, countBy, fmt, useEem, useLoanSummary, useLoans } from './components/useEem.js'
 
 useHead({ title: 'Holdings — Enns Entomology Museum' })
 
 const eem = useEem()
 const loans = useLoans()
+const ls = useLoanSummary()
 
 const monthYear = (d) => (d ? new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '')
 

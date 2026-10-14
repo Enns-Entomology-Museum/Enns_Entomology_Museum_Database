@@ -132,6 +132,26 @@ export function useLoans() {
   return loanState
 }
 
+// Full loan history (number of loans, specimens per loan, taxa), exported from
+// TaxonWorks when the site is built — see scripts/tw-loans.mjs. Null until that
+// export exists; the page then falls back to the counts above.
+const loanSummary = reactive({ loaded: false, data: null })
+let summaryStarted = false
+
+export function useLoanSummary() {
+  if (summaryStarted || import.meta.env.SSR) return loanSummary
+  summaryStarted = true
+  const base = import.meta.env.BASE_URL || '/'
+  fetch(`${base}data/loans-summary.json`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => {
+      if (d && d.totals && Array.isArray(d.loans)) loanSummary.data = d
+    })
+    .catch(() => {})
+    .finally(() => (loanSummary.loaded = true))
+  return loanSummary
+}
+
 // ── Collectors ───────────────────────────────────────────────────────────
 // recordedBy can hold several people separated by "|" (TaxonWorks) or ";"
 export function collectorsOf(r) {
