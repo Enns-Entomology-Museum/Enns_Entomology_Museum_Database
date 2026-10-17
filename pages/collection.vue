@@ -129,6 +129,9 @@
       </aside>
     </section>
 
+    <!-- Type specimens -->
+    <EemTypes />
+
     <!-- Loans -->
     <section class="border-t eem-rule">
       <div class="container mx-auto box-border px-4 py-14">
@@ -247,6 +250,7 @@ import { useHead } from '@unhead/vue'
 import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
 import EemLoanHistory from './components/EemLoanHistory.vue'
+import EemTypes from './components/EemTypes.vue'
 import { ORDER_NAMES, collectorsOf, countBy, fmt, useEem, useLoanSummary, useLoans } from './components/useEem.js'
 
 useHead({ title: 'Holdings — Enns Entomology Museum' })

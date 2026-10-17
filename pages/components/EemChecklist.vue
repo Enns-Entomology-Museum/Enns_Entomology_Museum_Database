@@ -42,18 +42,19 @@
       role="group"
       aria-label="Sources to include"
     >
-      <span class="eem-ck-sources-label">Recorded by</span>
+      <span class="eem-ck-sources-label">Species recorded by</span>
       <button
         v-for="src in SOURCES.filter((x) => available[x.key])"
         :key="src.key"
         type="button"
         :class="['eem-ck-srcbtn', { on: sources.has(src.key) }]"
         :aria-pressed="sources.has(src.key)"
+        :title="`Show species recorded by ${src.label}`"
         @click="toggleSource(src.key)"
       >
         <span :class="['eem-src', src.cls]">{{ src.badge }}</span>
         {{ src.label }}
-        <span class="tabular-nums">{{ fmt(sourceCounts[src.key]) }}</span>
+        <span class="tabular-nums">{{ fmt(sourceCounts[src.key]) }} species</span>
       </button>
       <button
         v-if="sources.size < SOURCES.filter((x) => available[x.key]).length"
@@ -231,8 +232,8 @@ const FILTERS = [
 ]
 // Which sources to include: a species is listed when any ticked source records it
 const SOURCES = [
-  { key: 'eem', badge: 'EEM', cls: 'eem-src-eem', label: 'Museum specimens' },
-  { key: 'gbif', badge: 'GBIF', cls: 'eem-src-gbif', label: 'GBIF records' },
+  { key: 'eem', badge: 'EEM', cls: 'eem-src-eem', label: 'Enns Museum' },
+  { key: 'gbif', badge: 'GBIF', cls: 'eem-src-gbif', label: 'GBIF' },
   { key: 'inat', badge: 'iNat', cls: 'eem-src-inat', label: 'iNaturalist' }
 ]
 const sources = ref(new Set(SOURCES.map((x) => x.key)))

@@ -23,6 +23,13 @@
       </p>
 
       <template v-else>
+        <p class="mb-6 text-sm">
+          <RouterLink
+            to="/report"
+            class="eem-link"
+            >Newsletter: these stories as a printable issue →</RouterLink
+          >
+        </p>
         <!-- Type filter -->
         <div
           v-if="types.length > 1"
