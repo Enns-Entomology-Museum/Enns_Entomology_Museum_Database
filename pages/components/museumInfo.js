@@ -25,10 +25,12 @@ export default {
   // Paste the University's giving link here when it is ready.
   givingUrl: '',
 
-  // GBIF. The collection is already registered in GRSciColl; add the dataset key
-  // and DOI once the specimen data are published to GBIF, and the site shows them.
+  // GBIF. The collection is registered in GRSciColl and the museum is an endorsed
+  // GBIF data publisher (October 2026). Add the dataset key and DOI once the
+  // specimen data are published to GBIF, and the site shows them.
   gbif: {
     grscicollKey: '02c807d4-c06c-40cc-a0ee-beac2d8b1b7e',
+    publisherKey: '794e6aee-90b8-4b53-8740-ef897a4a5496',
     datasetKey: '',
     doi: ''
   },

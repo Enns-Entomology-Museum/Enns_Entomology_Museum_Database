@@ -38,6 +38,12 @@ jobs:
       - name: Refresh GBIF Missouri checklist
         run: node scripts/gbif-missouri.mjs
 
+      # Adds the insect species with research-grade iNaturalist observations in
+      # Missouri (public/data/inat-missouri.json). Runs after the GBIF step, whose
+      # list it uses for orders and families. Never fails the build.
+      - name: Refresh iNaturalist Missouri checklist
+        run: node scripts/inat-missouri.mjs
+
       # Exports loan totals (loans, specimens per loan, taxa) from TaxonWorks to
       # public/data/loans-summary.json. Loans are not in the public API, so this
       # uses the repository secret TW_USER_TOKEN (a personal TaxonWorks API token).

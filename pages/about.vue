@@ -214,7 +214,15 @@
             class="eem-link"
             >Registry of Scientific Collections</a
           >
-          under the code <b>EEM</b>.<template v-if="!info.gbif.datasetKey">
+          under the code <b>EEM</b><template v-if="info.gbif.publisherKey">, and the museum is an endorsed
+            <a
+              :href="`https://www.gbif.org/publisher/${info.gbif.publisherKey}`"
+              target="_blank"
+              rel="noopener"
+              class="eem-link"
+              >GBIF data publisher</a
+            ></template
+          >.<template v-if="!info.gbif.datasetKey">
             Specimen data will be published to GBIF as digitization progresses.</template
           >
         </p>

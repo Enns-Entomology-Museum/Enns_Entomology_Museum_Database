@@ -3,7 +3,7 @@
     <EemPageHead
       kicker="Missouri checklist"
       title="Insects of Missouri"
-      lede="Every insect species recorded in Missouri — the ones preserved in the Enns Museum, and the ones known from GBIF records that the collection does not have yet."
+      lede="Every insect species recorded in Missouri — the ones preserved in the Enns Museum, and the ones known from GBIF and iNaturalist records that the collection does not have yet."
     />
 
     <!-- Numbers -->
@@ -23,6 +23,76 @@
           </p>
         </div>
       </dl>
+    </section>
+
+    <!-- Pests & invasives -->
+    <section
+      v-if="pests.species.length"
+      id="pests"
+      class="border-b eem-rule"
+    >
+      <div class="container mx-auto box-border px-4 py-12">
+        <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+          <div>
+            <p class="eem-kicker">For extension & growers</p>
+            <h2 class="eem-display text-3xl sm:text-4xl mt-3">Pests & invasive species</h2>
+            <p class="mt-2 eem-muted max-w-2xl">
+              Insects of concern in Missouri, with county maps, hosts and the season when they are found. They are
+              marked <span class="mo-pest">PEST</span> in the checklist below.
+            </p>
+          </div>
+          <RouterLink
+            to="/pests"
+            class="eem-btn eem-btn-gold"
+            >Open the pests page →</RouterLink
+          >
+        </div>
+        <ul class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <li
+            v-for="sp in pests.species.slice(0, 8)"
+            :key="sp.otuId"
+          >
+            <RouterLink
+              :to="{ path: '/pests', query: { otu: sp.otuId } }"
+              class="mo-pcard eem-card"
+            >
+              <img
+                v-if="sp.photo"
+                :src="sp.photo.thumb"
+                alt=""
+                loading="lazy"
+              />
+              <span
+                v-else
+                class="mo-pimg"
+              />
+              <span class="min-w-0">
+                <span class="block font-semibold leading-snug">{{ sp.common || sp.name }}</span>
+                <span
+                  v-if="sp.common"
+                  class="block text-sm italic"
+                  >{{ sp.name }}</span
+                >
+                <span class="block text-xs eem-muted mt-0.5">{{
+                  [sp.status, Object.keys(sp.records).length && `${Object.keys(sp.records).length} counties`]
+                    .filter(Boolean)
+                    .join(' · ')
+                }}</span>
+              </span>
+            </RouterLink>
+          </li>
+        </ul>
+        <p
+          v-if="pests.species.length > 8"
+          class="mt-3 text-sm"
+        >
+          <RouterLink
+            to="/pests"
+            class="eem-link"
+            >and {{ pests.species.length - 8 }} more</RouterLink
+          >
+        </p>
+      </div>
     </section>
 
     <!-- Checklist -->
@@ -52,6 +122,7 @@
           ref="ck"
           :records="mo.records"
           :records-loaded="mo.loaded"
+          :pests="pestList"
         />
       </div>
     </section>
@@ -165,10 +236,13 @@ import EemChecklist from './components/EemChecklist.vue'
 import EemCountyMap from './components/EemCountyMap.vue'
 import EemPageHead from './components/EemPageHead.vue'
 import { fmt, normCounty, useMissouri } from './components/useEem.js'
+import { usePests } from './components/usePests.js'
 
 useHead({ title: 'Insects of Missouri — checklist — Enns Entomology Museum' })
 
 const mo = useMissouri()
+const pests = usePests(mo)
+const pestList = computed(() => pests.species.map((sp) => ({ name: sp.name, otuId: sp.otuId, status: sp.status })))
 const pick = ref(null)
 const ck = ref(null)
 const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -203,7 +277,7 @@ const pickedTaxa = computed(() => {
 
 const ckCounts = computed(() => ck.value?.counts || null)
 const stats = computed(() => [
-  { label: 'Species recorded', value: ckCounts.value ? fmt(ckCounts.value.all) : '—', note: 'museum + GBIF' },
+  { label: 'Species recorded', value: ckCounts.value ? fmt(ckCounts.value.all) : '—', note: 'museum + GBIF + iNaturalist' },
   { label: 'In the museum', value: ckCounts.value ? fmt(ckCounts.value.eem) : '—', note: 'with digitized specimens' },
   { label: 'Museum specimens', value: mo.loaded ? fmt(mo.total) : '—', note: 'from Missouri' },
   { label: 'Counties', value: mo.loaded ? `${countiesWith.value} / 115` : '—', note: 'with museum specimens' }
@@ -211,4 +285,36 @@ const stats = computed(() => [
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.mo-pest {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0 0.35rem;
+  border-radius: 2px;
+  background: #000;
+  color: var(--eem-gold);
+}
+.mo-pcard {
+  color: var(--eem-ink) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem;
+  height: 100%;
+  transition: border-color 0.15s;
+}
+.mo-pcard:hover {
+  border-color: var(--eem-gold);
+}
+.mo-pcard img,
+.mo-pimg {
+  flex: none;
+  width: 3.4rem;
+  height: 3.4rem;
+  object-fit: cover;
+  border-radius: 2px;
+  background: var(--eem-paper-2);
+}
+</style>

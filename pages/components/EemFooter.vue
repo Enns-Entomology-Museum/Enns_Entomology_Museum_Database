@@ -102,6 +102,15 @@
                 >GBIF Registry of Scientific Collections</a
               >
             </li>
+            <li v-if="info.gbif.publisherKey">
+              <a
+                :href="`https://www.gbif.org/publisher/${info.gbif.publisherKey}`"
+                target="_blank"
+                rel="noopener"
+                class="eem-footer-link"
+                >GBIF data publisher</a
+              >
+            </li>
             <li v-if="info.gbif.datasetKey">
               <a
                 :href="`https://www.gbif.org/dataset/${info.gbif.datasetKey}`"

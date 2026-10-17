@@ -15,7 +15,7 @@
         aria-label="Show"
       >
         <button
-          v-for="f in FILTERS"
+          v-for="f in filters"
           :key="f.key"
           type="button"
           role="radio"
@@ -36,10 +36,41 @@
       </button>
     </div>
 
+    <!-- Sources -->
+    <div
+      class="eem-ck-sources"
+      role="group"
+      aria-label="Sources to include"
+    >
+      <span class="eem-ck-sources-label">Recorded by</span>
+      <button
+        v-for="src in SOURCES.filter((x) => available[x.key])"
+        :key="src.key"
+        type="button"
+        :class="['eem-ck-srcbtn', { on: sources.has(src.key) }]"
+        :aria-pressed="sources.has(src.key)"
+        @click="toggleSource(src.key)"
+      >
+        <span :class="['eem-src', src.cls]">{{ src.badge }}</span>
+        {{ src.label }}
+        <span class="tabular-nums">{{ fmt(sourceCounts[src.key]) }}</span>
+      </button>
+      <button
+        v-if="sources.size < SOURCES.filter((x) => available[x.key]).length"
+        type="button"
+        class="eem-link text-sm"
+        @click="sources = new Set(SOURCES.map((x) => x.key))"
+      >
+        Show all sources
+      </button>
+    </div>
+
     <!-- Legend -->
     <p class="eem-ck-legend">
       <span><span class="eem-src eem-src-eem">EEM</span> specimens in the Enns Museum</span>
       <span><span class="eem-src eem-src-gbif">GBIF</span> recorded in Missouri on GBIF — click to see the records</span>
+      <span v-if="inat"><span class="eem-src eem-src-inat">iNat</span> research-grade iNaturalist observations in Missouri</span>
+      <span v-if="pestByName.size"><span class="eem-src eem-src-pest">PEST</span> pest or invasive species — see the Pests page</span>
       <span><i class="eem-ck-muted-demo">Grey names</i> not yet in the museum</span>
     </p>
 
@@ -126,6 +157,22 @@
                     :title="`${t.gbif} GBIF records in Missouri — open on GBIF`"
                     >GBIF</a
                   >
+                  <a
+                    v-if="t.inat"
+                    class="eem-src eem-src-inat"
+                    :href="inatLink(t.inatId)"
+                    target="_blank"
+                    rel="noopener"
+                    :title="`${t.inat} research-grade iNaturalist observations in Missouri — open on iNaturalist`"
+                    >iNat</a
+                  >
+                  <RouterLink
+                    v-if="t.pest"
+                    class="eem-src eem-src-pest"
+                    :to="{ path: '/pests', query: { otu: t.pest.otuId } }"
+                    :title="t.pest.status || 'Pest or invasive species'"
+                    >PEST</RouterLink
+                  >
                 </span>
               </li>
             </ul>
@@ -148,6 +195,17 @@
         >view the search on GBIF</a
       >. Names follow the GBIF Backbone Taxonomy; museum records are matched to them by name. GBIF records
       include observations and other collections and have not been checked by the museum.
+      <template v-if="inat">
+        iNaturalist: {{ fmt(inat.species.length) }} species with research-grade observations in Missouri (snapshot of
+        {{ inat.updated }}),
+        <a
+          :href="inat.query"
+          target="_blank"
+          rel="noopener"
+          class="eem-link"
+          >view on iNaturalist</a
+        >; names follow iNaturalist's taxonomy, so a few species may appear under two names.
+      </template>
     </p>
   </div>
 </template>
@@ -160,32 +218,64 @@ import { ORDER_NAMES, fmt } from './useEem.js'
 const props = defineProps({
   // Missouri DwC records from the museum
   records: { type: Array, default: () => [] },
-  recordsLoaded: { type: Boolean, default: false }
+  recordsLoaded: { type: Boolean, default: false },
+  // tracked pests and invasives: [{ name, otuId, status }]
+  pests: { type: Array, default: () => [] }
 })
 
 const FILTERS = [
   { key: 'all', label: 'All species' },
   { key: 'eem', label: 'In the museum' },
-  { key: 'gbif', label: 'Not yet in the museum' }
+  { key: 'gbif', label: 'Not yet in the museum' },
+  { key: 'pest', label: 'Pests & invasives' }
 ]
+// Which sources to include: a species is listed when any ticked source records it
+const SOURCES = [
+  { key: 'eem', badge: 'EEM', cls: 'eem-src-eem', label: 'Museum specimens' },
+  { key: 'gbif', badge: 'GBIF', cls: 'eem-src-gbif', label: 'GBIF records' },
+  { key: 'inat', badge: 'iNat', cls: 'eem-src-inat', label: 'iNaturalist' }
+]
+const sources = ref(new Set(SOURCES.map((x) => x.key)))
+function toggleSource(key) {
+  const s = new Set(sources.value)
+  if (s.has(key)) s.delete(key)
+  else s.add(key)
+  // never leave nothing ticked: clicking the last one shows that source only
+  sources.value = s.size ? s : new Set([key])
+}
+const filters = computed(() => FILTERS.filter((f) => f.key !== 'pest' || pestByName.value.size))
+const pestByName = computed(() => new Map(props.pests.map((p) => [p.name, p])))
 
 const q = ref('')
 const show = ref('all')
 const gbif = shallowRef(null)
 const gbifLoaded = ref(false)
+const inat = shallowRef(null)
 const otuByName = shallowRef(new Map())
 const openOrders = ref(new Set())
 
 const ready = computed(() => props.recordsLoaded && gbifLoaded.value)
 
-onMounted(async () => {
+// The GBIF and iNaturalist lists are made when the site is deployed (scripts/).
+// When working locally without them (npm run dev), the published copies are used.
+const LIVE = 'https://enns-entomology-museum.github.io/Enns_Entomology_Museum_Database/'
+async function loadData(file) {
   const base = import.meta.env.BASE_URL || '/'
-  try {
-    const r = await fetch(`${base}data/gbif-missouri.json`)
-    if (r.ok) gbif.value = await r.json()
-  } catch {
-    /* museum-only checklist */
+  for (const root of [base, LIVE]) {
+    try {
+      const r = await fetch(`${root}data/${file}`)
+      if (r.ok && /json/.test(r.headers.get('content-type') || '')) return await r.json()
+    } catch {
+      /* try the next copy */
+    }
   }
+  return null
+}
+
+onMounted(async () => {
+  const [g, i] = await Promise.all([loadData('gbif-missouri.json'), loadData('inat-missouri.json')])
+  gbif.value = g
+  inat.value = i
   gbifLoaded.value = true
 })
 
@@ -204,6 +294,7 @@ watch(
 )
 
 const gbifLink = (key) => `https://www.gbif.org/occurrence/search?taxon_key=${key}&gadm_gid=USA.26_1`
+const inatLink = (id) => `https://www.inaturalist.org/observations?taxon_id=${id}&place_id=28&quality_grade=research`
 
 // One row per taxon, museum and GBIF merged by name
 const merged = computed(() => {
@@ -212,7 +303,17 @@ const merged = computed(() => {
   if (g) {
     g.species.forEach(([key, name, fi, n]) => {
       const [family, oi] = g.families[fi] || ['', 0]
-      map.set(name, { name, key, order: g.orders[oi] || 'Unplaced', family: family || 'Unplaced', gbif: n, eem: 0 })
+      map.set(name, { name, key, order: g.orders[oi] || 'Unplaced', family: family || 'Unplaced', gbif: n, eem: 0, inat: 0 })
+    })
+  }
+  const i = inat.value
+  if (i) {
+    i.species.forEach(([id, name, fi, n]) => {
+      const [family, oi] = i.families[fi] || ['', 0]
+      const t = map.get(name) || { name, key: null, order: i.orders[oi] || 'Unplaced', family: family || 'Unplaced', gbif: 0, eem: 0, inat: 0 }
+      t.inat = n
+      t.inatId = id
+      map.set(name, t)
     })
   }
   props.records.forEach((r) => {
@@ -225,27 +326,42 @@ const merged = computed(() => {
       order: r.order || 'Unplaced',
       family: r.family || 'Unplaced',
       gbif: 0,
-      eem: 0
+      eem: 0,
+      inat: 0
     }
     t.eem++
     map.set(name, t)
   })
-  return [...map.values()].map((t) => ({ ...t, otu: otuByName.value.get(t.name.replace(/ sp\.$/, '')) }))
+  return [...map.values()].map((t) => ({
+    ...t,
+    otu: otuByName.value.get(t.name.replace(/ sp\.$/, '')),
+    pest: pestByName.value.get(t.name) || null
+  }))
 })
 
-const counts = computed(() => ({
-  all: merged.value.length,
+const available = computed(() => ({ eem: true, gbif: !!gbif.value, inat: !!inat.value }))
+const sourceCounts = computed(() => ({
   eem: merged.value.filter((t) => t.eem).length,
-  gbif: merged.value.filter((t) => !t.eem).length
+  gbif: merged.value.filter((t) => t.gbif).length,
+  inat: merged.value.filter((t) => t.inat).length
+}))
+// species recorded by at least one of the ticked sources
+const visible = computed(() => merged.value.filter((t) => [...sources.value].some((k) => available.value[k] && t[k])))
+
+const counts = computed(() => ({
+  all: visible.value.length,
+  eem: visible.value.filter((t) => t.eem).length,
+  gbif: visible.value.filter((t) => !t.eem).length,
+  pest: visible.value.filter((t) => t.pest).length
 }))
 
 const openAll = computed(() => q.value.trim().length > 1)
 
 const groups = computed(() => {
   const term = q.value.trim().toLowerCase()
-  const list = merged.value.filter(
+  const list = visible.value.filter(
     (t) =>
-      (show.value === 'all' || (show.value === 'eem' ? t.eem : !t.eem)) &&
+      (show.value === 'all' || (show.value === 'pest' ? t.pest : show.value === 'eem' ? t.eem : !t.eem)) &&
       (term.length < 2 || `${t.order} ${t.family} ${t.name}`.toLowerCase().includes(term))
   )
   const orders = new Map()
@@ -277,16 +393,16 @@ function onToggle(name, e) {
 function downloadCsv() {
   const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const rows = [
-    ['order', 'family', 'taxon', 'in_enns_museum', 'eem_specimens', 'gbif_taxon_key', 'gbif_missouri_records'],
+    ['order', 'family', 'taxon', 'in_enns_museum', 'eem_specimens', 'gbif_taxon_key', 'gbif_missouri_records', 'inat_taxon_id', 'inat_missouri_observations', 'pest_or_invasive'],
     ...merged.value
       .slice()
       .sort((a, b) => `${a.order}${a.family}${a.name}`.localeCompare(`${b.order}${b.family}${b.name}`))
-      .map((t) => [t.order, t.family, t.name, t.eem ? 'yes' : 'no', t.eem, t.key || '', t.gbif])
+      .map((t) => [t.order, t.family, t.name, t.eem ? 'yes' : 'no', t.eem, t.key || '', t.gbif, t.inatId || '', t.inat || '', t.pest ? t.pest.status || 'yes' : ''])
   ]
   const csv = rows.map((r) => r.map(cell).join(',')).join('\r\n')
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-  a.download = `Missouri_insects_EEM_GBIF_${new Date().toISOString().slice(0, 10)}.csv`
+  a.download = `Missouri_insects_EEM_GBIF_iNat_${new Date().toISOString().slice(0, 10)}.csv`
   a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
@@ -340,6 +456,55 @@ defineExpose({ counts })
 .eem-ck-chips button.on span {
   color: rgba(255, 255, 255, 0.7);
 }
+.eem-ck-sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.eem-ck-sources-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--eem-ink-soft);
+  margin-right: 0.25rem;
+}
+.eem-ck-srcbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border: 2px solid var(--eem-rule);
+  border-radius: 2px;
+  background: var(--eem-card);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--eem-ink-soft);
+  opacity: 0.6;
+}
+.eem-ck-srcbtn > span:last-child {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.eem-ck-srcbtn.on {
+  border-color: var(--eem-ink);
+  color: var(--eem-ink);
+  opacity: 1;
+}
+.eem-ck-srcbtn::before {
+  content: '';
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+.eem-ck-srcbtn.on::before {
+  background: var(--eem-gold);
+  border-color: var(--eem-ink);
+  box-shadow: inset 0 0 0 2px var(--eem-card);
+}
 .eem-ck-legend {
   display: flex;
   flex-wrap: wrap;
@@ -375,6 +540,22 @@ defineExpose({ counts })
 a.eem-src-gbif:hover {
   background: #4c9a2a;
   color: #fff;
+}
+.eem-src-inat {
+  color: #2f7d4f;
+  border: 1px dashed #2f7d4f;
+}
+a.eem-src-inat:hover {
+  background: #2f7d4f;
+  color: #fff;
+}
+.eem-src-pest {
+  background: #000;
+  color: var(--eem-gold) !important;
+}
+:global(.dark) .eem-src-pest {
+  background: var(--eem-gold);
+  color: #000 !important;
 }
 .eem-ck-order {
   background: var(--eem-card);

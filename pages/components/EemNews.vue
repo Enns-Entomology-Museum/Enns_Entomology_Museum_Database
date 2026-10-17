@@ -14,13 +14,10 @@
 
     <div
       v-if="loading"
-      class="mt-8 grid md:grid-cols-3 gap-5"
+      class="mt-8 grid lg:grid-cols-12 gap-5"
     >
-      <div
-        v-for="i in 3"
-        :key="i"
-        class="eem-skel h-44"
-      />
+      <div class="eem-skel h-80 lg:col-span-7" />
+      <div class="eem-skel h-80 lg:col-span-5" />
     </div>
 
     <p
@@ -30,68 +27,79 @@
       No news yet — announcements, new donations and events will appear here.
     </p>
 
-    <ul
+    <div
       v-else
-      class="mt-8 grid md:grid-cols-3 gap-5"
+      :class="['mt-8 grid gap-5', rest.length ? 'lg:grid-cols-12' : '']"
     >
-      <li
-        v-for="(n, i) in items"
-        :key="n.id"
+      <!-- Lead story -->
+      <RouterLink
+        :to="`/news/${lead.id}`"
+        :class="['eem-lead eem-card', rest.length ? 'lg:col-span-7' : 'solo']"
       >
-        <RouterLink
-          :to="{ name: 'news-id', params: { id: n.id } }"
-          class="eem-news eem-card"
-          :class="{ first: i === 0 }"
-        >
-          <p class="flex items-center gap-3 text-xs">
-            <span class="eem-news-type">{{ n.type }}</span>
-            <time
-              :datetime="n.iso"
-              class="eem-muted"
-              >{{ n.date }}</time
-            >
+        <EemNewsCover
+          :story="lead"
+          class="eem-lead-cover"
+        />
+        <div class="eem-lead-text">
+          <p class="eem-news-meta">
+            <span class="eem-news-new">Latest</span>
+            <time :datetime="lead.iso">{{ lead.shortDate }}</time>
+            <span aria-hidden="true">·</span>
+            <span>{{ lead.minutes }} min read</span>
           </p>
-          <h3 class="mt-3 font-bold text-lg leading-snug">{{ n.title }}</h3>
-          <p class="mt-2 text-sm eem-muted leading-relaxed">{{ n.excerpt }}</p>
-          <span class="mt-auto pt-4 text-sm font-semibold">Read more →</span>
-        </RouterLink>
-      </li>
-    </ul>
+          <h3 class="eem-display mt-3 text-2xl sm:text-3xl leading-tight">{{ lead.title }}</h3>
+          <p class="mt-3 eem-muted leading-relaxed">{{ lead.excerpt }}</p>
+          <span class="eem-news-more mt-auto pt-5">Read the story <span aria-hidden="true">→</span></span>
+        </div>
+      </RouterLink>
+
+      <!-- More stories -->
+      <ul
+        v-if="rest.length"
+        class="lg:col-span-5 flex flex-col gap-3"
+      >
+        <li
+          v-for="n in rest"
+          :key="n.id"
+        >
+          <RouterLink
+            :to="`/news/${n.id}`"
+            class="eem-mini eem-card"
+          >
+            <EemNewsCover
+              :story="n"
+              class="eem-mini-cover"
+            />
+            <span class="min-w-0">
+              <span class="eem-news-meta">
+                <span class="eem-news-type">{{ n.type }}</span>
+                <time :datetime="n.iso">{{ n.shortDate }}</time>
+              </span>
+              <span class="block mt-1.5 font-bold leading-snug">{{ n.title }}</span>
+              <span class="block mt-1 text-sm eem-muted line-clamp-2">{{ n.excerpt }}</span>
+            </span>
+          </RouterLink>
+        </li>
+      </ul>
+    </div>
   </section>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { makeAPIRequest } from '@/utils/request'
+import { computed, onMounted, ref } from 'vue'
+import EemNewsCover from './EemNewsCover.vue'
+import { fetchNews } from './useNews.js'
 
-const props = defineProps({ count: { type: Number, default: 3 } })
+const props = defineProps({ count: { type: Number, default: 4 } })
 
 const loading = ref(true)
 const items = ref([])
-
-function excerpt(html = '', max = 170) {
-  const text = String(html)
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-  return text.length > max ? text.slice(0, max).replace(/\s+\S*$/, '') + '…' : text
-}
+const lead = computed(() => items.value[0])
+const rest = computed(() => items.value.slice(1, props.count))
 
 onMounted(async () => {
   try {
-    const { data } = await makeAPIRequest.get('/news', { params: { per: props.count } })
-    items.value = (Array.isArray(data) ? data : []).slice(0, props.count).map((n) => {
-      const d = new Date(n.created_at)
-      return {
-        id: n.id,
-        title: n.title,
-        type: String(n.type || 'News').split('::').pop(),
-        iso: n.created_at,
-        date: isNaN(d) ? '' : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        excerpt: excerpt(n.body_html || n.body)
-      }
-    })
+    items.value = await fetchNews(props.count)
   } catch {
     items.value = []
   } finally {
@@ -101,30 +109,85 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.eem-news {
+.eem-lead {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 1.5rem;
-  border-top: 4px solid #000;
+  overflow: hidden;
   color: var(--eem-ink);
-  transition: transform 0.15s, border-color 0.15s;
+  border-top: 4px solid var(--eem-gold);
+  transition: transform 0.15s, box-shadow 0.15s;
 }
-.eem-news.first {
-  border-top-color: var(--eem-gold);
+.eem-lead.solo {
+  display: grid;
 }
-.eem-news:hover {
+@media (min-width: 768px) {
+  .eem-lead.solo {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  }
+  .eem-lead.solo .eem-lead-cover {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 18rem;
+  }
+}
+.eem-lead:hover,
+.eem-mini:hover {
   transform: translateY(-2px);
-  border-top-color: var(--eem-gold);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
 }
+.eem-lead:hover :deep(.eem-cover:not(.plain) > img:first-child) {
+  transform: scale(1.03);
+}
+.eem-lead-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1.5rem 1.6rem 1.6rem;
+}
+.eem-news-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--eem-ink-soft);
+}
+.eem-news-new,
 .eem-news-type {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   padding: 0.1rem 0.45rem;
   border-radius: 2px;
   background: #000;
   color: var(--eem-gold);
+}
+.eem-news-new {
+  background: var(--eem-gold);
+  color: #000;
+}
+.eem-news-more {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--eem-gold-deep);
+}
+.eem-mini {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem;
+  color: var(--eem-ink);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.eem-mini-cover {
+  border-radius: 2px;
+}
+.eem-mini-cover :deep(.eem-cover-word) {
+  font-size: 1rem;
+}
+.eem-mini-cover :deep(.eem-cover-type) {
+  display: none;
 }
 </style>
