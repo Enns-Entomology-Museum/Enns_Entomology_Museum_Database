@@ -260,6 +260,7 @@ const LIB_PREFIX = /^EEM\.LIB/i
 
 const sources = shallowRef([])
 const tagsBySource = shallowRef(new Map())
+const tagDefinitions = shallowRef({}) // keyword name → its definition in TaxonWorks
 const loaded = ref(false)
 const group = ref('')
 const q = ref('')
@@ -279,17 +280,24 @@ async function getAll(path, params) {
 
 onMounted(async () => {
   try {
-    const [srcs, tags] = await Promise.all([
+    const [srcs, tags, terms] = await Promise.all([
       getAll('/sources', { in_project: true, 'extend[]': ['identifiers'] }),
-      getAll('/tags', { tag_object_type: 'Source' })
+      getAll('/tags', { tag_object_type: 'Source' }),
+      getAll('/controlled_vocabulary_terms').catch(() => [])
     ])
     const m = new Map()
+    // keyword definitions, e.g. "… the subfamily Cryptinae (Hymenoptera: Ichneumonidae)"
+    const defs = {}
+    terms.forEach((k) => {
+      if (k.type === 'Keyword' && k.name && k.definition) defs[k.name] = k.definition
+    })
     tags.forEach((t) => {
       if (t.tag_object_type !== 'Source' || !t.keyword?.name) return
       if (!m.has(t.tag_object_id)) m.set(t.tag_object_id, [])
       m.get(t.tag_object_id).push(t.keyword.name)
     })
     tagsBySource.value = m
+    tagDefinitions.value = defs
     sources.value = srcs
   } catch {
     sources.value = []
@@ -336,7 +344,7 @@ watch(
   () => groups.value.map((g) => g.name).join('|'),
   async () => {
     const names = groups.value.map((g) => g.name)
-    if (names.length) parents.value = await parentsOf(names)
+    if (names.length) parents.value = await parentsOf(names, tagDefinitions.value)
   }
 )
 
