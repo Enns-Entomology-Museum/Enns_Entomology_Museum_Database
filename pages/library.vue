@@ -256,6 +256,9 @@ useHead({ title: 'Library — Enns Entomology Museum' })
 // Tags and identifiers used in TaxonWorks for the library
 const PHYSICAL_TAG = 'physical copy'
 const PDF_TAG = 'only pdf'
+// Tags that are not taxonomic groups: library format, and the Research page's
+// "Uses EEM specimens" (see pages/research.vue)
+const NOT_GROUPS = [PHYSICAL_TAG, PDF_TAG, 'uses eem specimens']
 const LIB_PREFIX = /^EEM\.LIB/i
 
 const sources = shallowRef([])
@@ -321,7 +324,7 @@ const items = computed(() =>
       doi: (s.doi || '').trim(),
       libId,
       format: isPhys ? 'phys' : isPdf ? 'pdf' : '',
-      groups: tags.filter((t) => ![PHYSICAL_TAG, PDF_TAG].includes(t.toLowerCase())).sort()
+      groups: tags.filter((t) => !NOT_GROUPS.includes(t.toLowerCase())).sort()
     }
   })
     // Only library holdings: references added just for nomenclature carry no format tag
