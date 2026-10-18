@@ -161,10 +161,10 @@
             UMRM and UMC (University of Missouri, Columbia), found automatically in OpenAlex and Europe PMC<template v-if="updated"> (updated {{ updated }})</template>. They are
             checked by the museum and marked “Confirmed” once verified. Publications without an open full text cannot
             be found this way —
-            <a
-              :href="`mailto:${info.director.email}?subject=${encodeURIComponent('Publication using Enns Museum specimens')}`"
+            <RouterLink
+              to="/submit-paper"
               class="eem-link"
-              >tell us about yours</a
+              >tell us about yours</RouterLink
             >.
           </p>
         </template>
@@ -227,10 +227,10 @@
               class="eem-link"
               >Registry of Scientific Collections</a
             >. Published a paper with our specimens?
-            <a
-              :href="`mailto:${info.director.email}?subject=${encodeURIComponent('Publication using Enns Museum specimens')}`"
+            <RouterLink
+              to="/submit-paper"
               class="eem-link"
-              >Send it to us</a
+              >Send it to us</RouterLink
             >
             — we keep a copy in the museum library.
           </p>

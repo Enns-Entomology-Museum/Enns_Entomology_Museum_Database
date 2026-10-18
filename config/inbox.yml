@@ -1,0 +1,7 @@
+# Museum inbox: the website forms (for now "Submit a publication that used our
+# specimens"). Each form posts to a Cloudflare Worker that opens an issue in the
+# private Enns-Entomology-Museum/EEM_Inbox repository (see its README).
+# While endpoint is empty, the form falls back to an e-mail link.
+inbox:
+  endpoint: 'https://eem-inbox.worldichneumonidae.workers.dev/submit'
+  turnstile_site_key: '' # Cloudflare Turnstile site key (public), optional
