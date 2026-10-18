@@ -14,9 +14,11 @@ header_links:
         link: /tree
       - label: Collectors
         link: /collectors
+      - label: Research using the collection
+        link: /research
 
   - label: Specimens
-    link: /resources/tw/filter/dwc_otus
+    link: /specimens
 
   - label: Library
     link: /library

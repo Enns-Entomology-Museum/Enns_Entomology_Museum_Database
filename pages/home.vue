@@ -50,6 +50,7 @@
               Digitizing since <strong class="text-white">{{ since }}</strong> — every record links back to a
               physical specimen in our drawers.
             </p>
+            <EemProgress compact />
           </div>
         </aside>
       </div>
@@ -152,7 +153,7 @@
             <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Recently digitized</h2>
           </div>
           <RouterLink
-            to="/resources/tw/filter/dwc_otus"
+            to="/specimens"
             class="eem-link"
             >Search all specimens →</RouterLink
           >
@@ -222,6 +223,7 @@ import EemNews from './components/EemNews.vue'
 import EemPhotos from './components/EemPhotos.vue'
 import EemSearch from './components/EemSearch.vue'
 import { COLLECTION_ESTIMATE, ORDER_NAMES, countBy, fmt, useEem } from './components/useEem.js'
+import EemProgress from './components/EemProgress.vue'
 
 useHead({ title: 'Enns Entomology Museum — University of Missouri' })
 

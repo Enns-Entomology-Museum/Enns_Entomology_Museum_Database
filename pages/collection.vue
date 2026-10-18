@@ -129,6 +129,9 @@
       </aside>
     </section>
 
+    <!-- Digitization progress -->
+    <EemProgress />
+
     <!-- Type specimens -->
     <EemTypes />
 
@@ -234,7 +237,7 @@
             >Taxonomic tree</RouterLink
           >
           <RouterLink
-            to="/resources/tw/filter/dwc_otus"
+            to="/specimens"
             class="eem-btn eem-btn-gold"
             >Search specimens →</RouterLink
           >
@@ -251,6 +254,7 @@ import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
 import EemLoanHistory from './components/EemLoanHistory.vue'
 import EemTypes from './components/EemTypes.vue'
+import EemProgress from './components/EemProgress.vue'
 import { ORDER_NAMES, collectorsOf, countBy, fmt, useEem, useLoanSummary, useLoans } from './components/useEem.js'
 
 useHead({ title: 'Holdings — Enns Entomology Museum' })

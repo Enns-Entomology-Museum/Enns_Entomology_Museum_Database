@@ -44,6 +44,11 @@ jobs:
       - name: Refresh iNaturalist Missouri checklist
         run: node scripts/inat-missouri.mjs
 
+      # Publications mentioning the museum (OpenAlex, Europe PMC) for the Research
+      # page (public/data/eem-citations.json). Never fails the build.
+      - name: Refresh publications using the collection
+        run: node scripts/eem-citations.mjs
+
       # Exports loan totals (loans, specimens per loan, taxa) from TaxonWorks to
       # public/data/loans-summary.json. Loans are not in the public API, so this
       # uses the repository secret TW_USER_TOKEN (a personal TaxonWorks API token).

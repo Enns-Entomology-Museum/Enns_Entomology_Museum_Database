@@ -1,5 +1,27 @@
 <template>
-  <div class="eem min-h-screen rp-page">
+  <!-- Staff only: the page works when the site runs on your own computer (npm run dev) -->
+  <div
+    v-if="!STAFF"
+    class="eem min-h-screen"
+  >
+    <div class="container mx-auto box-border px-4 py-24 max-w-2xl">
+      <p class="eem-kicker">Newsletter</p>
+      <h1 class="eem-display mt-3 text-3xl">For museum staff</h1>
+      <p class="mt-4 eem-muted leading-relaxed">
+        Newsletter issues are prepared by the museum. Read the latest stories on the
+        <RouterLink
+          to="/news"
+          class="eem-link"
+          >News</RouterLink
+        >
+        page.
+      </p>
+    </div>
+  </div>
+  <div
+    v-else
+    class="eem min-h-screen rp-page"
+  >
     <!-- Controls (not printed) -->
     <section class="rp-controls print:hidden">
       <div class="container mx-auto box-border px-4 py-6 flex flex-wrap items-end gap-4">
@@ -230,6 +252,9 @@ import info from './components/museumInfo.js'
 import { fmt } from './components/useEem.js'
 import { emailHtml, issues, loadIssue } from './components/useReport.js'
 
+// Only when the site runs locally (npm run dev): the published site shows a short note instead
+const STAFF = import.meta.env.DEV
+
 const { project_url } = __APP_ENV__
 const siteUrl = project_url || 'https://enns-entomology-museum.github.io/Enns_Entomology_Museum_Database/'
 const siteUrlShort = siteUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')
@@ -243,7 +268,10 @@ const data = ref(null)
 const loading = ref(false)
 const copied = ref(false)
 
-useHead({ title: computed(() => `EEM Newsletter ${issue.value ? `— Issue ${issue.value.n}, ${issue.value.label}` : ''}`) })
+useHead({
+  title: computed(() => `EEM Newsletter ${issue.value ? `— Issue ${issue.value.n}, ${issue.value.label}` : ''}`),
+  meta: [{ name: 'robots', content: 'noindex, nofollow' }]
+})
 
 // default: the last finished issue (or the current one if none has finished)
 watch(
@@ -257,7 +285,7 @@ watch(
 watch(
   issue,
   async (i) => {
-    if (!i) return
+    if (!i || !STAFF) return
     loading.value = true
     data.value = null
     try {

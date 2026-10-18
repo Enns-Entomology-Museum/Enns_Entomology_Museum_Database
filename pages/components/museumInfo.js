@@ -35,6 +35,14 @@ export default {
     doi: ''
   },
 
+  // Digitization progress (home page and Holdings): the month digitizing started,
+  // and a goal of specimens to digitize per year — e.g. goals: { 2027: 10000 }.
+  // A year without a goal simply shows no goal bar.
+  digitization: {
+    since: '2026-09',
+    goals: {}
+  },
+
   // Rough size of the holdings, used in the text
   holdings: 'more than 7 million specimens'
 }

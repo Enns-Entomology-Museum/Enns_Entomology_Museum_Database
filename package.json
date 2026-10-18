@@ -12,6 +12,7 @@
     "setup": "taxonpages setup",
     "data:gbif": "node scripts/gbif-missouri.mjs",
     "data:inat": "node scripts/inat-missouri.mjs",
+    "data:citations": "node scripts/eem-citations.mjs",
     "data:loans": "node scripts/tw-loans.mjs"
   },
   "dependencies": {

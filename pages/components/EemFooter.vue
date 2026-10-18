@@ -59,8 +59,9 @@
             <li><RouterLink to="/tree" class="eem-footer-link">Taxonomic tree</RouterLink></li>
             <li><RouterLink to="/highlights" class="eem-footer-link">Highlights</RouterLink></li>
             <li><RouterLink to="/missouri" class="eem-footer-link">Insects of Missouri</RouterLink></li>
+            <li><RouterLink to="/research" class="eem-footer-link">Research using the collection</RouterLink></li>
             <li><RouterLink to="/collectors" class="eem-footer-link">Collectors</RouterLink></li>
-            <li><RouterLink to="/resources/tw/filter/dwc_otus" class="eem-footer-link">Search specimens</RouterLink></li>
+            <li><RouterLink to="/specimens" class="eem-footer-link">Search specimens</RouterLink></li>
             <li><RouterLink to="/resources/tw/filter/bibliography" class="eem-footer-link">Publications</RouterLink></li>
           </ul>
         </nav>
