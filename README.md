@@ -163,3 +163,28 @@ npx taxonpages update
 ## License
 
 Released under the MIT License. See [LICENSE](LICENSE) for details.
+
+## Newsletter / report (`/report`, staff only — `npm run dev`)
+
+`pages/report.vue` makes an issue (monthly or every two months) from TaxonWorks: the news
+posts published in the period and what was added to the database. Print / Save as PDF,
+or copy / download it as e-mail HTML.
+
+- **Page 1 — In this issue**: numbered contents (director's note, the numbers, each story with
+  its type, excerpt and cover thumbnail, "Get involved"); click an item to jump to it. In print
+  the rest starts on page 2.
+- **The numbers**: tiles, then **specimens digitized per month** over the last 12 months
+  (`components/MonthlyBars.vue`; the months of the issue in gold, earlier months in grey; hover a
+  bar for its number), then digitized by order. Monthly counts: `/collection_objects` created in
+  each month (`loadMonthly` / `monthWindow` in `components/useReport.js`).
+- **Running total**: "0 → 252 specimens online (+252 in September–October 2026)" — collection
+  objects created before the issue vs. by its end.
+- **Where this issue's specimens come from**: Missouri counties shaded by the specimens
+  digitized in the period, drawn as plain SVG so it prints sharply (`components/ReportCountyMap.vue`,
+  boundaries `public/data/mo-counties.json`), with the top 5 counties.
+- **Specimen of the month** (`components/SpecimenOfMonth.vue`): one of the specimens photographed
+  in the period (images whose depiction names an EEM catalog number — `specimenCandidates`), with
+  name, order · family, locality, date, collector, type status and catalog number. Previous / Next
+  (screen only) to choose; the choice is kept in this browser per issue. Also in the contents.
+- The e-mail version has the same contents list, the running total, the months as a simple bar
+  table, the list of counties and the specimen of the month.

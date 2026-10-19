@@ -118,9 +118,43 @@
       </p>
 
       <template v-else-if="data">
+        <!-- First page: what is in this issue (in print, the rest starts on page 2) -->
+        <section class="rp-pad rp-contents">
+          <p class="rp-label">In this issue</p>
+          <ol class="rp-clist">
+            <li
+              v-for="(c, i) in contents"
+              :key="c.id"
+            >
+              <a
+                :href="`#${c.id}`"
+                class="rp-citem"
+                @click.prevent="goTo(c.id)"
+              >
+                <span class="rp-cnum">{{ i + 1 }}</span>
+                <span class="rp-ctext">
+                  <span class="rp-ckicker">{{ c.kicker }}</span>
+                  <span class="rp-ctitle">{{ c.title }}</span>
+                  <span
+                    v-if="c.text"
+                    class="rp-cexcerpt"
+                  >{{ c.text }}</span>
+                </span>
+                <img
+                  v-if="c.img"
+                  :src="c.img"
+                  alt=""
+                  class="rp-cthumb"
+                />
+              </a>
+            </li>
+          </ol>
+        </section>
+
         <!-- Director's note -->
         <section
           v-if="note.trim()"
+          id="rp-sec-note"
           class="rp-note"
         >
           <p class="rp-label">From the director</p>
@@ -134,7 +168,10 @@
         </section>
 
         <!-- Numbers -->
-        <section class="rp-pad">
+        <section
+          id="rp-sec-numbers"
+          class="rp-pad rp-numbers"
+        >
           <p class="rp-label">In {{ issue.label }}</p>
           <dl class="rp-stats">
             <div>
@@ -154,11 +191,30 @@
               <dd>{{ fmt(data.numbers.toDate) }}</dd>
             </div>
           </dl>
+          <p
+            v-if="typeof data.numbers.atStart === 'number' && typeof data.numbers.toDate === 'number'"
+            class="rp-growth"
+          >
+            <b>{{ fmt(data.numbers.atStart) }} → {{ fmt(data.numbers.toDate) }}</b> specimens online
+            <span>(+{{ fmt(data.numbers.toDate - data.numbers.atStart) }} in {{ issue.label }})</span>
+          </p>
           <p class="rp-small">
             <template v-if="data.numbers.types">{{ fmt(data.numbers.types) }} type specimen(s) catalogued · </template>
             <template v-if="data.numbers.images">{{ fmt(data.numbers.images) }} image(s) added · </template>
             <template v-if="data.numbers.counties">specimens from {{ data.numbers.counties }} Missouri count{{ data.numbers.counties === 1 ? 'y' : 'ies' }}</template>
           </p>
+
+          <!-- Specimens digitized per month, last 12 months -->
+          <MonthlyBars
+            v-if="data.monthly && data.monthly.length"
+            :series="data.monthly"
+          />
+
+          <!-- Missouri counties of this issue's specimens -->
+          <ReportCountyMap
+            v-if="data.byCounty && Object.keys(data.byCounty).length"
+            :counts="data.byCounty"
+          />
 
           <!-- Digitized by order -->
           <div
@@ -179,25 +235,18 @@
           </div>
         </section>
 
-        <!-- In this issue -->
-        <section
-          v-if="data.stories.length > 1"
-          class="rp-pad rp-toc"
-        >
-          <p class="rp-label">In this issue</p>
-          <ol>
-            <li
-              v-for="s in data.stories"
-              :key="s.id"
-            >
-              {{ s.title }}
-            </li>
-          </ol>
-        </section>
+        <!-- Specimen of the month (one of the specimens photographed in the period) -->
+        <SpecimenOfMonth
+          :candidates="candidates"
+          :issue-key="issue.key"
+          :site-url="siteUrl"
+          @change="specimen = $event"
+        />
 
         <!-- Stories -->
         <section
           v-for="s in data.stories"
+          :id="`rp-story-${s.id}`"
           :key="s.id"
           class="rp-story"
         >
@@ -225,7 +274,10 @@
         </p>
 
         <!-- Back page -->
-        <footer class="rp-back">
+        <footer
+          id="rp-sec-back"
+          class="rp-back"
+        >
           <div>
             <p class="rp-back-title">Get involved</p>
             <p>
@@ -250,7 +302,10 @@ import { computed, ref, watch } from 'vue'
 import { useHead } from '@unhead/vue'
 import info from './components/museumInfo.js'
 import { fmt } from './components/useEem.js'
-import { emailHtml, issues, loadIssue } from './components/useReport.js'
+import { emailHtml, issues, loadIssue, specimenCandidates } from './components/useReport.js'
+import MonthlyBars from './components/MonthlyBars.vue'
+import ReportCountyMap from './components/ReportCountyMap.vue'
+import SpecimenOfMonth from './components/SpecimenOfMonth.vue'
 
 // Only when the site runs locally (npm run dev): the published site shows a short note instead
 const STAFF = import.meta.env.DEV
@@ -267,6 +322,8 @@ const issue = computed(() => list.value.find((i) => i.key === issueKey.value) ||
 const data = ref(null)
 const loading = ref(false)
 const copied = ref(false)
+const candidates = ref([])
+const specimen = ref(null)
 
 useHead({
   title: computed(() => `EEM Newsletter ${issue.value ? `— Issue ${issue.value.n}, ${issue.value.label}` : ''}`),
@@ -288,8 +345,11 @@ watch(
     if (!i || !STAFF) return
     loading.value = true
     data.value = null
+    candidates.value = []
     try {
-      data.value = await loadIssue(i)
+      const [d, c] = await Promise.all([loadIssue(i), specimenCandidates(i.from, i.to)])
+      data.value = d
+      candidates.value = c
     } finally {
       loading.value = false
     }
@@ -325,9 +385,32 @@ const noteParas = computed(() =>
     .filter(Boolean)
 )
 
+// First page: the contents of the issue
+const contents = computed(() => {
+  const d = data.value
+  if (!d) return []
+  const out = []
+  if (note.value.trim()) out.push({ id: 'rp-sec-note', kicker: 'From the director', title: info.director.name, text: '' })
+  out.push({
+    id: 'rp-sec-numbers',
+    kicker: 'The numbers',
+    title: `${fmt(d.numbers.specimens)} specimens digitized in ${issue.value.label}`,
+    text: `${fmt(d.numbers.toDate)} specimens online in total · digitization month by month`
+  })
+  if (candidates.value.length) {
+    out.push({ id: 'rp-sec-specimen', kicker: 'Specimen of the month', title: specimen.value?.name || 'From the drawers', text: specimen.value?.caption || '', img: specimen.value?.img || '' })
+  }
+  for (const s of d.stories) out.push({ id: `rp-story-${s.id}`, kicker: s.type, title: s.title, text: s.excerpt, img: s.cover?.src || '' })
+  out.push({ id: 'rp-sec-back', kicker: 'Get involved', title: 'Visit, borrow, donate, become a Friend of the Museum', text: '' })
+  return out
+})
+function goTo(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 const printIt = () => window.print()
 
-const html = () => emailHtml({ issue: issue.value, data: data.value, note: note.value.trim(), siteUrl, info })
+const html = () => emailHtml({ issue: issue.value, data: data.value, note: note.value.trim(), siteUrl, info, specimen: specimen.value })
 
 async function copyEmail() {
   const h = html()
@@ -503,6 +586,20 @@ function downloadEmail() {
   font-size: 1.9rem;
   font-variant-numeric: tabular-nums;
 }
+.rp-growth {
+  margin-top: 0.9rem;
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-size: 1.05rem;
+}
+.rp-growth b {
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.rp-growth span {
+  color: #6b665c;
+  font-size: 0.85rem;
+  font-family: 'Inter', system-ui, sans-serif;
+}
 .rp-small {
   margin-top: 0.6rem;
   font-size: 0.8rem;
@@ -540,13 +637,58 @@ function downloadEmail() {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
-.rp-toc ol {
-  list-style: decimal;
-  padding-left: 1.3rem;
-  font-weight: 600;
+.rp-clist {
+  display: grid;
+  gap: 0.2rem;
 }
-.rp-toc li {
-  margin: 0.2rem 0;
+.rp-citem {
+  display: grid;
+  grid-template-columns: 2.2rem 1fr auto;
+  gap: 0.9rem;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e5e0d4;
+  color: inherit;
+  text-decoration: none;
+}
+.rp-citem:hover .rp-ctitle {
+  text-decoration: underline;
+}
+.rp-cnum {
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: #f1b82d;
+  font-variant-numeric: tabular-nums;
+}
+.rp-ctext {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.rp-ckicker {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8c640a;
+}
+.rp-ctitle {
+  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+.rp-cexcerpt {
+  font-size: 0.82rem;
+  color: #6b665c;
+  line-height: 1.4;
+}
+.rp-cthumb {
+  width: 5.5rem;
+  height: 4rem;
+  object-fit: cover;
 }
 .rp-story {
   padding: 1.8rem 2.4rem;
@@ -711,6 +853,14 @@ function downloadEmail() {
   }
   .rp-head {
     break-after: avoid;
+  }
+  /* the contents fill the first page; the rest starts on page 2 */
+  .rp-contents {
+    break-after: page;
+  }
+  .rp-cnum {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 }
 </style>
