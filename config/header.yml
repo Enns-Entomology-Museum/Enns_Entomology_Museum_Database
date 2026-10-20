@@ -1,7 +1,7 @@
 ---
 # Navigation header configuration
 
-header_logo_url: /images/mu-mark.png
+header_logo_url: /images/eem-logo-rev-horiz.png
 header_logo_text: 'Enns Entomology Museum'
 header_links:
   - label: Collection

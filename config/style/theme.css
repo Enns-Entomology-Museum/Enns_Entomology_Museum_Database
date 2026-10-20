@@ -84,12 +84,44 @@
   border-bottom: 4px solid var(--eem-gold);
   box-shadow: none !important;
 }
+/* The official unit signature (MU shield + "Enns Entomology Museum / University of
+   Missouri") replaces the text name; the name stays for screen readers. */
+.tp-header > .container > a > img {
+  height: 2.6rem;
+  width: auto;
+  margin-right: 0;
+}
+/* The logo is the link home: it swells a little on hover / keyboard focus */
+.tp-header > .container > a > img {
+  transform-origin: left center;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+.tp-header > .container > a:hover > img,
+.tp-header > .container > a:focus-visible > img {
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 6px rgba(241, 184, 45, 0.45));
+}
+.tp-header > .container > a:focus-visible {
+  outline: 2px solid var(--eem-gold);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tp-header > .container > a > img {
+    transition: none;
+  }
+  .tp-header > .container > a:hover > img,
+  .tp-header > .container > a:focus-visible > img {
+    transform: none;
+  }
+}
 .tp-header > .container > a > span {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 .tp-header-nav a.router-link-exact-active,
 .tp-header-nav a.router-link-active {
@@ -196,12 +228,8 @@
 }
 
 @media (max-width: 480px) {
-  .tp-header > .container > a > span {
-    font-size: 0.82rem;
-  }
   .tp-header > .container > a > img {
     height: 2.1rem;
-    margin-right: 0.5rem;
   }
 }
 
@@ -233,13 +261,10 @@
   .tp-header-nav > div {
     gap: 0.95rem;
   }
-  .tp-header > .container > a > span {
-    font-size: 0.92rem;
-  }
 }
 @media (min-width: 1024px) and (max-width: 1119px) {
-  .tp-header > .container > a > span {
-    display: none;
+  .tp-header > .container > a > img {
+    height: 2.2rem;
   }
 }
 

@@ -35,12 +35,9 @@
           >
             <img
               :src="mark"
-              alt=""
-              class="h-12 w-auto"
+              alt="Enns Entomology Museum, University of Missouri"
+              class="h-20 w-auto"
             />
-            <span class="eem-display text-xl uppercase leading-tight">
-              Enns Entomology<br />Museum
-            </span>
           </RouterLink>
           <p class="mt-4 text-sm leading-relaxed eem-footer-muted max-w-sm">
             The insect collection of the University of Missouri, College of Agriculture, Food and
@@ -168,7 +165,7 @@
 <script setup>
 import info from './museumInfo.js'
 const { base_url } = __APP_ENV__
-const mark = `${base_url || '/'}images/mu-mark.png`.replace('//', '/')
+const mark = `${base_url || '/'}images/eem-logo-rev-vert.png`.replace('//', '/')
 const year = new Date().getFullYear()
 </script>
 
