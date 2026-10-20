@@ -78,6 +78,47 @@
             Contact email coming soon.
           </p>
         </div>
+        <div
+          v-if="info.directions || info.parking"
+          class="eem-card mt-5 p-5 text-sm"
+        >
+          <p class="eem-kicker">Getting here</p>
+          <p
+            v-if="info.directions"
+            class="mt-3 leading-relaxed"
+          >
+            {{ info.directions }}
+          </p>
+          <p
+            v-if="info.parking"
+            class="mt-2 leading-relaxed eem-muted"
+          >
+            <b>Parking.</b> {{ info.parking }}
+          </p>
+          <a
+            v-if="info.mapUrl"
+            :href="info.mapUrl"
+            target="_blank"
+            rel="noopener"
+            class="eem-link mt-3 inline-block font-semibold"
+            >Open in a map ↗</a
+          >
+          <p
+            v-if="info.mailing"
+            class="mt-4 text-xs eem-muted"
+          >
+            <b>Mailing address</b> (loans and parcels): {{ info.mailing }}
+          </p>
+        </div>
+        <div class="eem-card mt-5 p-5 text-sm">
+          <p class="font-bold">Request a loan</p>
+          <p class="mt-1 eem-muted">Opens an email with the details we need, ready to fill in.</p>
+          <a
+            :href="loanMail"
+            class="eem-btn eem-btn-line mt-3 !py-1.5 !px-3 !text-sm"
+            >Start a loan request</a
+          >
+        </div>
         <RouterLink
           to="/outreach"
           class="eem-card mt-5 p-5 block eem-accent-l !text-[color:var(--eem-ink)]"
@@ -99,6 +140,20 @@ import info from './components/museumInfo.js'
 useHead({ title: 'Visit & loans — Enns Entomology Museum' })
 
 const contactEmail = computed(() => info.email || info.director.email)
+
+const loanMail = computed(() => {
+  const body = [
+    'Name and position:',
+    'Institution (receiving the loan):',
+    'Supervising researcher (if you are a student):',
+    'Taxa requested (and catalog numbers, if known):',
+    'Purpose of the study:',
+    'Any destructive sampling (e.g. DNA, dissection)?',
+    'Requested loan period:',
+    'Shipping address:'
+  ].join('\n\n')
+  return `mailto:${contactEmail.value}?subject=${encodeURIComponent('Loan request — Enns Entomology Museum')}&body=${encodeURIComponent(body)}`
+})
 
 const sections = [
   {

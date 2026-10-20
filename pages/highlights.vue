@@ -50,47 +50,64 @@
 
         <div class="lg:col-span-8">
           <div
-            v-if="!eem.loaded"
+            v-if="!tys.loaded"
             class="space-y-2"
           >
             <div
-              v-for="i in 4"
+              v-for="i in 3"
               :key="i"
               class="eem-skel h-14"
             />
           </div>
           <div
-            v-else-if="!types.length"
+            v-else-if="!tys.rows.length"
             class="eem-card p-8"
           >
             <p class="font-bold">Coming online</p>
             <p class="mt-1 eem-muted">
-              No type specimens have been digitized yet — this list fills in automatically as they are catalogued.
+              No type specimens have been digitized yet — they appear here automatically as they are catalogued.
             </p>
           </div>
           <template v-else>
-            <p class="text-sm eem-muted mb-3">
-              {{ types.length }} digitized type {{ types.length === 1 ? 'specimen' : 'specimens' }}
-              <span v-if="typeKinds.length"> · {{ typeKinds.join(' · ') }}</span>
+            <p class="eem-display text-2xl">
+              {{ tys.rows.length }} digitized type {{ tys.rows.length === 1 ? 'specimen' : 'specimens' }}
             </p>
-            <ul class="eem-types">
+            <ul class="mt-3 flex flex-wrap gap-2">
               <li
-                v-for="t in types"
-                :key="t.catalogNumber"
+                v-for="k in kinds"
+                :key="k.kind"
               >
                 <RouterLink
-                  :to="{ path: '/specimen', query: { cat: t.catalogNumber } }"
+                  :to="{ path: '/specimens', query: { types: '1', kind: k.kind } }"
+                  :class="['eem-hl-kind', k.primary ? 'primary' : 'secondary']"
+                  ><b>{{ k.n }}</b> {{ k.label }}</RouterLink
+                >
+              </li>
+            </ul>
+            <p class="mt-6 text-xs font-bold uppercase tracking-[0.14em] eem-muted">Name-bearing types</p>
+            <ul class="eem-types mt-2">
+              <li
+                v-for="t in primaries"
+                :key="t.id"
+              >
+                <RouterLink
+                  :to="{ path: '/specimen', query: { cat: t.cat } }"
                   class="eem-type-row"
                 >
                   <span class="eem-type-kind">{{ t.kind }}</span>
                   <span class="min-w-0 flex-1">
                     <i class="font-semibold">{{ t.name }}</i>
-                    <span class="block text-xs eem-muted truncate">{{ t.status }}</span>
+                    <span class="block text-xs eem-muted truncate">{{ [t.order, t.family].filter(Boolean).join(' · ') }}</span>
                   </span>
-                  <span class="eem-type-cat">{{ t.catalogNumber }}</span>
+                  <span class="eem-type-cat">{{ t.cat }}</span>
                 </RouterLink>
               </li>
             </ul>
+            <RouterLink
+              :to="{ path: '/specimens', query: { types: '1' } }"
+              class="eem-link mt-5 inline-block font-semibold"
+              >Browse all type specimens →</RouterLink
+            >
           </template>
         </div>
       </div>
@@ -160,38 +177,22 @@
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
 import EemPageHead from './components/EemPageHead.vue'
-import { useEem } from './components/useEem.js'
+import { typeKinds, useTypes } from './components/useEem.js'
 
 useHead({ title: 'Highlights — Enns Entomology Museum' })
 
-const eem = useEem()
 const base = import.meta.env.BASE_URL || '/'
 const img = (f) => `${base}images/history/${f}`
 
-const KINDS = ['holotype', 'neotype', 'lectotype', 'syntype', 'paralectotype', 'paratype', 'allotype', 'topotype']
-const ORDER = Object.fromEntries(KINDS.map((k, i) => [k, i]))
-
-const types = computed(() =>
-  eem.records
-    .filter((r) => r.typeStatus && String(r.typeStatus).trim())
-    .map((r) => {
-      const status = String(r.typeStatus).split('|')[0].trim()
-      const kind = KINDS.find((k) => status.toLowerCase().startsWith(k)) || 'type'
-      return {
-        catalogNumber: r.catalogNumber,
-        name: [r.genus, r.specificEpithet].filter(Boolean).join(' ') || r.scientificName || r.family,
-        status,
-        kind
-      }
-    })
-    .sort((a, b) => (ORDER[a.kind] ?? 99) - (ORDER[b.kind] ?? 99) || a.name.localeCompare(b.name))
+// The whole list lives on the Specimens page; here a summary and the name-bearing types
+const tys = useTypes()
+const kinds = computed(() => typeKinds(tys.rows))
+const primaries = computed(() =>
+  tys.rows
+    .filter((t) => t.primary)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .slice(0, 6)
 )
-
-const typeKinds = computed(() => {
-  const c = {}
-  types.value.forEach((t) => (c[t.kind] = (c[t.kind] || 0) + 1))
-  return Object.entries(c).map(([k, n]) => `${n} ${k}${n > 1 ? 's' : ''}`)
-})
 
 const collections = [
   { year: '1941', number: '300,000', name: 'G. W. Bock beetles', text: 'Papered beetles, many still in their original envelopes.', img: '1941-bock.jpg', alt: 'Box of papered beetles' },
@@ -292,5 +293,19 @@ const collections = [
   font-family: 'Archivo', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2.2rem;
+}
+.eem-hl-kind {
+  display: inline-block;
+  font-size: 0.82rem;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid #e3a59e;
+  background: #f6d5d1;
+  color: #8a1c1c !important;
+  border-radius: 2px;
+}
+.eem-hl-kind.primary {
+  background: #be2828;
+  border-color: #be2828;
+  color: #fff !important;
 }
 </style>

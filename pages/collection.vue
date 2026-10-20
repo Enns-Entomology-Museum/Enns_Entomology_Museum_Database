@@ -129,11 +129,11 @@
       </aside>
     </section>
 
-    <!-- Digitization progress -->
-    <EemProgress />
-
     <!-- Type specimens -->
     <EemTypes />
+
+    <!-- Digitization progress -->
+    <EemProgress />
 
     <!-- Loans -->
     <section class="border-t eem-rule">

@@ -147,6 +147,7 @@ const props = defineProps({
   title: { type: String, default: 'Specimen' }
 })
 
+const emit = defineEmits(['count'])
 const images = ref([])
 const loading = ref(false)
 const active = ref(0)
@@ -162,7 +163,7 @@ watch(
   async (id) => {
     images.value = []
     active.value = 0
-    if (!id) return
+    if (!id) return emit('count', 0)
     loading.value = true
     try {
       const { data } = await makeAPIRequest.get('/images', { params: { 'collection_object_id[]': id, per: 50 } })
@@ -181,6 +182,7 @@ watch(
       images.value = []
     } finally {
       loading.value = false
+      emit('count', images.value.length)
     }
   },
   { immediate: true }

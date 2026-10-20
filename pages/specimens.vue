@@ -9,6 +9,54 @@
     </EemPageHead>
 
     <section class="container mx-auto box-border px-4 py-10">
+      <!-- All specimens / type specimens -->
+      <div
+        class="sp-tabs"
+        role="tablist"
+        aria-label="Which specimens"
+      >
+        <button
+          type="button"
+          role="tab"
+          :aria-selected="!onlyTypes"
+          @click="showTypes(false)"
+        >
+          All specimens <span>{{ fmt(records.length) }}</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="is-types"
+          :aria-selected="onlyTypes"
+          @click="showTypes(true)"
+        >
+          Type specimens <span>{{ fmt(allTypes.length) }}</span>
+        </button>
+      </div>
+
+      <div
+        v-if="onlyTypes"
+        class="sp-typebar"
+      >
+        <p class="text-sm">
+          The museum's type collection: {{ fmt(allTypes.length) }} specimen{{ allTypes.length === 1 ? '' : 's' }} of
+          {{ fmt(typeNames) }} name{{ typeNames === 1 ? '' : 's' }}. Name-bearing types (holotypes, lectotypes, neotypes,
+          syntypes) in red, paratypes and other types in pink.
+        </p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button
+            v-for="k in typeKindList"
+            :key="k.kind"
+            type="button"
+            :class="['sp-kind', k.primary ? 'primary' : 'secondary', { on: typeKind === k.kind }]"
+            :aria-pressed="typeKind === k.kind"
+            @click="typeKind = typeKind === k.kind ? '' : k.kind"
+          >
+            {{ k.label }} <b>{{ fmt(k.n) }}</b>
+          </button>
+        </div>
+      </div>
+
       <!-- Search -->
       <form
         class="sp-search"
@@ -291,7 +339,7 @@
                           >
                           <span
                             v-if="r.type"
-                            :class="['sp-type', { primary: r.primaryType }]"
+                            :class="['sp-type', r.primaryType ? 'primary' : 'secondary']"
                             >{{ r.type }}</span
                           >
                           <span class="block text-xs eem-muted">{{ [r.order, r.family].filter(Boolean).join(' · ') }}</span>
@@ -338,7 +386,7 @@ import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
 import EemPageHead from './components/EemPageHead.vue'
 import EemMap from './components/EemMap.vue'
-import { collectorsOf, fmt, normCat, useSpecimenImages } from './components/useEem.js'
+import { collectorsOf, fmt, normCat, typeInfo, typeKinds, useSpecimenImages } from './components/useEem.js'
 
 useHead({ title: 'Specimens — Enns Entomology Museum' })
 
@@ -354,7 +402,6 @@ const FACETS = [
   { key: 'county', label: 'County' },
   { key: 'collector', label: 'Collector' }
 ]
-const PRIMARY = ['holotype', 'lectotype', 'neotype', 'syntype']
 
 const route = useRoute()
 const router = useRouter()
@@ -367,6 +414,7 @@ const sel = reactive(Object.fromEntries(FACETS.map((f) => [f.key, String(route.q
 const from = ref(route.query.from ? Number(route.query.from) : null)
 const to = ref(route.query.to ? Number(route.query.to) : null)
 const onlyTypes = ref(route.query.types === '1')
+const typeKind = ref(String(route.query.kind || ''))
 const onlyPhotos = ref(route.query.photos === '1')
 const onlyMapped = ref(route.query.mapped === '1')
 const view = ref(route.query.view === 'map' ? 'map' : 'list')
@@ -397,7 +445,7 @@ const records = computed(() =>
   raw.value.map((r) => {
     const species = [r.genus, r.specificEpithet].filter(Boolean).join(' ')
     const name = species || r.scientificName || r.family || r.order || 'Unidentified'
-    const type = String(r.typeStatus || '').trim()
+    const ti = typeInfo(r.typeStatus)
     const lat = Number(r.decimalLatitude)
     const lng = Number(r.decimalLongitude)
     const cat = r.catalogNumber || ''
@@ -418,8 +466,9 @@ const records = computed(() =>
       year,
       collectors: collectorsOf(r),
       collector: collectorsOf(r).join(', '),
-      type: type ? type.charAt(0).toUpperCase() + type.slice(1) : '',
-      primaryType: PRIMARY.includes(type.toLowerCase()),
+      type: ti ? ti.label : '',
+      typeKind: ti ? ti.label.toLowerCase() : '',
+      primaryType: !!ti?.primary,
       otu: r.otu_id || null,
       lat: Number.isFinite(lat) && r.decimalLatitude !== null && r.decimalLatitude !== '' ? lat : null,
       lng: Number.isFinite(lng) && r.decimalLongitude !== null && r.decimalLongitude !== '' ? lng : null,
@@ -445,6 +494,7 @@ function matches(r, except) {
   if (from.value && (!r.year || r.year < from.value)) return false
   if (to.value && (!r.year || r.year > to.value)) return false
   if (onlyTypes.value && !r.type) return false
+  if (onlyTypes.value && typeKind.value && r.typeKind !== typeKind.value) return false
   if (onlyPhotos.value && !r.photo) return false
   if (onlyMapped.value && r.lat === null) return false
   return true
@@ -458,6 +508,14 @@ function facetValues(key) {
     .filter((r) => matches(r, key))
     .forEach((r) => (key === 'collector' ? r.collectors : [r[key]]).forEach((v) => v && m.set(v, (m.get(v) || 0) + 1)))
   return [...m.entries()].map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+}
+
+const allTypes = computed(() => records.value.filter((r) => r.type))
+const typeNames = computed(() => new Set(allTypes.value.map((r) => r.name)).size)
+const typeKindList = computed(() => typeKinds(allTypes.value.map((r) => ({ kind: r.typeKind }))))
+function showTypes(on) {
+  onlyTypes.value = on
+  if (!on) typeKind.value = ''
 }
 
 const typeCount = computed(() => filtered.value.filter((r) => r.type).length)
@@ -492,7 +550,7 @@ const points = computed(() =>
 const active = computed(() => [
   ...FACETS.filter((f) => sel[f.key]).map((f) => ({ key: f.key, label: `${f.label}: ${sel[f.key]}` })),
   ...(from.value || to.value ? [{ key: 'years', label: `Collected ${from.value || '…'}–${to.value || '…'}` }] : []),
-  ...(onlyTypes.value ? [{ key: 'types', label: 'Type specimens' }] : []),
+  ...(onlyTypes.value ? [{ key: 'types', label: typeKind.value ? `Type specimens: ${typeKind.value}s` : 'Type specimens' }] : []),
   ...(onlyPhotos.value ? [{ key: 'photos', label: 'With a photo' }] : []),
   ...(onlyMapped.value ? [{ key: 'mapped', label: 'With coordinates' }] : [])
 ])
@@ -503,7 +561,7 @@ function setFacet(key, value) {
 function clear(key) {
   if (key in sel) sel[key] = ''
   if (key === 'years') from.value = to.value = null
-  if (key === 'types') onlyTypes.value = false
+  if (key === 'types') showTypes(false)
   if (key === 'photos') onlyPhotos.value = false
   if (key === 'mapped') onlyMapped.value = false
 }
@@ -511,12 +569,13 @@ function clearAll() {
   FACETS.forEach((f) => (sel[f.key] = ''))
   from.value = to.value = null
   onlyTypes.value = onlyPhotos.value = onlyMapped.value = false
+  typeKind.value = ''
   q.value = ''
 }
 
 // Keep the search in the address, so it can be shared
 watch(
-  [q, () => ({ ...sel }), from, to, onlyTypes, onlyPhotos, onlyMapped, view, sort],
+  [q, () => ({ ...sel }), from, to, onlyTypes, typeKind, onlyPhotos, onlyMapped, view, sort],
   () => {
     limit.value = 100
     const query = {
@@ -525,6 +584,7 @@ watch(
       ...(from.value ? { from: String(from.value) } : {}),
       ...(to.value ? { to: String(to.value) } : {}),
       ...(onlyTypes.value ? { types: '1' } : {}),
+      ...(onlyTypes.value && typeKind.value ? { kind: typeKind.value } : {}),
       ...(onlyPhotos.value ? { photos: '1' } : {}),
       ...(onlyMapped.value ? { mapped: '1' } : {}),
       ...(view.value === 'map' ? { view: 'map' } : {}),
@@ -768,6 +828,72 @@ a.sp-name:hover {
   background: #be2828;
   border-color: #be2828;
   color: #fff;
+}
+.sp-type.secondary {
+  background: #f6d5d1;
+  border-color: #e3a59e;
+  color: #8a1c1c;
+}
+.sp-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--eem-ink);
+}
+.sp-tabs button {
+  padding: 0.55rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 2px 2px 0 0;
+  color: var(--eem-ink-soft);
+}
+.sp-tabs button span {
+  margin-left: 0.3rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.sp-tabs button[aria-selected='true'] {
+  background: #000;
+  color: var(--eem-gold);
+}
+.sp-tabs button.is-types[aria-selected='true'] {
+  background: #be2828;
+  color: #fff;
+}
+.sp-typebar {
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  background: var(--eem-card);
+  border: 1px solid var(--eem-rule);
+  border-left: 4px solid #be2828;
+}
+.sp-kind {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid;
+  border-radius: 2px;
+}
+.sp-kind b {
+  margin-left: 0.2rem;
+  font-variant-numeric: tabular-nums;
+}
+.sp-kind.primary {
+  border-color: #be2828;
+  color: #be2828;
+}
+.sp-kind.secondary {
+  border-color: #e3a59e;
+  color: #8a1c1c;
+}
+.sp-kind.primary.on {
+  background: #be2828;
+  color: #fff;
+}
+.sp-kind.secondary.on {
+  background: #f6d5d1;
 }
 .sp-thumb {
   width: 2.6rem;

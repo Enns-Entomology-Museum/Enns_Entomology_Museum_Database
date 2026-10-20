@@ -10,17 +10,27 @@
           <h2 class="eem-display mt-3 text-3xl">Name-bearing types</h2>
           <p class="mt-2 eem-muted max-w-2xl">
             The specimens on which species names are founded — the museum's most valuable holdings. Primary types
-            (holotypes, lectotypes, neotypes, syntypes) are marked in red, as on their labels.
+            (holotypes, lectotypes, neotypes, syntypes) are marked in red, as on their labels; paratypes and other
+            types of the type series in pink.
           </p>
         </div>
-        <button
+        <div
           v-if="rows.length"
-          type="button"
-          class="eem-link font-semibold"
-          @click="downloadCsv"
+          class="flex flex-wrap gap-x-5 gap-y-1"
         >
-          Download list (CSV)
-        </button>
+          <RouterLink
+            :to="{ path: '/specimens', query: { types: '1' } }"
+            class="eem-link font-semibold"
+            >Search them on the Specimens page →</RouterLink
+          >
+          <button
+            type="button"
+            class="eem-link font-semibold"
+            @click="downloadCsv"
+          >
+            Download list (CSV)
+          </button>
+        </div>
       </div>
 
       <p
@@ -43,9 +53,13 @@
             <dt>Type specimens</dt>
             <dd>{{ fmt(rows.length) }}</dd>
           </div>
-          <div>
+          <div class="is-primary">
             <dt>Primary types</dt>
             <dd>{{ fmt(primaryCount) }}</dd>
+          </div>
+          <div class="is-secondary">
+            <dt>Paratypes &amp; other types</dt>
+            <dd>{{ fmt(rows.length - primaryCount) }}</dd>
           </div>
           <div>
             <dt>Names with types</dt>
@@ -67,7 +81,7 @@
             v-for="k in kinds"
             :key="k.name"
             type="button"
-            :class="['ty-chip', { on: kind === k.name, primary: k.primary }]"
+            :class="['ty-chip', k.primary ? 'primary' : 'secondary', { on: kind === k.name }]"
             :aria-pressed="kind === k.name"
             @click="kind = kind === k.name ? '' : k.name"
           >
@@ -98,7 +112,7 @@
               >
                 <RouterLink
                   :to="s.cat ? { path: '/specimen', query: { cat: s.cat } } : '/specimen'"
-                  :class="['ty-spec', { primary: s.primary }]"
+                  :class="['ty-spec', s.primary ? 'primary' : 'secondary']"
                   :title="[s.cat, s.where, s.date].filter(Boolean).join(' · ')"
                 >
                   <b>{{ s.kind }}</b> {{ s.cat }}
@@ -235,10 +249,21 @@ function downloadCsv() {
 <style scoped>
 .ty-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border-top: 4px solid #000;
   border-left: 1px solid var(--eem-rule);
   background: var(--eem-card);
+}
+@media (min-width: 768px) {
+  .ty-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.ty-stats .is-primary dd {
+  color: #be2828;
+}
+.ty-stats .is-secondary dd {
+  color: #b5524a;
 }
 .ty-stats > div {
   padding: 1.1rem 1.25rem;
@@ -293,6 +318,16 @@ function downloadCsv() {
 .ty-chip.on span {
   color: rgba(255, 255, 255, 0.7);
 }
+.ty-chip.secondary {
+  border-color: #e3a59e;
+  background: #f6d5d1;
+  color: #8a1c1c;
+}
+.ty-chip.secondary.on {
+  background: #8a1c1c;
+  border-color: #8a1c1c;
+  color: #fff;
+}
 .ty-chip.primary.on {
   background: #be2828;
   border-color: #be2828;
@@ -326,6 +361,11 @@ a.ty-title:hover {
   background: #be2828;
   border-color: #be2828;
   color: #fff;
+}
+.ty-spec.secondary {
+  background: #f6d5d1;
+  border-color: #e3a59e;
+  color: #8a1c1c;
 }
 .ty-spec:hover {
   border-color: var(--eem-gold);

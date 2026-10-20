@@ -278,7 +278,7 @@ const pickedTaxa = computed(() => {
 const ckCounts = computed(() => ck.value?.counts || null)
 const stats = computed(() => [
   { label: 'Species recorded', value: ckCounts.value ? fmt(ckCounts.value.all) : '—', note: 'museum + GBIF + iNaturalist' },
-  { label: 'In the museum', value: ckCounts.value ? fmt(ckCounts.value.eem) : '—', note: 'with digitized specimens' },
+  { label: 'In the museum', value: ckCounts.value ? fmt(ckCounts.value.eem) : '—', note: 'identified to species in the digitized specimens' },
   { label: 'Museum specimens', value: mo.loaded ? fmt(mo.total) : '—', note: 'from Missouri' },
   { label: 'Counties', value: mo.loaded ? `${countiesWith.value} / 115` : '—', note: 'with museum specimens' }
 ])

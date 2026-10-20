@@ -53,7 +53,6 @@
           />
           <div class="nw-lead-text">
             <p class="nw-meta">
-              <span class="nw-type">{{ lead.type }}</span>
               <time :datetime="lead.iso">{{ lead.date }}</time>
               <span aria-hidden="true">·</span>
               <span>{{ lead.minutes }} min read</span>

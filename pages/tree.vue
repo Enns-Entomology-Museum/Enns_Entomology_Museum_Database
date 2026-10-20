@@ -137,6 +137,9 @@ const counted = computed(() => {
   const byFull = new Map()
   map.forEach((n) => {
     if (!byFull.has(n.full)) byFull.set(n.full, n)
+    // "Ambrysus (Ambrysus) brunneus" also as "Ambrysus brunneus", as in the DwC records
+    const plain = n.full.replace(/\s*\([^)]*\)/g, '').trim()
+    if (plain !== n.full && !byFull.has(plain)) byFull.set(plain, n)
   })
   map.forEach((n) => {
     n.own = 0
@@ -187,9 +190,10 @@ const matches = computed(() => {
 })
 
 const summary = computed(() => {
-  const map = nodes.value
-  const count = (r) => [...map.values()].filter((n) => n.rank === r).length
-  return `${count('Order')} orders · ${count('Family')} families · ${count('Genus')} genera · ${count('Species')} species`
+  // only groups with digitized specimens, so the numbers match the home page
+  const map = counted.value
+  const count = (r) => [...map.values()].filter((n) => n.rank === r && n.total > 0).length
+  return `With specimens: ${count('Order')} orders · ${count('Family')} families · ${count('Genus')} genera · ${count('Species')} species`
 })
 
 function setAll(v) {

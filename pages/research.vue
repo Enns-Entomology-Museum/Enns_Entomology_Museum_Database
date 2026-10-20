@@ -81,6 +81,10 @@
               {{ f.label }} <span>{{ fmt(counts[f.key]) }}</span>
             </button>
           </div>
+          <p class="mt-2 text-xs eem-muted max-w-3xl">
+            <b>Confirmed</b>: checked by the museum. <b>Not yet checked</b>: found automatically because the text mentions
+            the museum or its codens (EEM, UMRM, UMC) — most use our specimens, but a few may only cite them.
+          </p>
           <div class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm">
             <button
               type="button"
@@ -143,7 +147,7 @@
                     v-else
                     class="rs-badge"
                     title="Found by full-text search for the museum's name or coden; not yet checked"
-                    >Found by search</span
+                    >Not yet checked</span
                   >
                 </p>
               </li>
@@ -157,7 +161,7 @@
           </p>
 
           <p class="mt-10 text-xs eem-muted leading-relaxed">
-            “Found by search” lists publications whose full text mentions the Enns Entomology Museum or the codens
+            “Not yet checked” lists publications whose full text mentions the Enns Entomology Museum or the codens
             UMRM and UMC (University of Missouri, Columbia), found automatically in OpenAlex and Europe PMC<template v-if="updated"> (updated {{ updated }})</template>. They are
             checked by the museum and marked “Confirmed” once verified. Publications without an open full text cannot
             be found this way —
@@ -197,7 +201,7 @@
           <template v-if="info.gbif.doi">
             <p class="mt-4 text-sm leading-relaxed">When you use our data from GBIF, cite the dataset:</p>
             <p class="rs-cite mt-2">
-              Enns Entomology Museum, University of Missouri. Enns Entomology Museum Collection. Occurrence dataset
+              Dal Pos D (2026). Enns Entomology Museum Collection (EEM). Enns Entomology Museum. Occurrence dataset
               <a
                 :href="`https://doi.org/${info.gbif.doi}`"
                 target="_blank"
@@ -260,7 +264,7 @@ const LIVE = 'https://enns-entomology-museum.github.io/Enns_Entomology_Museum_Da
 const FILTERS = [
   { key: 'all', label: 'All' },
   { key: 'confirmed', label: 'Confirmed' },
-  { key: 'found', label: 'Found by search' }
+  { key: 'found', label: 'Not yet checked' }
 ]
 
 const loading = ref(true)

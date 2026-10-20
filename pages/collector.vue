@@ -119,7 +119,7 @@
                 />
               </ClientOnly>
             </div>
-            <p class="mt-2 text-xs eem-muted">{{ points.length }} georeferenced specimens</p>
+            <p class="mt-2 text-xs eem-muted">{{ points.length }} georeferenced {{ points.length === 1 ? 'specimen' : 'specimens' }}</p>
           </aside>
         </div>
       </template>
@@ -171,7 +171,7 @@ const stats = computed(() => [
   { label: 'Specimens', value: fmt(recs.value.length) },
   { label: 'Years', value: years.value },
   { label: 'Taxa', value: fmt(new Set(recs.value.map(taxonOf)).size) },
-  { label: 'States', value: fmt(new Set(recs.value.map((r) => r.stateProvince).filter(Boolean)).size) }
+  { label: 'Places', value: fmt(new Set(recs.value.map((r) => [r.stateProvince, r.country].filter(Boolean).join(', ')).filter(Boolean)).size) }
 ])
 
 const coCollectors = computed(() => {

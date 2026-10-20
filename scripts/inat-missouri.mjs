@@ -102,6 +102,21 @@ async function main() {
   }
   await writeFile(OUT, JSON.stringify(data))
   console.log(`Wrote ${data.species.length} species to public/data/inat-missouri.json`)
+
+  // Species recorded by GBIF or iNaturalist together — the total shown on the home page,
+  // the same number as the checklist page.
+  try {
+    const SUMMARY = new URL('../public/data/gbif-missouri-summary.json', import.meta.url)
+    const GBIF = new URL('../public/data/gbif-missouri.json', import.meta.url)
+    const g = JSON.parse(await readFile(GBIF, 'utf8'))
+    const summary = JSON.parse(await readFile(SUMMARY, 'utf8'))
+    const names = new Set([...g.species.map((s) => s[1]), ...data.species.map((s) => s[1])])
+    summary.speciesAll = names.size
+    await writeFile(SUMMARY, JSON.stringify(summary))
+    console.log(`Missouri species, GBIF + iNaturalist: ${names.size}`)
+  } catch (e) {
+    console.warn(`Summary not updated: ${e.message}`)
+  }
 }
 
 main().catch((e) => {

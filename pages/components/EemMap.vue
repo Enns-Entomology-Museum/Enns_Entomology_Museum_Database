@@ -16,7 +16,11 @@ const props = defineProps({
   points: { type: Array, default: () => [] },
   height: { type: String, default: '420px' },
   label: { type: String, default: 'Map of collecting localities' },
-  zoom: { type: Number, default: 4 }
+  zoom: { type: Number, default: 4 },
+  // zoom used when there is a single point
+  pointZoom: { type: Number, default: 8 },
+  // a fixed, non-interactive map (e.g. a small locator inset)
+  still: { type: Boolean, default: false }
 })
 
 const el = ref(null)
@@ -44,14 +48,17 @@ function draw() {
   })
   layer.addTo(map)
   if (bounds.length > 1) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 8 })
-  else if (bounds.length === 1) map.setView(bounds[0], 8)
+  else if (bounds.length === 1) map.setView(bounds[0], props.pointZoom)
 }
 
 onMounted(async () => {
   const mod = await import('leaflet')
   await import('leaflet/dist/leaflet.css')
   L = mod.default || mod
-  map = L.map(el.value, { scrollWheelZoom: false, zoomControl: true }).setView([38.6, -92.4], props.zoom)
+  const still = props.still
+    ? { dragging: false, zoomControl: false, attributionControl: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false }
+    : { zoomControl: true }
+  map = L.map(el.value, { scrollWheelZoom: false, ...still }).setView([38.6, -92.4], props.zoom)
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
     { attribution: 'Tiles &copy; Esri — Esri, DeLorme, NAVTEQ', maxZoom: 16 }

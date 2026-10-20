@@ -21,13 +21,13 @@
       <dl class="lg:col-span-4 grid grid-cols-2 gap-6">
         <div>
           <dt class="eem-moband-label">Species recorded</dt>
-          <dd class="eem-display text-4xl sm:text-5xl">{{ summary ? fmt(summary.species) : '—' }}</dd>
-          <p class="text-xs mt-1 opacity-75">GBIF records for Missouri</p>
+          <dd class="eem-display text-4xl sm:text-5xl">{{ summary ? fmt(summary.speciesAll || summary.species) : '—' }}</dd>
+          <p class="text-xs mt-1 opacity-75">{{ summary?.speciesAll ? 'GBIF + iNaturalist' : 'GBIF records for Missouri' }}</p>
         </div>
         <div>
           <dt class="eem-moband-label">In the museum</dt>
           <dd class="eem-display text-4xl sm:text-5xl">{{ mo.loaded ? fmt(museumSpecies) : '—' }}</dd>
-          <p class="text-xs mt-1 opacity-75">from digitized specimens</p>
+          <p class="text-xs mt-1 opacity-75">identified to species, from digitized specimens</p>
         </div>
       </dl>
 

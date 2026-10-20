@@ -422,7 +422,15 @@ const decades = computed(() => {
   const out = []
   for (let d = keys[0]; d <= keys[keys.length - 1]; d += 10) out.push({ d, n: m.get(d) || 0 })
   const max = Math.max(...out.map((x) => x.n))
-  return out.map(({ d, n }) => ({ name: `${d}s`, short: `’${String(d).slice(2)}`, n, h: n ? Math.max(5, (n / max) * 100) : 0 }))
+  // Over a century, label every 50 years with the full year so decades don't repeat
+  const long = out.length > 10
+  const first = out[0].d
+  return out.map(({ d, n }) => ({
+    name: `${d}s`,
+    short: !long ? `’${String(d).slice(2)}` : d % 50 === 0 || d === first ? String(d) : '',
+    n,
+    h: n ? Math.max(5, (n / max) * 100) : 0
+  }))
 })
 const oldest = computed(() => {
   const ys = items.value.map((i) => i.year).filter((y) => y > 1500)
@@ -556,6 +564,7 @@ const shown = computed(() => {
   min-height: 2px;
 }
 .eem-lib-dec-lab {
+  white-space: nowrap;
   margin-top: 3px;
   font-size: 0.6rem;
   text-align: center;

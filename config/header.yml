@@ -8,6 +8,8 @@ header_links:
     submenu:
       - label: Holdings
         link: /collection
+      - label: Type specimens
+        link: /specimens?types=1
       - label: Highlights
         link: /highlights
       - label: Taxonomic tree
@@ -16,27 +18,34 @@ header_links:
         link: /collectors
       - label: Research using the collection
         link: /research
+      - label: Library
+        link: /library
 
   - label: Specimens
     link: /specimens
 
-  - label: Library
-    link: /library
+  - label: Missouri
+    submenu:
+      - label: Insects of Missouri (checklist)
+        link: /missouri
+      - label: Pests & invasive species
+        link: /pests
 
   - label: News
     link: /news
 
-  - label: People
-    link: /people
-
-  - label: Visit
-    link: /visit
+  - label: Get involved
+    submenu:
+      - label: Visit & loans
+        link: /visit
+      - label: Teachers & groups
+        link: /outreach
+      - label: Donate
+        link: /donate
+      - label: Students & collaborators
+        link: /people
+      - label: Tell us about your paper
+        link: /submit-paper
 
   - label: About
     link: /about
-
-  - label: Pests
-    link: /pests
-
-  - label: Missouri Checklist
-    link: /missouri

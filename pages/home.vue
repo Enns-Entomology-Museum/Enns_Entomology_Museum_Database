@@ -74,6 +74,44 @@
       </div>
     </section>
 
+    <!-- Type collection -->
+    <section
+      v-if="types.rows.length"
+      class="eem-typeband border-b eem-rule"
+    >
+      <div class="container mx-auto box-border px-4 py-6 flex flex-wrap items-center gap-x-8 gap-y-4">
+        <div class="min-w-0">
+          <p class="eem-kicker">Type collection</p>
+          <p class="mt-2 eem-display text-2xl">
+            {{ fmt(types.rows.length) }} type specimen{{ types.rows.length === 1 ? '' : 's' }}
+            <span class="eem-muted font-normal text-base"
+              >· {{ fmt(typeNames) }} name{{ typeNames === 1 ? '' : 's' }}</span
+            >
+          </p>
+        </div>
+        <ul class="flex flex-wrap gap-2">
+          <li
+            v-for="k in typeKindsList"
+            :key="k.kind"
+          >
+            <RouterLink
+              :to="{ path: '/specimens', query: { types: '1', kind: k.kind } }"
+              :class="['eem-typechip', { primary: k.primary }]"
+              ><b>{{ fmt(k.n) }}</b> {{ k.label }}</RouterLink
+            >
+          </li>
+        </ul>
+        <RouterLink
+          :to="{ path: '/specimens', query: { types: '1' } }"
+          class="eem-link text-sm font-semibold sm:ml-auto"
+          >Browse the types →</RouterLink
+        >
+      </div>
+    </section>
+
+    <!-- GBIF dataset -->
+    <EemGbif />
+
     <!-- Missouri checklist -->
     <EemMissouriBand />
 
@@ -173,15 +211,22 @@
           >
             <RouterLink
               :to="{ path: '/specimen', query: { cat: r.catalogNumber } }"
-              class="eem-label group block h-full"
+              :class="['eem-label group block h-full', { 'is-type': typeInfo(r.typeStatus) }]"
             >
-              <span class="eem-label-cat">{{ r.catalogNumber || 'No catalog number' }}</span>
+              <span class="flex flex-wrap items-center gap-1.5">
+                <span class="eem-label-cat">{{ r.catalogNumber || 'No catalog number' }}</span>
+                <span
+                  v-if="typeInfo(r.typeStatus)"
+                  :class="['eem-label-type', typeInfo(r.typeStatus).primary ? 'primary' : 'secondary']"
+                  >{{ typeInfo(r.typeStatus).label }}</span
+                >
+              </span>
               <span class="block mt-3 text-[1.02rem] font-semibold leading-snug italic group-hover:underline">{{
                 taxonOf(r)
               }}</span>
               <span class="block mt-1 text-xs eem-muted">{{ r.order }}<template v-if="r.family"> · {{ r.family }}</template></span>
               <span class="block mt-3 text-sm leading-snug">{{ placeOf(r) }}</span>
-              <span class="block mt-1 text-sm eem-muted">{{ r.eventDate || r.year || 'Date unknown' }}<template v-if="r.recordedBy"> · {{ r.recordedBy }}</template></span>
+              <span class="block mt-1 text-sm eem-muted">{{ r.eventDate || r.year || 'Date unknown' }}<template v-if="r.recordedBy"> · {{ collectorsOf(r).join(', ') }}</template></span>
             </RouterLink>
           </li>
         </ul>
@@ -217,12 +262,13 @@
 <script setup>
 import { computed } from 'vue'
 import { useHead } from '@unhead/vue'
+import EemGbif from './components/EemGbif.vue'
 import EemMap from './components/EemMap.vue'
 import EemMissouriBand from './components/EemMissouriBand.vue'
 import EemNews from './components/EemNews.vue'
 import EemPhotos from './components/EemPhotos.vue'
 import EemSearch from './components/EemSearch.vue'
-import { COLLECTION_ESTIMATE, ORDER_NAMES, countBy, fmt, useEem } from './components/useEem.js'
+import { COLLECTION_ESTIMATE, ORDER_NAMES, collectorsOf, countBy, fmt, typeInfo, typeKinds, useEem, useTypes } from './components/useEem.js'
 import EemProgress from './components/EemProgress.vue'
 
 useHead({ title: 'Enns Entomology Museum — University of Missouri' })
@@ -251,9 +297,18 @@ const since = computed(() => {
   return d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 })
 
+const types = useTypes()
+const typeKindsList = computed(() => typeKinds(types.rows))
+const typeNames = computed(() => new Set(types.rows.map((r) => r.name)).size)
+
+// Species among the digitized specimens (same count as the taxonomic tree)
+const speciesCount = computed(
+  () => new Set(eem.records.filter((r) => r.genus && r.specificEpithet).map((r) => `${r.genus} ${r.specificEpithet}`)).size
+)
+
 const stats = computed(() => [
   { label: 'Specimens', value: eem.stats['Collection objects'] },
-  { label: 'Taxa', value: eem.stats['Otus'] },
+  { label: 'Species', value: eem.loaded ? speciesCount.value : undefined },
   { label: 'Collecting events', value: eem.stats['Collecting events'] },
   { label: 'Georeferenced', value: eem.stats['Georeferences'] },
   { label: 'Images', value: eem.stats['Images'] },
@@ -386,6 +441,48 @@ const uses = [
 .eem-label:hover {
   border-left-color: var(--eem-gold);
   transform: translateY(-2px);
+}
+.eem-label.is-type {
+  border-left-color: #be2828;
+}
+.eem-label-type {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border: 1.5px solid #be2828;
+  color: #be2828;
+}
+.eem-label-type.secondary {
+  background: #f6d5d1;
+  border-color: #e3a59e;
+  color: #8a1c1c;
+}
+.eem-typeband {
+  background: var(--eem-card);
+  border-left: 6px solid #be2828;
+}
+.eem-typechip {
+  display: inline-block;
+  font-size: 0.82rem;
+  padding: 0.3rem 0.7rem;
+  border: 1.5px solid #e3a59e;
+  background: #f6d5d1;
+  color: #8a1c1c !important;
+  border-radius: 2px;
+}
+.eem-typechip.primary {
+  background: #be2828;
+  border-color: #be2828;
+  color: #fff !important;
+}
+.eem-typechip:hover {
+  filter: brightness(0.95);
+}
+.eem-label-type.primary {
+  background: #be2828;
+  color: #fff;
 }
 .eem-label-cat {
   display: inline-block;

@@ -13,7 +13,6 @@ taxa_page:
           - panel:eem-catalogue-of-life
           - panel:descendants
           - panel:keys
-          - panel:statistics
 
   gbif:
     label: GBIF

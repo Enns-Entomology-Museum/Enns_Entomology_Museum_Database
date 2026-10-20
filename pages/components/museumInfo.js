@@ -7,7 +7,15 @@ export default {
   city: 'Columbia, Missouri',
 
   // e.g. '1-87 Agriculture Building, 600 Hitt St, Columbia, MO 65211'
-  address: '',
+  // From the museum's old site (museum.insecta.missouri.edu/map.htm) — check it is still current
+  address: 'Room 3-38, Agriculture Building, University of Missouri, Columbia, MO 65211',
+  mailing: '1-33 Agriculture Building, Division of Plant Science & Technology, University of Missouri, Columbia, MO 65211',
+  directions:
+    'The Agriculture Building is on the NE corner of Hitt St and Rollins St. Use the Rollins Street entrance and take the stairs up to the third floor.',
+  parking: 'Metered parking on Hitt St in front of the building, or on the west side of Virginia Ave by the parking garage.',
+  // Pin on the About page map (Agriculture Building, from OpenStreetMap — adjust if needed)
+  location: { lat: 38.94285, lng: -92.32533 },
+  mapUrl: 'https://www.openstreetmap.org/search?query=Agriculture%20Building%2C%20University%20of%20Missouri%2C%20Columbia',
   // e.g. 'ennsmuseum@missouri.edu'
   email: '',
   phone: '',
@@ -31,8 +39,11 @@ export default {
   gbif: {
     grscicollKey: '02c807d4-c06c-40cc-a0ee-beac2d8b1b7e',
     publisherKey: '794e6aee-90b8-4b53-8740-ef897a4a5496',
-    datasetKey: '',
-    doi: ''
+    datasetKey: 'a6a90206-efc3-4a7c-9449-ea4f9255bc5d',
+    doi: '10.15468/eqzfmb',
+    // Official GBIF logo (download it from GBIF and save it under public/images/);
+    // without the file a plain text mark is shown instead.
+    logo: 'images/gbif-logo.svg'
   },
 
   // Digitization progress (home page and Holdings): the month digitizing started,

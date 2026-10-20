@@ -87,7 +87,7 @@
               <span
                 v-if="r.recordedBy"
                 class="text-base-soft"
-                >· {{ r.recordedBy }}</span
+                >· {{ people(r).join(', ') }}</span
               >
             </RouterLink>
           </li>
@@ -121,7 +121,9 @@ const shown = computed(() => records.value.slice(0, limit.value))
 const localities = computed(
   () => new Set(records.value.map((r) => [r.stateProvince, r.county, r.verbatimLocality].join('|'))).size
 )
-const collectors = computed(() => new Set(records.value.map((r) => r.recordedBy).filter(Boolean)).size)
+// recordedBy holds several people separated by "|" or ";"
+const people = (r) => String(r?.recordedBy || '').split(/\s*[|;]\s*/).map((s) => s.trim()).filter(Boolean)
+const collectors = computed(() => new Set(records.value.flatMap(people)).size)
 const years = computed(() => {
   const ys = records.value.map((r) => Number(String(r.eventDate || '').slice(0, 4))).filter((y) => y > 1800)
   if (!ys.length) return ''

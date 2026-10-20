@@ -240,3 +240,52 @@ export async function findByCatalog(text) {
   )
   return results.find(Boolean) || null
 }
+
+// Type status from a DwC row → { label, primary } (primary = name-bearing, shown in red,
+// as on red type labels), or null if the specimen is not a type.
+const PRIMARY_TYPES = ['holotype', 'lectotype', 'neotype', 'syntype']
+export function typeInfo(typeStatus) {
+  const s = String(typeStatus || '').split('|')[0].trim()
+  if (!s) return null
+  const kind = s.split(/\s+/)[0].toLowerCase()
+  return { label: kind.charAt(0).toUpperCase() + kind.slice(1), primary: PRIMARY_TYPES.includes(kind) }
+}
+
+// ── Type collection (collection objects with type material) ──────────────
+// One row per specimen and type designation; shared by the home page band.
+export const TYPE_ORDER = ['holotype', 'lectotype', 'neotype', 'syntype', 'paralectotype', 'paratype', 'allotype', 'topotype']
+const typesState = reactive({ loaded: false, rows: [] })
+let typesStarted = false
+
+export function useTypes() {
+  if (typesStarted || import.meta.env.SSR) return typesState
+  typesStarted = true
+  makeAPIRequest
+    .get('/collection_objects', { params: { type_material: true, per: 2000, 'extend[]': ['dwc_fields', 'type_material'] } })
+    .then(({ data }) => {
+      const out = []
+      ;(Array.isArray(data) ? data : []).forEach((co) => {
+        const d = co.dwc || {}
+        const tms = co.type_materials?.length ? co.type_materials : [{ type_type: d.typeStatus || 'type' }]
+        tms.forEach((tm) => {
+          const kind = String(tm.type_type || d.typeStatus || 'type').split(/\s+/)[0].toLowerCase()
+          const name = [d.genus, d.specificEpithet].filter(Boolean).join(' ') || d.scientificName || 'Unidentified'
+          out.push({ id: `${co.id}-${kind}`, coId: co.id, kind, primary: PRIMARY_TYPES.includes(kind), name, cat: d.catalogNumber || '', order: d.order || '', family: d.family || '' })
+        })
+      })
+      typesState.rows = out
+    })
+    .catch(() => (typesState.rows = []))
+    .finally(() => (typesState.loaded = true))
+  return typesState
+}
+
+// counts per kind, in nomenclatural order: [{ kind, label, n, primary }]
+export function typeKinds(rows) {
+  const m = new Map()
+  rows.forEach((r) => m.set(r.kind, (m.get(r.kind) || 0) + 1))
+  const rank = (k) => (TYPE_ORDER.indexOf(k) < 0 ? 99 : TYPE_ORDER.indexOf(k))
+  return [...m.entries()]
+    .sort((a, b) => rank(a[0]) - rank(b[0]))
+    .map(([kind, n]) => ({ kind, n, label: kind.charAt(0).toUpperCase() + kind.slice(1) + (n === 1 ? '' : 's'), primary: PRIMARY_TYPES.includes(kind) }))
+}

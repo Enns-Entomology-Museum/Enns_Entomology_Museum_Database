@@ -61,11 +61,21 @@
               <p class="text-sm eem-muted">{{ info.director.role }}</p>
             </div>
           </div>
-          <RouterLink
-            to="/visit"
-            class="eem-link inline-block mt-5 text-sm"
-            >Contact &amp; visits →</RouterLink
-          >
+          <p class="mt-4 text-sm eem-muted">
+            With a team of staff, students and collaborators.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            <RouterLink
+              to="/people"
+              class="eem-link"
+              >Students &amp; collaborators →</RouterLink
+            >
+            <RouterLink
+              to="/visit"
+              class="eem-link"
+              >Contact &amp; visits →</RouterLink
+            >
+          </div>
         </div>
       </aside>
     </section>
@@ -181,6 +191,55 @@
       </div>
     </section>
 
+    <!-- Where we are -->
+    <section
+      v-if="info.location"
+      class="border-t eem-rule"
+    >
+      <div class="container mx-auto box-border px-4 py-16 grid lg:grid-cols-12 gap-10">
+        <div class="lg:col-span-4">
+          <p class="eem-kicker">Find us</p>
+          <h2 class="eem-display text-3xl mt-3">Where the museum is</h2>
+          <p
+            v-if="info.address"
+            class="mt-4 leading-relaxed"
+          >
+            {{ info.address }}
+          </p>
+          <p
+            v-if="info.directions"
+            class="mt-3 text-sm eem-muted leading-relaxed"
+          >
+            {{ info.directions }}
+          </p>
+          <div class="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            <RouterLink
+              to="/visit"
+              class="eem-link font-semibold"
+              >Plan a visit →</RouterLink
+            >
+            <a
+              :href="directionsUrl"
+              target="_blank"
+              rel="noopener"
+              class="eem-link"
+              >Directions ↗</a
+            >
+          </div>
+        </div>
+        <div class="lg:col-span-8 eem-card p-2">
+          <ClientOnly>
+            <EemMap
+              :points="[pin]"
+              height="380px"
+              :point-zoom="16"
+              label="Location of the Enns Entomology Museum"
+            />
+          </ClientOnly>
+        </div>
+      </div>
+    </section>
+
     <section class="border-t eem-rule bg-[color:var(--eem-paper-2)]">
       <div class="container mx-auto box-border px-4 py-12">
         <p class="eem-kicker">Cite the database</p>
@@ -196,7 +255,7 @@
         <template v-if="info.gbif.doi">
           <p class="eem-kicker mt-8">Cite the dataset in GBIF</p>
           <p class="mt-3 max-w-3xl leading-relaxed">
-            Enns Entomology Museum, University of Missouri. Enns Entomology Museum Collection. Occurrence dataset
+            Dal Pos D (2026). Enns Entomology Museum Collection (EEM). Enns Entomology Museum. Occurrence dataset
             <a
               :href="`https://doi.org/${info.gbif.doi}`"
               class="eem-link"
@@ -234,8 +293,21 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useHead } from '@unhead/vue'
+import EemMap from './components/EemMap.vue'
 import EemPageHead from './components/EemPageHead.vue'
 import info from './components/museumInfo.js'
+
+// Museum pin for the "Where the museum is" map
+const pin = info.location
+  ? {
+      lat: info.location.lat,
+      lng: info.location.lng,
+      html: `<strong>${info.fullName}</strong>${info.address ? `<br>${info.address}` : ''}`
+    }
+  : null
+const directionsUrl = info.location
+  ? `https://www.openstreetmap.org/directions?to=${info.location.lat}%2C${info.location.lng}`
+  : info.mapUrl
 
 useHead({ title: 'About — Enns Entomology Museum' })
 
@@ -279,7 +351,7 @@ const events = [
 const shownEvents = computed(() => (kind.value === 'all' ? events : events.filter((e) => e.kind === kind.value)))
 
 const holdings = [
-  { img: 'c-compactors.jpg', alt: 'Aisle of compactor cabinets', value: '7M+', title: 'Specimens in compactor storage', text: 'Pinned, papered, slide-mounted and fluid-preserved material, 80–90% from the Ozark Plateau.' },
+  { img: 'c-compactors.jpg', alt: 'Aisle of compactor cabinets', value: '7M+', title: 'Specimens in the collection', text: 'Pinned, papered, slide-mounted and fluid-preserved material, 80–90% from the Ozark Plateau.' },
   { img: 'c-xerces.jpg', alt: 'Pinned Xerces blue butterfly', value: 'Type material', title: 'Rare and extinct species', text: 'Including the extinct Xerces blue and primary type specimens.' },
   { img: 'c-odonata.jpg', alt: 'Drawer of papered dragonflies', value: '38 drawers', title: 'Papered Odonata', text: 'Dragonflies and damselflies kept in envelopes.' },
   { img: 'c-galls.jpg', alt: 'Leaves with insect galls in a drawer', value: '24 drawers', title: 'Insect galls', text: 'About 309 galls on their host plants.' },
