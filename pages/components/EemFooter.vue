@@ -71,7 +71,7 @@
           <ul class="mt-3 space-y-2 text-sm">
             <li><RouterLink to="/visit" class="eem-footer-link">Visit &amp; loans</RouterLink></li>
             <li><RouterLink to="/news" class="eem-footer-link">News</RouterLink></li>
-            <li><RouterLink to="/people" class="eem-footer-link">Students &amp; collaborators</RouterLink></li>
+            <li><RouterLink to="/people" class="eem-footer-link">People &amp; community</RouterLink></li>
             <li><RouterLink to="/outreach" class="eem-footer-link">Outreach requests</RouterLink></li>
             <li><RouterLink to="/donate" class="eem-footer-link">Donate</RouterLink></li>
             <li><RouterLink to="/library" class="eem-footer-link">Library</RouterLink></li>
@@ -117,6 +117,34 @@
                 class="eem-footer-link eem-gbif-badge"
                 >Published through GBIF</a
               >
+            </li>
+            <li class="pt-2">
+              <p class="eem-footer-label">Data partners</p>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                <a
+                  :href="info.gbif.datasetKey ? `https://www.gbif.org/dataset/${info.gbif.datasetKey}` : 'https://www.gbif.org'"
+                  target="_blank"
+                  rel="noopener"
+                  class="eem-partner"
+                  title="Our specimen data are published through GBIF"
+                  ><img
+                    :src="gbifLogo"
+                    alt="GBIF"
+                    class="eem-partner-gbif"
+                /></a>
+                <a
+                  href="https://www.catalogueoflife.org"
+                  target="_blank"
+                  rel="noopener"
+                  class="eem-partner"
+                  title="Species names are checked against the Catalogue of Life"
+                  ><img
+                    :src="colLogo"
+                    alt="Catalogue of Life"
+                    class="eem-partner-col"
+                  /><span>Catalogue<br />of Life</span></a
+                >
+              </div>
             </li>
             <li>
               <TrackerReport
@@ -167,12 +195,45 @@ import info from './museumInfo.js'
 const { base_url } = __APP_ENV__
 const mark = `${base_url || '/'}images/eem-logo-rev-vert.png`.replace('//', '/')
 const year = new Date().getFullYear()
+const gbifLogo = `${base_url || '/'}${info.gbif.logo || 'images/GBIF.png'}`.replace('//', '/')
+const colLogo = `${base_url || '/'}images/col-logo.png`.replace('//', '/')
 </script>
 
 <style scoped>
 .eem-footer {
   background: #000;
   color: #fff;
+}
+/* GBIF and COL logos sit on white so they read on the black footer */
+.eem-partner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.6rem;
+  padding: 0.3rem 0.55rem;
+  background: #fff;
+  border-radius: 4px;
+  border: 2px solid transparent;
+  transition: border-color 0.15s;
+  text-decoration: none;
+}
+.eem-partner:hover {
+  border-color: var(--eem-gold);
+}
+.eem-partner-gbif {
+  height: 1.7rem;
+  width: auto;
+}
+.eem-partner-col {
+  height: 1.9rem;
+  width: 1.9rem;
+}
+.eem-partner span {
+  color: #111;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
 }
 .eem-footer-band {
   height: 6px;

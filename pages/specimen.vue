@@ -266,25 +266,10 @@
               class="eem-card p-2 relative"
             >
               <ClientOnly>
-                <EemMap
-                  :points="[point]"
-                  height="300px"
-                  :point-zoom="7"
-                  label="Collecting locality"
+                <EemSpecimenMap
+                  :rec="rec"
+                  :is-type="!!type?.primary"
                 />
-                <div
-                  class="eem-inset"
-                  aria-hidden="true"
-                >
-                  <EemMap
-                    :points="[{ lat: point.lat, lng: point.lng }]"
-                    height="100%"
-                    :zoom="0"
-                    :point-zoom="0"
-                    still
-                    label="Locator"
-                  />
-                </div>
               </ClientOnly>
               <p class="px-2 pt-2 pb-1 text-xs eem-muted">{{ placeLine }}</p>
             </div>
@@ -297,6 +282,52 @@
 
             <div class="eem-card p-5 text-sm">
               <p class="eem-kicker">Cite this specimen</p>
+
+              <!-- Where the record is published: GBIF occurrence + dataset DOI -->
+              <div class="eem-cite-gbif mt-3">
+                <img
+                  v-if="gbifLogoOk"
+                  :src="gbifLogo"
+                  alt="GBIF"
+                  class="eem-cite-gbif-logo"
+                  @error="gbifLogoOk = false"
+                />
+                <span
+                  v-else
+                  class="eem-cite-gbif-mark"
+                  >GBIF</span
+                >
+                <div class="min-w-0 flex flex-col items-start">
+                  <a
+                    v-if="gbifOcc"
+                    :href="`https://www.gbif.org/occurrence/${gbifOcc}`"
+                    target="_blank"
+                    rel="noopener"
+                    class="eem-link font-semibold"
+                    >Occurrence {{ gbifOcc }} ↗</a
+                  >
+                  <span
+                    v-else-if="gbifChecked"
+                    class="eem-muted"
+                    >Not on GBIF yet — it will appear with the next dataset update.</span
+                  >
+                  <span
+                    v-else
+                    class="eem-muted"
+                    >Looking up GBIF…</span
+                  >
+                  <a
+                    v-if="info.gbif.doi"
+                    :href="`https://doi.org/${info.gbif.doi}`"
+                    target="_blank"
+                    rel="noopener"
+                    class="eem-cite-doi mt-1.5"
+                    :title="`Dataset DOI ${info.gbif.doi}`"
+                    ><span class="k">DOI</span><span class="v">{{ info.gbif.doi }}</span></a
+                  >
+                </div>
+              </div>
+
               <div
                 class="eem-cite-tabs mt-3"
                 role="tablist"
@@ -351,7 +382,7 @@
               </p>
               <p class="mt-2 text-xs eem-muted">
                 Please cite the catalog number <b>{{ rec.catalogNumber }}</b> and the acronym <b>EEM</b> when you
-                publish on this specimen.
+                publish on this specimen. Including the dataset DOI lets GBIF count your paper as a use of our data.
               </p>
             </div>
           </aside>
@@ -413,9 +444,10 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
-import EemMap from './components/EemMap.vue'
+import EemSpecimenMap from './components/EemSpecimenMap.vue'
 import EemSpecimenImages from './components/EemSpecimenImages.vue'
 import { collectorsOf, findByCatalog, normCat, typeInfo, useEem, useLoans } from './components/useEem.js'
+import info from './components/museumInfo.js'
 
 const loans = useLoans()
 const eem = useEem()
@@ -618,12 +650,42 @@ const point = computed(() => {
   return { lat: Number(r.decimalLatitude), lng: Number(r.decimalLongitude), html: `<strong>${r.catalogNumber}</strong>` }
 })
 
+// ── GBIF: the specimen's occurrence page and the dataset DOI ──────────────
+const gbifOcc = ref(null)
+const gbifChecked = ref(false)
+watch(
+  () => rec.value?.catalogNumber,
+  async (c) => {
+    gbifOcc.value = null
+    gbifChecked.value = false
+    if (!c || !info.gbif.datasetKey) return
+    try {
+      const params = new URLSearchParams({ datasetKey: info.gbif.datasetKey, catalogNumber: c, limit: 1 })
+      const r = await fetch(`https://api.gbif.org/v1/occurrence/search?${params}`).then((x) => x.json())
+      gbifOcc.value = r.results?.[0]?.key || null
+    } catch {
+      /* GBIF unreachable: the citation still works without the occurrence link */
+    } finally {
+      gbifChecked.value = true
+    }
+  },
+  { immediate: true }
+)
+const gbifLogo = `${import.meta.env.BASE_URL || '/'}${info.gbif.logo || 'images/GBIF.png'}`
+const gbifLogoOk = ref(true)
+const datasetDoi = computed(() => (info.gbif.doi ? `https://doi.org/${info.gbif.doi}` : ''))
+const gbifUrl = computed(() => (gbifOcc.value ? `https://www.gbif.org/occurrence/${gbifOcc.value}` : ''))
+
+// GBIF-style citation: specimen + occurrence link + the dataset DOI (so GBIF counts the use)
 const citation = computed(() => {
   const r = rec.value || {}
   const today = new Date().toISOString().slice(0, 10)
-  return `Enns Entomology Museum, University of Missouri (EEM). Specimen ${r.catalogNumber || ''}, ${name.value}.${
-    r.occurrenceID ? ` Occurrence ID ${r.occurrenceID}.` : ''
-  } Enns Entomology Museum Database, ${permalink.value} (accessed ${today}).`
+  const specimen = `Enns Entomology Museum, University of Missouri (EEM). Specimen ${r.catalogNumber || ''}, ${name.value}.`
+  const where = gbifUrl.value ? ` GBIF occurrence ${gbifUrl.value}.` : ` ${permalink.value}.`
+  const dataset = datasetDoi.value
+    ? ` In: Enns Entomology Museum Collection (EEM). Occurrence dataset ${datasetDoi.value} accessed via GBIF.org on ${today}.`
+    : ` Enns Entomology Museum Database (accessed ${today}).`
+  return specimen + where + dataset
 })
 
 const onLoan = computed(() => {
@@ -690,8 +752,10 @@ const bibtex = computed(() => {
   return `@misc{${bibKey.value},
   author = {{Enns Entomology Museum, University of Missouri}},
   title = {Specimen ${r.catalogNumber}: \\textit{${name.value}}},
-  howpublished = {Enns Entomology Museum Database},
-  url = {${permalink.value}},${r.occurrenceID ? `\n  note = {Occurrence ID ${r.occurrenceID}},` : ''}
+  howpublished = {Enns Entomology Museum Collection (EEM), occurrence dataset via GBIF.org},
+  url = {${gbifUrl.value || permalink.value}},${info.gbif.doi ? `\n  doi = {${info.gbif.doi}},` : ''}${
+    r.occurrenceID ? `\n  note = {Occurrence ID ${r.occurrenceID}},` : ''
+  }
   urldate = {${accessed}}
 }`
 })
@@ -702,8 +766,10 @@ const ris = computed(() => {
     'TY  - DATA',
     'AU  - Enns Entomology Museum, University of Missouri',
     `TI  - Specimen ${r.catalogNumber}: ${name.value}`,
-    'T2  - Enns Entomology Museum Database',
-    `UR  - ${permalink.value}`,
+    'T2  - Enns Entomology Museum Collection (EEM). Occurrence dataset',
+    `UR  - ${gbifUrl.value || permalink.value}`,
+    info.gbif.doi ? `DO  - ${info.gbif.doi}` : null,
+    'PB  - GBIF.org',
     r.occurrenceID ? `N1  - Occurrence ID ${r.occurrenceID}` : null,
     `Y2  - ${accessed}`,
     'ER  - '
@@ -766,6 +832,58 @@ useHead({
   font-size: 0.95rem;
   letter-spacing: 0.04em;
   padding: 0.25rem 0.6rem;
+  background: var(--eem-gold);
+  color: #000;
+}
+.eem-cite-gbif {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--eem-rule);
+  background: var(--eem-paper);
+}
+.eem-cite-gbif-logo {
+  flex-shrink: 0;
+  height: 1.9rem;
+  width: auto;
+}
+:global(.dark) .eem-cite-gbif-logo {
+  background: #fff;
+  padding: 0.15rem 0.3rem;
+  border-radius: 3px;
+}
+.eem-cite-gbif-mark {
+  flex-shrink: 0;
+  font-family: 'Archivo', system-ui, sans-serif;
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.4rem;
+  border: 2px solid var(--eem-ink);
+  border-radius: 3px;
+}
+.eem-cite-doi {
+  display: inline-flex;
+  border-radius: 999px;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid #000;
+  text-decoration: none !important;
+}
+.eem-cite-doi .k {
+  background: #000;
+  color: var(--eem-gold);
+  padding: 0.15rem 0.45rem 0.15rem 0.6rem;
+}
+.eem-cite-doi .v {
+  background: var(--eem-card);
+  color: var(--eem-ink);
+  padding: 0.15rem 0.6rem 0.15rem 0.45rem;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+.eem-cite-doi:hover .v {
   background: var(--eem-gold);
   color: #000;
 }

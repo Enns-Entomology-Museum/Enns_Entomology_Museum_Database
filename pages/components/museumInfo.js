@@ -41,9 +41,9 @@ export default {
     publisherKey: '794e6aee-90b8-4b53-8740-ef897a4a5496',
     datasetKey: 'a6a90206-efc3-4a7c-9449-ea4f9255bc5d',
     doi: '10.15468/eqzfmb',
-    // Official GBIF logo (download it from GBIF and save it under public/images/);
+    // Official GBIF logo (saved under public/images/);
     // without the file a plain text mark is shown instead.
-    logo: 'images/gbif-logo.svg'
+    logo: 'images/GBIF.png'
   },
 
   // Digitization progress (home page and Holdings): the month digitizing started,

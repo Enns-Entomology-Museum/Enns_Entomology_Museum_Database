@@ -196,7 +196,27 @@
               v-else
               class="text-sm mt-2 space-y-1"
             >
-              <li v-if="countyRecord.museum">{{ countyRecord.museum }} Enns Museum specimen(s)</li>
+              <li v-if="countyRecord.museum">
+                {{ countyRecord.museum }} Enns Museum specimen{{ countyRecord.museum === 1 ? '' : 's' }}
+                <ul
+                  v-if="countyRecord.specimens?.length"
+                  class="mt-1 mb-2 space-y-1"
+                >
+                  <li
+                    v-for="s in countyRecord.specimens"
+                    :key="s.cat"
+                  >
+                    <RouterLink
+                      :to="{ path: '/specimen', query: { cat: s.cat } }"
+                      class="pest-spec"
+                    >
+                      <span class="pest-spec-cat">{{ s.cat }}</span>
+                      <span class="eem-muted">{{ [s.date, s.by].filter(Boolean).join(' · ') }}</span>
+                      <span aria-hidden="true">→</span>
+                    </RouterLink>
+                  </li>
+                </ul>
+              </li>
               <li
                 v-for="(r, i) in countyRecord.reported"
                 :key="i"
@@ -739,5 +759,24 @@ const stats = computed(() => {
   padding: 0.3rem 0.4rem;
   border-bottom: 1px solid var(--eem-rule);
   font-variant-numeric: tabular-nums;
+}
+.pest-spec {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--eem-rule, #e5e1d8);
+  text-decoration: none;
+}
+.pest-spec:hover {
+  border-color: var(--eem-gold);
+}
+.pest-spec-cat {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.05rem 0.35rem;
+  background: var(--eem-gold);
+  color: #000;
 }
 </style>

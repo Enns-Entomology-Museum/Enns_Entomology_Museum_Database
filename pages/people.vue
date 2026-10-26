@@ -1,63 +1,56 @@
 <template>
   <div class="eem min-h-screen">
     <EemPageHead
-      kicker="People"
-      title="Students & collaborators"
-      lede="The museum is a place to learn, do research and work together. Here is how to get involved — and who is already part of it."
+      kicker="About the museum"
+      title="People & community"
+      lede="The staff, students and collaborators who work with the collection — and how you can join them."
     />
 
-    <!-- Ways in -->
+    <!-- The network: numbers + map -->
     <section class="container mx-auto box-border px-4 py-14">
-      <ul class="grid lg:grid-cols-3 gap-6">
-        <li
-          v-for="(p, i) in paths"
-          :id="p.id"
-          :key="p.id"
-          class="eem-card eem-path"
+      <dl class="eem-ppl-stats">
+        <div
+          v-for="s in stats"
+          :key="s.label"
         >
-          <span class="eem-display text-5xl text-[color:var(--eem-gold-deep)]">{{ String(i + 1).padStart(2, '0') }}</span>
-          <h2 class="eem-display mt-3 text-2xl">{{ p.title }}</h2>
-          <p class="mt-2 eem-muted leading-relaxed">{{ p.lede }}</p>
-          <ul class="mt-5 space-y-3">
-            <li
-              v-for="b in p.items"
-              :key="b.title"
-              class="border-l-4 border-[color:var(--eem-gold)] pl-4"
-            >
-              <h3 class="font-bold">{{ b.title }}</h3>
-              <p class="text-sm eem-muted leading-relaxed mt-0.5">{{ b.text }}</p>
-            </li>
-          </ul>
-          <p
-            v-if="p.note"
-            class="mt-5 text-sm leading-relaxed"
-          >
-            {{ p.note }}
+          <dt>{{ s.label }}</dt>
+          <dd>{{ loading ? '—' : s.value }}</dd>
+        </div>
+      </dl>
+
+      <div class="mt-10 grid lg:grid-cols-12 gap-8 items-start">
+        <div class="lg:col-span-4">
+          <p class="eem-kicker">Our network</p>
+          <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Where our people are</h2>
+          <p class="mt-3 eem-muted leading-relaxed">
+            Everyone who has joined the museum network, by where they are based. Click a dot to see who is there.
           </p>
-          <div class="mt-auto pt-6 flex flex-wrap gap-3">
+          <div class="mt-6 flex flex-wrap gap-3">
             <a
-              :href="mailto(p.subject)"
+              :href="`${NETWORK}/join`"
+              target="_blank"
+              rel="noopener"
               class="eem-btn eem-btn-gold"
-              >{{ p.cta }}</a
+              >Add yourself</a
             >
-            <RouterLink
-              v-if="p.id === 'collaborators'"
-              to="/visit"
+            <a
+              :href="NETWORK"
+              target="_blank"
+              rel="noopener"
               class="eem-btn eem-btn-line"
-              >Visits &amp; loans</RouterLink
+              >Table, timeline &amp; visitors ↗</a
             >
           </div>
-        </li>
-      </ul>
-      <p class="mt-6 text-sm eem-muted">
-        Write to
-        <a
-          :href="mailto('')"
-          class="eem-link"
-          >{{ email }}</a
-        >
-        — a few lines about who you are and what interests you is all it takes to start.
-      </p>
+        </div>
+        <div class="lg:col-span-8 eem-card p-2">
+          <ClientOnly>
+            <EemPeopleMap
+              :people="mapPeople"
+              :groups="GROUPS"
+            />
+          </ClientOnly>
+        </div>
+      </div>
     </section>
 
     <!-- Community -->
@@ -65,7 +58,7 @@
       <div class="container mx-auto box-border px-4 py-16">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p class="eem-kicker">Our community</p>
+            <p class="eem-kicker">Who we are</p>
             <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Who works with the collection</h2>
             <p class="mt-2 eem-muted max-w-2xl">
               Staff, students and collaborators who have joined the museum network.
@@ -84,7 +77,7 @@
               target="_blank"
               rel="noopener"
               class="eem-btn eem-btn-line"
-              >Community map ↗</a
+              >Community app ↗</a
             >
           </div>
         </div>
@@ -188,34 +181,65 @@
       </div>
     </section>
 
-    <!-- Live community network: map, table, timeline and visitors -->
-    <section class="container mx-auto box-border px-4 py-16">
-      <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p class="eem-kicker">Community map</p>
-          <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Our network and visitors</h2>
-          <p class="mt-2 eem-muted max-w-2xl">
-            Everyone connected to the museum, on a map and in a table, with how the community has grown over time and
-            the schools, classes and groups that have visited. Use the Map / List switch inside to change view.
-          </p>
-        </div>
-        <a
-          :href="NETWORK"
-          target="_blank"
-          rel="noopener"
-          class="eem-btn eem-btn-line"
-          >Open full screen ↗</a
+    <!-- Ways in -->
+    <section
+      id="join"
+      class="container mx-auto box-border px-4 py-16 scroll-mt-24"
+    >
+      <p class="eem-kicker">Get involved</p>
+      <h2 class="eem-display mt-3 mb-8 text-3xl sm:text-4xl">Join the community</h2>
+      <ul class="grid lg:grid-cols-3 gap-6">
+        <li
+          v-for="(p, i) in paths"
+          :id="p.id"
+          :key="p.id"
+          class="eem-card eem-path"
         >
-      </div>
-      <div class="eem-network mt-6">
-        <iframe
-          :src="NETWORK"
-          title="Enns Entomology Museum community map and visitors"
-          loading="lazy"
-          referrerpolicy="no-referrer"
-        />
-      </div>
+          <span class="eem-display text-5xl text-[color:var(--eem-gold-deep)]">{{ String(i + 1).padStart(2, '0') }}</span>
+          <h2 class="eem-display mt-3 text-2xl">{{ p.title }}</h2>
+          <p class="mt-2 eem-muted leading-relaxed">{{ p.lede }}</p>
+          <ul class="mt-5 space-y-3">
+            <li
+              v-for="b in p.items"
+              :key="b.title"
+              class="border-l-4 border-[color:var(--eem-gold)] pl-4"
+            >
+              <h3 class="font-bold">{{ b.title }}</h3>
+              <p class="text-sm eem-muted leading-relaxed mt-0.5">{{ b.text }}</p>
+            </li>
+          </ul>
+          <p
+            v-if="p.note"
+            class="mt-5 text-sm leading-relaxed"
+          >
+            {{ p.note }}
+          </p>
+          <div class="mt-auto pt-6 flex flex-wrap gap-3">
+            <a
+              :href="mailto(p.subject)"
+              class="eem-btn eem-btn-gold"
+              >{{ p.cta }}</a
+            >
+            <RouterLink
+              v-if="p.id === 'collaborators'"
+              to="/visit"
+              class="eem-btn eem-btn-line"
+              >Visits &amp; loans</RouterLink
+            >
+          </div>
+        </li>
+      </ul>
+      <p class="mt-6 text-sm eem-muted">
+        Write to
+        <a
+          :href="mailto('')"
+          class="eem-link"
+          >{{ email }}</a
+        >
+        — a few lines about who you are and what interests you is all it takes to start.
+      </p>
     </section>
+
   </div>
 </template>
 
@@ -223,9 +247,10 @@
 import { computed, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import EemPageHead from './components/EemPageHead.vue'
+import EemPeopleMap from './components/EemPeopleMap.vue'
 import info from './components/museumInfo.js'
 
-useHead({ title: 'Students & collaborators — Enns Entomology Museum' })
+useHead({ title: 'People & community — Enns Entomology Museum' })
 
 const NETWORK = 'https://enns-museum-community.netlify.app'
 const base = import.meta.env.BASE_URL || '/'
@@ -277,8 +302,9 @@ const loading = ref(true)
 const data = ref({ people: [], updated: '' })
 
 onMounted(async () => {
-  // Copy of the public list from the museum-network repo (public/associates-public.json)
-  const sources = [`${base}data/community.json`]
+  // The live list from the community network site, so this page always matches it;
+  // the copy in public/data/community.json is used if the network site can't be reached.
+  const sources = [`${NETWORK}/associates-public.json`, `${base}data/community.json`]
   for (const url of sources) {
     try {
       const r = await fetch(url)
@@ -317,6 +343,32 @@ const groups = computed(() =>
   })).filter((g) => g.people.length)
 )
 
+// Numbers and map
+const stats = computed(() => {
+  const ppl = data.value.people
+  const inst = new Set(ppl.map((p) => cleanAff(p.affiliation).trim().toLowerCase()).filter(Boolean))
+  const countries = new Set(ppl.map((p) => p.country).filter((c) => c && !/^\d+$/.test(c)))
+  return [
+    { label: 'People', value: ppl.length },
+    { label: 'Institutions', value: inst.size },
+    { label: 'Countries', value: countries.size },
+    { label: 'Students', value: ppl.filter((p) => groupOf(p) === 'students').length }
+  ]
+})
+const mapPeople = computed(() =>
+  data.value.people
+    .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng))
+    .map((p) => ({
+      name: p.name,
+      lat: p.lat,
+      lng: p.lng,
+      city: p.city,
+      country: /^\d+$/.test(p.country || '') ? '' : p.country,
+      group: groupOf(p),
+      role: p.historical ? p.formerRole : p.title || p.careerStage
+    }))
+)
+
 const updated = computed(() => {
   const d = new Date(data.value.updated)
   return isNaN(d) ? '—' : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
@@ -335,18 +387,6 @@ function initials(n = '') {
 </script>
 
 <style scoped>
-.eem-network {
-  border: 1px solid var(--eem-rule);
-  border-top: 4px solid #000;
-  background: var(--eem-card);
-}
-.eem-network iframe {
-  display: block;
-  width: 100%;
-  height: min(80vh, 760px);
-  min-height: 560px;
-  border: 0;
-}
 .eem-path {
   display: flex;
   flex-direction: column;
@@ -398,5 +438,36 @@ function initials(n = '') {
   border: 1px solid var(--eem-rule);
   border-radius: 2px;
   background: var(--eem-paper);
+}
+.eem-ppl-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 4px solid #000;
+  border-left: 1px solid var(--eem-rule);
+}
+@media (min-width: 768px) {
+  .eem-ppl-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.eem-ppl-stats > div {
+  padding: 1rem 1.25rem;
+  border-right: 1px solid var(--eem-rule);
+  border-bottom: 1px solid var(--eem-rule);
+  background: var(--eem-card);
+}
+.eem-ppl-stats dt {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eem-ink-soft);
+}
+.eem-ppl-stats dd {
+  margin: 0.3rem 0 0;
+  font-family: 'Archivo', Inter, system-ui, sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1.1;
 }
 </style>

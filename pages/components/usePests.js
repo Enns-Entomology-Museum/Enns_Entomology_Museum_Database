@@ -120,6 +120,8 @@ function makeSpecies(otu, taxonName) {
     // county key → { reported: [{ year, source }], museum: n, gbif: n, inat: n, firstYear }
     records: {},
     months: Array(12).fill(0),
+    // Enns Museum specimens: { cat, county, lat, lng, date, by, type }
+    specimens: [],
     inatLoaded: false,
     inatTotal: null,
     gbifKey: null,
@@ -129,8 +131,12 @@ function makeSpecies(otu, taxonName) {
 
 function addRecord(sp, key, kind, extra = {}) {
   if (!key) return
-  const r = (sp.records[key] ||= { reported: [], museum: 0, gbif: 0, inat: 0, firstYear: null })
+  const r = (sp.records[key] ||= { reported: [], museum: 0, specimens: [], gbif: 0, inat: 0, firstYear: null })
   if (kind === 'reported') r.reported.push(extra)
+  else if (kind === 'museum') {
+    r.museum += 1
+    if (extra.specimen) r.specimens.push(extra.specimen)
+  }
   else r[kind] += extra.n || 1
   const y = Number(extra.year)
   if (y && (!r.firstYear || y < r.firstYear)) r.firstYear = y
@@ -305,7 +311,19 @@ function loadMuseum(species, missouri) {
     records
       .filter((r) => lower([r.genus, r.specificEpithet].filter(Boolean).join(' ')) === n || lower(r.scientificName).startsWith(n))
       .forEach((r) => {
-        addRecord(sp, countyKey(r.county), 'museum', { year: Number(String(r.eventDate || r.year || '').slice(0, 4)) || null })
+        const lat = Number(r.decimalLatitude)
+        const lng = Number(r.decimalLongitude)
+        const specimen = {
+          cat: r.catalogNumber || '',
+          county: r.county || '',
+          lat: Number.isFinite(lat) && r.decimalLatitude !== '' && r.decimalLatitude != null ? lat : null,
+          lng: Number.isFinite(lng) && r.decimalLongitude !== '' && r.decimalLongitude != null ? lng : null,
+          date: r.eventDate || '',
+          by: r.recordedBy || '',
+          type: r.typeStatus || ''
+        }
+        sp.specimens.push(specimen)
+        addRecord(sp, countyKey(r.county), 'museum', { year: Number(String(r.eventDate || r.year || '').slice(0, 4)) || null, specimen })
         const m = Number(r.month || String(r.eventDate || '').slice(5, 7))
         if (m >= 1 && m <= 12) sp.months[m - 1] += 1
       })

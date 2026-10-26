@@ -68,6 +68,11 @@
               :alt="p.name ? `Specimen of ${p.name}` : 'Specimen photograph'"
               loading="lazy"
             />
+            <span
+              v-if="p.type"
+              :class="['eem-shot-type', { primary: p.type.primary }]"
+              >{{ p.type.label }}</span
+            >
             <span class="eem-shot-cap">
               <i v-if="p.name">{{ p.name }}</i>
               <span
@@ -85,7 +90,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { normCat, useEem, useSpecimenImages } from './useEem.js'
+import { normCat, typeInfo, useEem, useSpecimenImages } from './useEem.js'
 
 const eem = useEem()
 const imgs = useSpecimenImages()
@@ -97,16 +102,26 @@ const byCat = computed(() => {
   return m
 })
 
-const items = computed(() =>
-  imgs.items.map((i) => {
-    const r = byCat.value.get(i.cat)
-    return {
-      ...i,
-      cat: r?.catalogNumber || i.cat,
-      name: r ? [r.genus, r.specificEpithet].filter(Boolean).join(' ') || r.family || r.order : ''
-    }
+// One photo per specimen (the habitus rather than the labels when both exist), newest first
+const items = computed(() => {
+  const best = new Map()
+  imgs.items.forEach((i) => {
+    const key = i.cat || `img-${i.id}`
+    const have = best.get(key)
+    if (!have || (have.labelsShot && !i.labelsShot)) best.set(key, i)
   })
-)
+  return [...best.values()]
+    .sort((a, b) => b.id - a.id)
+    .map((i) => {
+      const r = byCat.value.get(i.cat)
+      return {
+        ...i,
+        cat: r?.catalogNumber || i.cat,
+        name: r ? [r.genus, r.specificEpithet].filter(Boolean).join(' ') || r.family || r.order : '',
+        type: r ? typeInfo(r.typeStatus) : null
+      }
+    })
+})
 
 function scroll(dir) {
   const el = track.value
@@ -154,6 +169,23 @@ function scroll(dir) {
 }
 .eem-shot-link:hover img {
   transform: scale(1.04);
+}
+.eem-shot-type {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 1;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  background: #f6d5d1;
+  color: #8a1c1c;
+}
+.eem-shot-type.primary {
+  background: #be2828;
+  color: #fff;
 }
 .eem-shot-cap {
   position: absolute;

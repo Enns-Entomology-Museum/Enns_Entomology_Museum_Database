@@ -122,11 +122,18 @@
         <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Orders in the database</h2>
         <p class="mt-3 eem-muted">{{ sampleNote }}</p>
 
-        <ul class="mt-7 space-y-3">
+        <ul class="mt-7 space-y-1">
           <li
             v-for="o in orders"
             :key="o.name"
           >
+            <button
+              type="button"
+              :class="['eem-order-row', { on: mapOrder === o.name, off: mapOrder && mapOrder !== o.name }]"
+              :aria-pressed="mapOrder === o.name"
+              :title="mapOrder === o.name ? 'Show all orders on the map' : `Show only ${o.name} on the map`"
+              @click="mapOrder = mapOrder === o.name ? '' : o.name"
+            >
             <div class="flex items-baseline justify-between gap-3">
               <span>
                 <strong class="font-semibold">{{ o.name }}</strong>
@@ -140,8 +147,9 @@
               <span class="tabular-nums text-sm font-semibold">{{ fmt(o.n) }}</span>
             </div>
             <div class="eem-hbar mt-1.5">
-              <span :style="{ width: o.share + '%' }" />
+              <span :style="{ width: o.share + '%', background: orderColor(o.name, mainOrders, isDark) || '#8a8478' }" />
             </div>
+            </button>
           </li>
           <li
             v-if="eem.loaded && !orders.length"
@@ -160,21 +168,32 @@
       <div class="lg:col-span-7">
         <p class="eem-kicker">Where they come from</p>
         <h2 class="eem-display mt-3 text-3xl sm:text-4xl">Collecting localities</h2>
-        <div class="mt-6 eem-card p-2">
+        <p class="mt-3 eem-muted text-sm">
+          Click a dot for its specimens, a state to zoom in, or an order on the left to show only that order.
+        </p>
+        <div class="mt-5 eem-card p-2">
           <ClientOnly>
-            <EemMap
-              :points="points"
+            <EemHomeMap
+              :records="eem.records"
+              :main-orders="mainOrders"
+              :focus-state="mapState"
+              :filter-order="mapOrder"
               height="440px"
+              @reset="resetMap"
             />
           </ClientOnly>
         </div>
         <div class="mt-4 flex flex-wrap gap-2">
-          <span
+          <button
             v-for="s in states.slice(0, 8)"
             :key="s.name"
-            class="eem-chip"
-            >{{ s.name }} <b>{{ s.n }}</b></span
+            type="button"
+            :class="['eem-chip eem-chip-btn', { on: mapState === s.name }]"
+            :aria-pressed="mapState === s.name"
+            @click="mapState = mapState === s.name ? '' : s.name"
           >
+            {{ s.name }} <b>{{ s.n }}</b>
+          </button>
         </div>
       </div>
     </section>
@@ -260,15 +279,15 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useHead } from '@unhead/vue'
 import EemGbif from './components/EemGbif.vue'
-import EemMap from './components/EemMap.vue'
+import EemHomeMap from './components/EemHomeMap.vue'
 import EemMissouriBand from './components/EemMissouriBand.vue'
 import EemNews from './components/EemNews.vue'
 import EemPhotos from './components/EemPhotos.vue'
 import EemSearch from './components/EemSearch.vue'
-import { COLLECTION_ESTIMATE, ORDER_NAMES, collectorsOf, countBy, fmt, typeInfo, typeKinds, useEem, useTypes } from './components/useEem.js'
+import { COLLECTION_ESTIMATE, ORDER_NAMES, collectorsOf, countBy, fmt, orderColor, typeInfo, typeKinds, useEem, useTypes } from './components/useEem.js'
 import EemProgress from './components/EemProgress.vue'
 
 useHead({ title: 'Enns Entomology Museum — University of Missouri' })
@@ -332,15 +351,24 @@ const sampleNote = computed(() => {
 
 const states = computed(() => countBy(eem.records, 'stateProvince'))
 
-const points = computed(() =>
-  eem.records
-    .filter((r) => r.decimalLatitude && r.decimalLongitude)
-    .map((r) => ({
-      lat: Number(r.decimalLatitude),
-      lng: Number(r.decimalLongitude),
-      html: `<strong>${r.catalogNumber || ''}</strong><br><i>${r.scientificName || ''}</i><br>${placeOf(r)}`
-    }))
-)
+// Map: state chips zoom in, order bars filter; the three biggest orders get a colour
+const mapState = ref('')
+const mapOrder = ref('')
+const mainOrders = computed(() => countBy(eem.records, 'order').slice(0, 3).map((o) => o.name))
+function resetMap() {
+  mapState.value = ''
+  mapOrder.value = ''
+}
+
+// light / dark theme (for the order colours)
+const isDark = ref(false)
+let themeObserver
+onMounted(() => {
+  isDark.value = document.documentElement.classList.contains('dark')
+  themeObserver = new MutationObserver(() => (isDark.value = document.documentElement.classList.contains('dark')))
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+})
+onBeforeUnmount(() => themeObserver?.disconnect())
 
 const recent = computed(() => eem.records.slice(0, 8))
 
@@ -513,5 +541,30 @@ const uses = [
   line-height: 1;
   color: var(--eem-gold);
   -webkit-text-stroke: 1px #000;
+}
+.eem-order-row {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.45rem 0.5rem;
+  margin: 0 -0.5rem;
+  width: calc(100% + 1rem);
+  border-radius: 4px;
+  transition: opacity 0.2s, background 0.2s;
+}
+.eem-order-row:hover,
+.eem-order-row.on {
+  background: color-mix(in srgb, var(--eem-gold) 12%, transparent);
+}
+.eem-order-row.off {
+  opacity: 0.4;
+}
+.eem-chip-btn {
+  cursor: pointer;
+}
+.eem-chip-btn:hover,
+.eem-chip-btn.on {
+  outline: 2px solid var(--eem-gold);
+  outline-offset: 1px;
 }
 </style>

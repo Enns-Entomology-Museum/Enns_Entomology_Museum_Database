@@ -19,7 +19,14 @@
           <i :style="{ background: palette[k.key] }" />{{ k.label }}
           <span class="tabular-nums eem-muted">{{ kindCounts[k.key] }}</span>
         </li>
+        <li v-if="mixedCount">
+          <i :style="{ background: `repeating-linear-gradient(45deg, ${palette.museum} 0 4px, ${palette.other} 4px 8px)` }" />Several kinds of
+          record <span class="tabular-nums eem-muted">{{ mixedCount }}</span>
+        </li>
         <li><i :style="{ background: EMPTY_C }" />No record yet</li>
+        <li v-if="pinned.length">
+          <b class="eem-pmap-dot" />Enns Museum specimen, exact locality <span class="tabular-nums eem-muted">{{ pinned.length }}</span>
+        </li>
       </template>
       <template v-else>
         <li><i :style="{ background: EMPTY_C }" />None yet</li>
@@ -40,6 +47,7 @@
 //    (Enns Museum specimen > reported in the literature or a survey > GBIF or iNaturalist)
 //  • no species: counties shaded by how many tracked species are recorded there
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { countyKey, evidenceOf } from './usePests.js'
 
 const props = defineProps({
@@ -68,6 +76,8 @@ const EMPTY_C = computed(() => (isDark.value ? EMPTY_DARK : EMPTY_LIGHT))
 let L = null
 let map = null
 let layer = null
+let pins = null
+const router = useRouter()
 let geo = null
 let observer = null
 
@@ -80,6 +90,38 @@ const kindCounts = computed(() => {
   })
   return c
 })
+
+// All kinds of record in a county, strongest first (museum > reported > other)
+function kindsOf(r) {
+  if (!r) return []
+  return [r.museum && 'museum', r.reported.length && 'reported', (r.gbif || r.inat) && 'other'].filter(Boolean)
+}
+const mixedCount = computed(() => Object.values(props.species?.records || {}).filter((r) => kindsOf(r).length > 1).length)
+
+// Striped SVG patterns for counties with several kinds of record
+function ensurePatterns() {
+  const svg = el.value?.querySelector('.leaflet-overlay-pane svg')
+  if (!svg) return
+  let defs = svg.querySelector('defs#eem-mix')
+  if (!defs) {
+    defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs')
+    defs.id = 'eem-mix'
+    svg.prepend(defs)
+  }
+  const combos = [
+    ['museum', 'reported'],
+    ['museum', 'other'],
+    ['reported', 'other'],
+    ['museum', 'reported', 'other']
+  ]
+  defs.innerHTML = combos
+    .map((ks) => {
+      const w = 5
+      const bands = ks.map((k, i) => `<rect x="${i * w}" y="0" width="${w}" height="${w * ks.length}" fill="${palette.value[k]}"/>`).join('')
+      return `<pattern id="eem-mix-${ks.join('-')}" patternUnits="userSpaceOnUse" width="${w * ks.length}" height="${w * ks.length}" patternTransform="rotate(45)">${bands}</pattern>`
+    })
+    .join('')
+}
 
 // overview: number of species per county
 const speciesPerCounty = computed(() => {
@@ -134,13 +176,50 @@ function tooltip(name, key) {
 
 function fillFor(key) {
   if (!props.species) return rampColor(speciesPerCounty.value[key] || 0)
+  const kinds = kindsOf(props.species.records[key])
+  if (kinds.length > 1) return `url(#eem-mix-${kinds.join('-')})`
   const kind = evidenceOf(props.species.records[key])
   return kind ? palette.value[kind] : EMPTY_C.value
+}
+
+// Enns Museum specimens with coordinates → one dot per locality (several specimens can share it)
+const pinned = computed(() => (props.species?.specimens || []).filter((s) => s.lat != null && s.lng != null))
+const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
+
+function drawPins() {
+  if (pins) pins.remove()
+  pins = null
+  if (!map || !L || !pinned.value.length) return
+  const groups = new Map()
+  pinned.value.forEach((s) => {
+    const k = `${s.lat.toFixed(5)},${s.lng.toFixed(5)}`
+    if (!groups.has(k)) groups.set(k, [])
+    groups.get(k).push(s)
+  })
+  pins = L.layerGroup()
+  groups.forEach((list) => {
+    const { lat, lng } = list[0]
+    const m = L.circleMarker([lat, lng], {
+      radius: list.length > 1 ? 4.5 : 3.5,
+      color: '#fff',
+      weight: 1.5,
+      fillColor: '#d62828',
+      fillOpacity: 1
+    })
+    const rows = list
+      .map((s) => `<b>${esc(s.cat)}</b>${s.type ? ` · ${esc(s.type)}` : ''}<br><span>${esc(s.date)}${s.by ? ` · ${esc(s.by)}` : ''}</span>`)
+      .join('<br>')
+    m.bindTooltip(`${list.length > 1 ? `<b>${list.length} Enns Museum specimens</b><br>` : ''}${rows}<br><em>Click to open ${list.length > 1 ? 'the first' : 'the specimen'}</em>`)
+    m.on('click', () => router.push({ path: '/specimen', query: { cat: list[0].cat } }))
+    pins.addLayer(m)
+  })
+  pins.addTo(map)
 }
 
 function draw(fit = false) {
   if (!map || !L || !geo) return
   if (layer) layer.remove()
+  ensurePatterns()
   layer = L.geoJSON(geo, {
     style: (f) => ({
       color: isDark.value ? '#55524b' : '#8a8478',
@@ -158,7 +237,9 @@ function draw(fit = false) {
       })
     }
   }).addTo(map)
+  ensurePatterns() // the overlay SVG exists only after the first layer is added
   if (fit) map.fitBounds(layer.getBounds(), { padding: [10, 10] })
+  drawPins()
 }
 
 onMounted(async () => {
@@ -183,7 +264,12 @@ onMounted(async () => {
 
 // redraw when records arrive (iNaturalist fills in over time) or the species changes
 watch(
-  () => [props.species, isDark.value, JSON.stringify(props.species ? props.species.records : speciesPerCounty.value)],
+  () => [
+    props.species,
+    isDark.value,
+    JSON.stringify(props.species ? props.species.records : speciesPerCounty.value),
+    pinned.value.length
+  ],
   () => draw()
 )
 
@@ -217,6 +303,14 @@ onBeforeUnmount(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+}
+.eem-pmap-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  background: #d62828;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px #8a8478;
 }
 .eem-pmap-legend i {
   width: 0.9rem;

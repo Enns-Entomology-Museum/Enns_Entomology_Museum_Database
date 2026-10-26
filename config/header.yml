@@ -42,10 +42,14 @@ header_links:
         link: /outreach
       - label: Donate
         link: /donate
-      - label: Students & collaborators
-        link: /people
+      - label: Join as a student or collaborator
+        link: /people#join
       - label: Tell us about your paper
         link: /submit-paper
 
   - label: About
-    link: /about
+    submenu:
+      - label: The museum
+        link: /about
+      - label: People & community
+        link: /people

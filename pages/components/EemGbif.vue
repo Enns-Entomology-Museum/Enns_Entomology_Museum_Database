@@ -239,6 +239,11 @@ function copy() {
   border: 2px solid var(--eem-ink);
   border-radius: 4px;
 }
+:global(.dark) .eem-gbif-logo {
+  background: #fff;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+}
 .eem-doi {
   display: inline-flex;
   align-items: stretch;

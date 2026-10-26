@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-13T15:46:45.203Z",
-  "count": 13,
+  "updated": "2026-10-19T22:28:18.093Z",
+  "count": 27,
   "people": [
     {
       "name": "Davide Dal Pos",
@@ -355,6 +355,406 @@
       "title": "",
       "orcid": "0000-0003-1066-8912",
       "website": "",
+      "note": ""
+    },
+    {
+      "name": "Robert W. Sites",
+      "affiliation": "University of Missouri",
+      "careerStage": "Museum or collection staff",
+      "role": "Former museum staff",
+      "staff": false,
+      "taxa": [],
+      "interactions": [
+        "Curation or collection management"
+      ],
+      "startYear": 1991,
+      "ongoing": false,
+      "historical": true,
+      "formerRole": "Director",
+      "endYear": 2026,
+      "deceased": false,
+      "born": null,
+      "died": null,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.95,
+      "lng": -92.33,
+      "title": "Director of the Enns Entomology Museum",
+      "orcid": "",
+      "website": "",
+      "note": "Built the Naucoridae collection"
+    },
+    {
+      "name": "Robert W. Sites",
+      "affiliation": "University of Missouri",
+      "careerStage": "Faculty / researcher",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Hemiptera",
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Taught with the collection",
+        "Visited the collection",
+        "Used images or data",
+        "Co-authored with museum staff",
+        "Volunteered",
+        "Curation or collection management",
+        "Identified specimens",
+        "Borrowed specimens (loan)",
+        "Donated specimens",
+        "Mentored or trained at the museum",
+        "Outreach or education"
+      ],
+      "startYear": 1991,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Emeritus Professor",
+      "orcid": "0000-0002-3895-813X",
+      "website": "",
+      "note": "Revision of world Naucoridae"
+    },
+    {
+      "name": "Kristin B. Simpson",
+      "affiliation": "University of Missouri",
+      "careerStage": "Museum or collection staff",
+      "role": "Former museum staff",
+      "staff": false,
+      "taxa": [],
+      "interactions": [
+        "Curation or collection management"
+      ],
+      "startYear": 1989,
+      "ongoing": false,
+      "historical": true,
+      "formerRole": "Collection manager",
+      "endYear": 2026,
+      "deceased": false,
+      "born": null,
+      "died": null,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.95,
+      "lng": -92.33,
+      "title": "Collection Manager of the Enns Entomology Museum",
+      "orcid": "",
+      "website": "",
+      "note": "Curated the Enns Entomology Museum collection"
+    },
+    {
+      "name": "Kristin B. Simpson",
+      "affiliation": "Private",
+      "careerStage": "Other",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Hemiptera",
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Taught with the collection",
+        "Visited the collection",
+        "Volunteered",
+        "Co-authored with museum staff",
+        "Outreach or education",
+        "Curation or collection management"
+      ],
+      "startYear": 1989,
+      "ongoing": true,
+      "city": "Jefferson City, MO",
+      "country": "United States",
+      "lat": 38.577359,
+      "lng": -92.1724265,
+      "title": "Retired",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Higor Rodrigues",
+      "affiliation": "Fundação Oswaldo Cruz",
+      "careerStage": "Postdoc",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Identified specimens",
+        "Visited the collection",
+        "Borrowed specimens (loan)",
+        "Donated specimens",
+        "Co-authored with museum staff"
+      ],
+      "startYear": 2015,
+      "ongoing": true,
+      "city": "Rio de Janeiro",
+      "country": "Brazil",
+      "lat": -22.8767563,
+      "lng": -43.2469314,
+      "title": "Postdoc",
+      "orcid": "0000-0002-9649-4142",
+      "website": "",
+      "note": "Taxonomy of the aquatic Heteroptera"
+    },
+    {
+      "name": "Suputa .",
+      "affiliation": "Universitas Gadjah Mada",
+      "careerStage": "Faculty / researcher",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Hemiptera",
+        "Diptera",
+        "Hymenoptera",
+        "Coleoptera",
+        "Lepidoptera",
+        "Orthoptera",
+        "Odonata"
+      ],
+      "interactions": [
+        "Visited the collection",
+        "Co-authored with museum staff",
+        "Donated specimens"
+      ],
+      "startYear": 2008,
+      "ongoing": true,
+      "city": "Yogyakarta",
+      "country": "Indonesia",
+      "lat": -7.7676341,
+      "lng": 110.3788843,
+      "title": "Dr.",
+      "orcid": "0000-0001-6941-5026",
+      "website": "https://hpt.faperta.ugm.ac.id/suputa/",
+      "note": "Collaborative Research on Aquatic Insect Taxonomy and Biodiversity with Prof. Robert W. Sites (2008), including Specimen Deposition at the Enns Entomology Museum."
+    },
+    {
+      "name": "Richard Zack",
+      "affiliation": "Washington State University",
+      "careerStage": "Faculty / researcher",
+      "role": "Visitor",
+      "staff": false,
+      "taxa": [
+        "Coleoptera",
+        "Hemiptera",
+        "Lepidoptera",
+        "Diptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Visited the collection",
+        "Used images or data",
+        "Co-authored with museum staff",
+        "Volunteered",
+        "Curation or collection management",
+        "Identified specimens",
+        "Borrowed specimens (loan)",
+        "Donated specimens",
+        "Mentored or trained at the museum"
+      ],
+      "startYear": 1990,
+      "ongoing": true,
+      "city": "Pullman",
+      "country": "United States",
+      "lat": 46.7337716,
+      "lng": -117.1498035,
+      "title": "Professor",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Anh Duc Tran",
+      "affiliation": "Vietnam National University",
+      "careerStage": "Faculty / researcher",
+      "role": "Research associate",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Co-authored with museum staff",
+        "Research using the collection",
+        "Borrowed specimens (loan)"
+      ],
+      "startYear": 2007,
+      "ongoing": true,
+      "city": "Hanoi",
+      "country": "Vietnam",
+      "lat": 21.0388103,
+      "lng": 105.7818897,
+      "title": "Associate Professor",
+      "orcid": "0000-0001-9605-0739",
+      "website": "",
+      "note": "Revisionary work on various family of Hemiptera"
+    },
+    {
+      "name": "Akekawat Vitheepradit",
+      "affiliation": "Kasetsart Uni",
+      "careerStage": "Faculty / researcher",
+      "role": "Student / mentee",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Curation or collection management",
+        "Identified specimens",
+        "Visited the collection",
+        "Borrowed specimens (loan)",
+        "Used images or data",
+        "Donated specimens",
+        "Co-authored with museum staff"
+      ],
+      "startYear": 1998,
+      "ongoing": true,
+      "city": "Bangkok",
+      "country": "Thailand",
+      "lat": 13.8482589,
+      "lng": 100.5675435,
+      "title": "Associate Professor",
+      "orcid": "0000-0003-4777-8330",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Ryn Kreitz",
+      "affiliation": "Univeristy of Missouri",
+      "careerStage": "Other",
+      "role": "Friend of the museum",
+      "staff": false,
+      "taxa": [
+        "Hymenoptera"
+      ],
+      "interactions": [
+        "Curation or collection management",
+        "Outreach or education"
+      ],
+      "startYear": 2024,
+      "ongoing": true,
+      "city": "Columbia",
+      "country": "United States",
+      "lat": 38.9364147,
+      "lng": -92.329703,
+      "title": "Research Technician",
+      "orcid": "",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Felipe Moreira",
+      "affiliation": "Fundação Oswaldo Cruz",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Used images or data",
+        "Co-authored with museum staff",
+        "Identified specimens",
+        "Borrowed specimens (loan)"
+      ],
+      "startYear": 2013,
+      "ongoing": true,
+      "city": "Rio de Janeiro",
+      "country": "Brazil",
+      "lat": -22.8767563,
+      "lng": -43.2469314,
+      "title": "Technologist in Public Health",
+      "orcid": "0000-0002-6692-0323",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Dalton Ludwick",
+      "affiliation": "USDA-ARS Plant Genetics Research Unit",
+      "careerStage": "Government / agency",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Coleoptera",
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Visited the collection",
+        "Co-authored with museum staff",
+        "Outreach or education",
+        "Identified specimens",
+        "Donated specimens",
+        "Mentored or trained at the museum"
+      ],
+      "startYear": 2010,
+      "ongoing": true,
+      "city": "Columbia, MO",
+      "country": "United States",
+      "lat": 38.951883,
+      "lng": -92.3337366,
+      "title": "Research Entomologist",
+      "orcid": "0000-0003-2061-3579",
+      "website": "",
+      "note": ""
+    },
+    {
+      "name": "Zhen Ye",
+      "affiliation": "Nankai University",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Hemiptera"
+      ],
+      "interactions": [
+        "Research using the collection"
+      ],
+      "startYear": 2020,
+      "ongoing": true,
+      "city": "Tianjin",
+      "country": "China",
+      "lat": 39.1035701,
+      "lng": 117.1622314,
+      "title": "",
+      "orcid": "",
+      "website": "",
+      "note": "Macro-evolution of Naucoridae project"
+    },
+    {
+      "name": "Grey Gustafson",
+      "affiliation": "Northern Arizona University",
+      "careerStage": "Faculty / researcher",
+      "role": "Collaborator",
+      "staff": false,
+      "taxa": [
+        "Coleoptera"
+      ],
+      "interactions": [
+        "Research using the collection",
+        "Visited the collection",
+        "Co-authored with museum staff",
+        "Curation or collection management",
+        "Identified specimens",
+        "Borrowed specimens (loan)",
+        "Mentored or trained at the museum"
+      ],
+      "startYear": 2015,
+      "ongoing": true,
+      "city": "Flagstaff",
+      "country": "United States",
+      "lat": 35.1830867,
+      "lng": -111.654961,
+      "title": "Associate Professor",
+      "orcid": "0000-0002-2014-7128",
+      "website": "https://www.gustafsonlab.org/",
       "note": ""
     }
   ]

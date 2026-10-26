@@ -201,13 +201,24 @@ export function useSpecimenImages() {
   makeAPIRequest
     .get('/images', { params: { per: 60, 'extend[]': ['depictions'] } })
     .then(({ data }) => {
+      // Only photos of specimens (not logos or other project images), newest first
       imgState.items = (Array.isArray(data) ? data : [])
         .map((im) => {
-          const label = (im.depictions || []).map((d) => d.label).join(' ')
+          const deps = (im.depictions || []).filter((d) => d.depiction_object_type === 'CollectionObject')
+          const label = deps.map((d) => d.label).join(' ')
           const m = label.match(/EEM\s?\d{6,9}/i)
-          return { id: im.id, thumb: im.thumb, medium: im.medium, cat: m ? normCat(m[0]) : '' }
+          return {
+            id: im.id,
+            thumb: im.thumb,
+            medium: im.medium,
+            cat: m ? normCat(m[0]) : '',
+            specimen: deps.length > 0,
+            // a photo of the labels rather than the specimen (depiction caption "Labels")
+            labelsShot: deps.some((d) => /label/i.test(d.caption || ''))
+          }
         })
-        .filter((i) => i.medium)
+        .filter((i) => i.medium && i.specimen)
+        .sort((a, b) => b.id - a.id)
     })
     .catch(() => {})
     .finally(() => (imgState.loaded = true))
@@ -288,4 +299,14 @@ export function typeKinds(rows) {
   return [...m.entries()]
     .sort((a, b) => rank(a[0]) - rank(b[0]))
     .map(([kind, n]) => ({ kind, n, label: kind.charAt(0).toUpperCase() + kind.slice(1) + (n === 1 ? '' : 's'), primary: PRIMARY_TYPES.includes(kind) }))
+}
+
+// ── Insect-order colours (home page bars and map) ─────────────────────────
+// Three categorical slots, validated for colour-vision deficiency on light and dark
+// backgrounds when used together on a map; any further order is shown as "Other".
+const ORDER_LIGHT = ['#2a78d6', '#eb6834', '#1baf7a']
+const ORDER_DARK = ['#3987e5', '#d95926', '#199e70']
+export function orderColor(order, mainOrders = [], dark = false) {
+  const i = mainOrders.indexOf(order)
+  return i < 0 ? null : (dark ? ORDER_DARK : ORDER_LIGHT)[i]
 }
