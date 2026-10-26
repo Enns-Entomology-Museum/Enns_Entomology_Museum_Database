@@ -15,12 +15,12 @@
         >
           <dt class="eem-kicker !text-[0.68rem]">{{ s.label }}</dt>
           <dd class="eem-display text-4xl mt-2">{{ s.value }}</dd>
-          <p
+          <dd
             v-if="s.note"
             class="text-xs eem-muted mt-1"
           >
             {{ s.note }}
-          </p>
+          </dd>
         </div>
       </dl>
     </section>
@@ -657,7 +657,7 @@ const stats = computed(() => {
 .pest-thumb-all {
   display: grid;
   place-items: center;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 0.8rem;
   text-transform: uppercase;
@@ -691,7 +691,7 @@ const stats = computed(() => {
   color: var(--eem-ink-soft);
 }
 .pest-facts dd {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.35rem;
   font-variant-numeric: tabular-nums;
@@ -702,7 +702,7 @@ const stats = computed(() => {
   gap: 0 0.9rem;
 }
 .pest-other small {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--eem-ink-soft);

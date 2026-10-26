@@ -110,7 +110,7 @@
           <div
             class="eem-decades mt-5"
             role="img"
-            :aria-label="decades.map((d) => `${d.name}: ${d.n}`).join(', ')"
+            :aria-label="decades.length ? `Specimens by decade collected: ${decades.map((d) => `${d.name}: ${d.n}`).join(', ')}` : 'Specimens by decade collected'"
           >
             <div
               v-for="d in decades"
@@ -352,7 +352,7 @@ const sampleNote = computed(() => {
 }
 .eem-loan-stats dd {
   margin: 0.35rem 0 0;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2.4rem;
   line-height: 1.1;

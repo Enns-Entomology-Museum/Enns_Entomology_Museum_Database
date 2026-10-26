@@ -5,7 +5,7 @@
         ref="el"
         class="eem-smap-map"
         :style="{ height }"
-        role="img"
+        role="region"
         :aria-label="`Map of the collecting locality of ${rec.catalogNumber}`"
       />
 
@@ -276,10 +276,10 @@ function drawMe() {
   if (uncertainty.value) {
     L.circle([lat.value, lng.value], {
       radius: uncertainty.value,
-      color: '#f1b82d',
+      color: '#fdb719',
       weight: 2,
       dashArray: '5 5',
-      fillColor: '#f1b82d',
+      fillColor: '#fdb719',
       fillOpacity: 0.12,
       interactive: false
     }).addTo(layerMe)
@@ -317,7 +317,7 @@ function drawOthers() {
       radius: list.length > 1 ? 6 : 4.5,
       color: '#fff',
       weight: 1.5,
-      fillColor: '#f1b82d',
+      fillColor: '#fdb719',
       fillOpacity: 1
     })
     const place = [r0.county ? `${r0.county} Co.` : '', r0.stateProvince, r0.country === 'United States' ? 'USA' : r0.country].filter(Boolean).join(', ')
@@ -456,13 +456,13 @@ onBeforeUnmount(() => map && map.remove())
   background: #be2828;
 }
 .eem-smap-legend .sw.other {
-  background: #f1b82d;
+  background: #fdb719;
   border: 1.5px solid #fff;
   box-shadow: 0 0 0 1px #888;
 }
 .eem-smap-legend .sw.circle {
   border: 2px dashed #c48a0e;
-  background: rgba(241, 184, 45, 0.15);
+  background: rgba(253, 183, 25, 0.15);
 }
 .eem-smap-label {
   display: flex;

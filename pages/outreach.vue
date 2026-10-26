@@ -319,7 +319,7 @@ function reset() {
   border-top: 1px solid var(--eem-rule);
 }
 .eem-form legend {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.15rem;
   margin-bottom: 0.9rem;

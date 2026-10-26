@@ -234,7 +234,7 @@ const points = computed(() =>
 }
 .eem-col-stats dd {
   margin: 0.3rem 0 0;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2rem;
   line-height: 1.1;

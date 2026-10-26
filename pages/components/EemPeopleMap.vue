@@ -4,7 +4,7 @@
       ref="el"
       class="eem-pplmap"
       :style="{ height }"
-      role="img"
+      role="region"
       :aria-label="`Map of where the ${people.length} members of the museum community are based`"
     />
     <ul

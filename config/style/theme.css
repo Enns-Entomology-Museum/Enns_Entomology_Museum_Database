@@ -1,14 +1,16 @@
 /*
   Enns Entomology Museum — University of Missouri
-  Mizzou black & gold, with warm limestone neutrals (Francis Quadrangle columns).
+  Mizzou brand colors (brand.missouri.edu/brand-visuals/colors): Tiger Paw Black #000,
+  Mizzou Gold #FDB719 and its tints. Gold is never used as text on light backgrounds
+  (not an approved combination), so light-mode accents and links are black.
 */
 :root {
   --tp-primary: rgb(0, 0, 0);
   --tp-primary-content: rgb(255, 255, 255);
-  --tp-secondary: rgb(140, 100, 10);
-  --tp-secondary-content: rgb(0, 0, 0);
+  --tp-secondary: rgb(0, 0, 0);
+  --tp-secondary-content: rgb(255, 255, 255);
   --tp-success: rgb(46, 125, 50);
-  --tp-warning: rgb(241, 184, 45);
+  --tp-warning: rgb(253, 183, 25);
   --tp-danger: rgb(190, 40, 40);
   --tp-base-foreground: rgb(255, 255, 255);
   --tp-base-background: rgb(247, 245, 240);
@@ -24,11 +26,11 @@
   --tp-footer-background: rgb(0, 0, 0);
   --tp-footer-content: rgb(255, 255, 255);
   --tp-footer-link: rgb(200, 195, 185);
-  --tp-footer-link-hover: rgb(241, 184, 45);
+  --tp-footer-link-hover: rgb(253, 183, 25);
   --tp-footer-border: rgb(45, 45, 45);
   --tp-map-georeference: rgb(196, 140, 10);
   --tp-map-aggregate: rgb(60, 60, 60);
-  --tp-map-asserted: rgb(241, 184, 45);
+  --tp-map-asserted: rgb(253, 183, 25);
   --tp-map-asserted-absent: rgb(106, 81, 163);
   --tp-map-type-material: rgb(51, 112, 200);
   --tp-map-collection-object: rgb(196, 140, 10);
@@ -39,8 +41,8 @@
   --tp-map-marker-opacity: 0.8;
 
   /* EEM palette for the custom pages */
-  --eem-gold: #f1b82d;
-  --eem-gold-deep: #8c640a;
+  --eem-gold: #fdb719;
+  --eem-gold-deep: #000000;
   --eem-black: #000000;
   --eem-ink: #111111;
   --eem-ink-soft: #5c5850;
@@ -53,7 +55,7 @@
 .dark {
   --tp-primary: rgb(0, 0, 0);
   --tp-primary-content: rgb(255, 255, 255);
-  --tp-secondary: rgb(241, 184, 45);
+  --tp-secondary: rgb(253, 183, 25);
   --tp-secondary-content: rgb(0, 0, 0);
   --tp-base-background: rgb(14, 14, 13);
   --tp-base-foreground: rgb(26, 26, 24);
@@ -69,7 +71,7 @@
   --tp-scrollbar-thumb: rgb(90, 88, 82);
   --tp-scrollbar-track: rgb(26, 26, 24);
 
-  --eem-gold-deep: #f1b82d;
+  --eem-gold-deep: #fdb719;
   --eem-ink: #f0ede6;
   --eem-ink-soft: #aaa59b;
   --eem-paper: #0e0e0d;
@@ -99,7 +101,7 @@
 .tp-header > .container > a:hover > img,
 .tp-header > .container > a:focus-visible > img {
   transform: scale(1.06);
-  filter: drop-shadow(0 0 6px rgba(241, 184, 45, 0.45));
+  filter: drop-shadow(0 0 6px rgba(253, 183, 25, 0.45));
 }
 .tp-header > .container > a:focus-visible {
   outline: 2px solid var(--eem-gold);
@@ -142,7 +144,7 @@
   box-sizing: border-box;
 }
 .eem-display {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   letter-spacing: -0.015em;
 }
@@ -150,7 +152,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.18em;
@@ -179,7 +181,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.25rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: 0.02em;
@@ -191,7 +193,7 @@
   color: #000 !important;
 }
 .eem-btn-gold:hover {
-  background: #ffcf5c;
+  background: #ffd17d;
 }
 .eem-btn-line {
   border: 2px solid currentColor;
@@ -276,5 +278,11 @@
 }
 .tp-header-nav [role='menu'] a:hover,
 .tp-header-nav [role='menu'] a.router-link-active {
-  background: #fdf3d6 !important;
+  background: #ffedcf !important;
+}
+
+/* Map attribution links: readable and underlined (Mizzou Digital Access) */
+.leaflet-control-attribution a {
+  color: #000 !important;
+  text-decoration: underline !important;
 }

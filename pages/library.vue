@@ -15,12 +15,12 @@
         >
           <dt class="eem-kicker !text-[0.68rem]">{{ s.label }}</dt>
           <dd class="eem-display text-4xl mt-2">{{ loaded ? s.value : '—' }}</dd>
-          <p
+          <dd
             v-if="s.note"
             class="text-xs eem-muted mt-1"
           >
             {{ s.note }}
-          </p>
+          </dd>
         </div>
       </dl>
     </section>
@@ -498,7 +498,7 @@ const shown = computed(() => {
   background: var(--eem-paper-2);
 }
 .eem-lib-row.on {
-  background: #fdf3d6;
+  background: #ffedcf;
   outline: 2px solid var(--eem-gold);
 }
 .eem-lib-name {

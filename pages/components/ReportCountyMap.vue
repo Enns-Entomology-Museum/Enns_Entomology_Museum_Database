@@ -62,7 +62,7 @@ const props = defineProps({ counts: { type: Object, default: () => ({}) } })
 const W = 420
 const H = 380
 const EMPTY = '#ece8de'
-const RAMP = ['#f7e3a6', '#f1b82d', '#c48a0e', '#7a5406']
+const RAMP = ['#f7e3a6', '#fdb719', '#c48a0e', '#7a5406']
 
 const geo = shallowRef(null)
 onMounted(async () => {

@@ -394,9 +394,12 @@ const uses = [
 <style scoped>
 .eem-hero {
   background:
-    radial-gradient(circle at 88% 10%, rgba(241, 184, 45, 0.18), transparent 40%),
+    radial-gradient(circle at 88% 10%, rgba(253, 183, 25, 0.18), transparent 40%),
     #000;
   border-bottom: 6px solid var(--eem-gold);
+}
+.eem-meter .eem-kicker {
+  color: var(--eem-gold);
 }
 .eem-meter {
   background: #111;
@@ -463,7 +466,7 @@ const uses = [
   border-left: 4px solid #000;
   padding: 1rem 1.1rem 1.1rem;
   color: var(--eem-ink) !important;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   transition: border-color 0.15s, transform 0.15s;
 }
 .eem-label:hover {
@@ -535,12 +538,12 @@ const uses = [
   border-top-color: var(--eem-gold);
 }
 .eem-use-num {
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2.2rem;
   line-height: 1;
-  color: var(--eem-gold);
-  -webkit-text-stroke: 1px #000;
+  /* gold text on light backgrounds is not an approved Mizzou combination */
+  color: var(--eem-gold-deep);
 }
 .eem-order-row {
   display: block;

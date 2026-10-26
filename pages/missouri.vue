@@ -15,12 +15,12 @@
         >
           <dt class="eem-kicker !text-[0.68rem]">{{ s.label }}</dt>
           <dd class="eem-display text-4xl mt-2">{{ s.value }}</dd>
-          <p
+          <dd
             v-if="s.note"
             class="text-xs eem-muted mt-1"
           >
             {{ s.note }}
-          </p>
+          </dd>
         </div>
       </dl>
     </section>

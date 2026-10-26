@@ -248,7 +248,7 @@ function close() {
   font-size: 0.95rem;
 }
 .eem-usearch-item.on {
-  background: #fdf3d6;
+  background: #ffedcf;
 }
 .eem-usearch-kind {
   flex-shrink: 0;

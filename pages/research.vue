@@ -455,7 +455,7 @@ function downloadCsv() {
 }
 .rs-stats dd {
   margin-top: 0.4rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 2rem;
   font-variant-numeric: tabular-nums;
@@ -521,7 +521,7 @@ function downloadCsv() {
   color: rgba(255, 255, 255, 0.7);
 }
 .rs-year {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.3rem;
   padding-bottom: 0.3rem;

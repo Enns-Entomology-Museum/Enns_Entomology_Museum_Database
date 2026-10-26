@@ -855,7 +855,7 @@ useHead({
 }
 .eem-cite-gbif-mark {
   flex-shrink: 0;
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
@@ -995,7 +995,7 @@ useHead({
   border-radius: 999px;
 }
 .eem-facts-ico {
-  color: var(--eem-gold-deep, #9a7412);
+  color: var(--eem-gold-deep, #000000);
   font-weight: 800;
 }
 .eem-labels {

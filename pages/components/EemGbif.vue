@@ -59,24 +59,24 @@
             <dd>
               <span :class="{ 'eem-skel': !loaded }">{{ loaded ? fmt(records) : '—' }}</span>
             </dd>
-            <p
+            <dd
               v-if="loaded && records === 0"
               class="eem-gbif-note"
             >
               being indexed by GBIF
-            </p>
+            </dd>
           </div>
           <div>
             <dt>Citations</dt>
             <dd>
               <span :class="{ 'eem-skel': !loaded }">{{ loaded ? fmt(citeCount) : '—' }}</span>
             </dd>
-            <p class="eem-gbif-note">papers using our GBIF data</p>
+            <dd class="eem-gbif-note">papers using our GBIF data</dd>
           </div>
           <div>
             <dt>Licence</dt>
             <dd class="!text-xl">{{ licence }}</dd>
-            <p class="eem-gbif-note">free to use, with credit</p>
+            <dd class="eem-gbif-note">free to use, with credit</dd>
           </div>
         </dl>
 
@@ -231,7 +231,7 @@ function copy() {
   width: auto;
 }
 .eem-gbif-wordmark {
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 1.1rem;
   letter-spacing: 0.04em;
@@ -291,7 +291,7 @@ function copy() {
 }
 .eem-gbif-stats dd {
   margin-top: 0.35rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.9rem;
   line-height: 1.1;

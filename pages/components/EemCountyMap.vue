@@ -4,7 +4,7 @@
       ref="el"
       class="eem-cmap"
       :style="{ height }"
-      role="img"
+      role="region"
       :aria-label="label"
     />
     <div
@@ -34,7 +34,7 @@ const props = defineProps({
 const emit = defineEmits(['select'])
 
 const EMPTY = '#ece8de'
-const RAMP = ['#f7e3a6', '#f1b82d', '#c48a0e', '#7a5406']
+const RAMP = ['#f7e3a6', '#fdb719', '#c48a0e', '#7a5406']
 
 const el = ref(null)
 let L = null

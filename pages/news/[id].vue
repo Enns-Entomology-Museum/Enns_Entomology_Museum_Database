@@ -187,7 +187,7 @@ async function copyLink() {
 <style scoped>
 .ns-head {
   background:
-    radial-gradient(circle at 90% 0%, rgba(241, 184, 45, 0.16), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(253, 183, 25, 0.16), transparent 45%),
     #000;
   border-bottom: 6px solid var(--eem-gold);
 }
@@ -249,7 +249,7 @@ async function copyLink() {
 }
 .ns-body :deep(h2),
 .ns-body :deep(h3) {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   letter-spacing: -0.01em;
   line-height: 1.2;

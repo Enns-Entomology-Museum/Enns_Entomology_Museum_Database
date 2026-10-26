@@ -208,7 +208,7 @@ const steps = [
   height: 2rem;
   background: var(--eem-gold);
   color: #000;
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
 }
 </style>

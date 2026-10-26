@@ -178,7 +178,7 @@ const monthYear = (d) =>
   transition: background-color 0.15s ease;
 }
 .eem-lbar.on {
-  background: var(--eem-gold, #f1b82d);
+  background: var(--eem-gold, #fdb719);
 }
 .eem-ltip {
   position: absolute;
@@ -198,7 +198,7 @@ const monthYear = (d) =>
 .eem-ltrack span {
   display: block;
   height: 100%;
-  background: var(--eem-gold, #f1b82d);
+  background: var(--eem-gold, #fdb719);
 }
 .eem-ltable th {
   text-align: left;
@@ -227,8 +227,8 @@ const monthYear = (d) =>
   border: 1px solid currentColor;
 }
 .eem-lstatus.open {
-  background: var(--eem-gold, #f1b82d);
-  border-color: var(--eem-gold, #f1b82d);
+  background: var(--eem-gold, #fdb719);
+  border-color: var(--eem-gold, #fdb719);
   color: #000;
 }
 .eem-lstatus.closed {

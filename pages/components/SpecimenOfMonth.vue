@@ -151,7 +151,7 @@ watch(
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8c640a;
+  color: #000000;
   margin-bottom: 0.8rem;
 }
 .sm-grid {

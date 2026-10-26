@@ -42,8 +42,8 @@ const mark = `${import.meta.env.BASE_URL || '/'}images/eem-mark.svg`
   display: grid;
   place-items: center;
   background:
-    repeating-linear-gradient(135deg, rgba(241, 184, 45, 0.09) 0 2px, transparent 2px 14px),
-    radial-gradient(circle at 85% 15%, rgba(241, 184, 45, 0.28), transparent 55%),
+    repeating-linear-gradient(135deg, rgba(253, 183, 25, 0.09) 0 2px, transparent 2px 14px),
+    radial-gradient(circle at 85% 15%, rgba(253, 183, 25, 0.28), transparent 55%),
     #000;
 }
 .eem-cover-mark {
@@ -55,7 +55,7 @@ const mark = `${import.meta.env.BASE_URL || '/'}images/eem-mark.svg`
   opacity: 0.35;
 }
 .eem-cover-word {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.01em;

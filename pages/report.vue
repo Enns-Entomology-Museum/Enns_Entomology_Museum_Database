@@ -498,7 +498,7 @@ function downloadEmail() {
   gap: 1rem;
   padding: 2rem 2.4rem 1.6rem;
   background: #000;
-  border-bottom: 8px solid #f1b82d;
+  border-bottom: 8px solid #fdb719;
   color: #fff;
 }
 .rp-mast-kicker {
@@ -506,11 +506,11 @@ function downloadEmail() {
   font-weight: 800;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: #f1b82d;
+  color: #fdb719;
 }
 .rp-mast-title {
   margin-top: 0.4rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 2.3rem;
   line-height: 1;
@@ -527,10 +527,10 @@ function downloadEmail() {
   align-items: flex-end;
   gap: 0.5rem;
   text-align: right;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1rem;
-  color: #f1b82d;
+  color: #fdb719;
 }
 .rp-mast-period img {
   width: 3.2rem;
@@ -543,12 +543,12 @@ function downloadEmail() {
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #8c640a;
+  color: #000000;
   margin-bottom: 0.7rem;
 }
 .rp-note {
   padding: 1.6rem 2.4rem;
-  background: #fdf6e0;
+  background: #ffedcf;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.05rem;
   line-height: 1.6;
@@ -557,7 +557,7 @@ function downloadEmail() {
   margin-top: 0.7rem;
 }
 .rp-sign {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.85rem;
   color: #555;
 }
@@ -581,14 +581,14 @@ function downloadEmail() {
 }
 .rp-stats dd {
   margin-top: 0.3rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.9rem;
   font-variant-numeric: tabular-nums;
 }
 .rp-growth {
   margin-top: 0.9rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 1.05rem;
 }
 .rp-growth b {
@@ -598,7 +598,7 @@ function downloadEmail() {
 .rp-growth span {
   color: #6b665c;
   font-size: 0.85rem;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
 }
 .rp-small {
   margin-top: 0.6rem;
@@ -629,7 +629,7 @@ function downloadEmail() {
   display: block;
   height: 100%;
   min-width: 2px;
-  background: #f1b82d;
+  background: #fdb719;
   border-radius: 0 3px 3px 0;
 }
 .rp-on {
@@ -655,10 +655,10 @@ function downloadEmail() {
   text-decoration: underline;
 }
 .rp-cnum {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.6rem;
-  color: #f1b82d;
+  color: #fdb719;
   font-variant-numeric: tabular-nums;
 }
 .rp-ctext {
@@ -672,10 +672,10 @@ function downloadEmail() {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8c640a;
+  color: #000000;
 }
 .rp-ctitle {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.05rem;
   line-height: 1.25;
@@ -705,11 +705,11 @@ function downloadEmail() {
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #8c640a;
+  color: #000000;
 }
 .rp-title {
   margin: 0.4rem 0 0.9rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.7rem;
   line-height: 1.15;
@@ -723,7 +723,7 @@ function downloadEmail() {
   margin: 0 0 0.9em;
 }
 .rp-body :deep(a) {
-  color: #8c640a;
+  color: #000000;
   text-decoration: underline;
   word-break: break-word;
 }
@@ -735,12 +735,12 @@ function downloadEmail() {
 .rp-body :deep(blockquote) {
   margin: 1em 0;
   padding-left: 1em;
-  border-left: 4px solid #f1b82d;
+  border-left: 4px solid #fdb719;
   font-style: italic;
 }
 .rp-body :deep(h2),
 .rp-body :deep(h3) {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.15rem;
   margin: 1.2em 0 0.4em;
@@ -757,10 +757,10 @@ function downloadEmail() {
 .rp-body :deep(.ns-linkcard) {
   display: block;
   padding: 0.5rem 0.8rem;
-  border-left: 4px solid #f1b82d;
+  border-left: 4px solid #fdb719;
   background: #faf8f3;
   text-decoration: none;
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.85rem;
   font-weight: 700;
   color: #111;
@@ -768,7 +768,7 @@ function downloadEmail() {
 .rp-body :deep(.ns-linkcard-u) {
   display: block;
   font-weight: 500;
-  color: #8c640a;
+  color: #000000;
   font-size: 0.75rem;
 }
 .rp-back {
@@ -783,10 +783,10 @@ function downloadEmail() {
   line-height: 1.55;
 }
 .rp-back-title {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
-  color: #f1b82d;
+  color: #fdb719;
 }
 .rp-back b {
   color: #fff;

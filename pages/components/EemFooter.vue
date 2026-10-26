@@ -5,7 +5,7 @@
       <div class="container mx-auto box-border px-4 py-7 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
         <div class="flex-1">
           <p class="eem-display text-xl text-[color:var(--eem-gold)]">Become a Friend of the Museum</p>
-          <p class="text-sm text-white/70 mt-1 max-w-2xl">
+          <p class="text-sm text-white mt-1 max-w-2xl">
             Your gift buys drawers and cabinets, digitizes specimens, pays student positions and brings insects to
             schools across Missouri.
           </p>
@@ -43,7 +43,28 @@
             The insect collection of the University of Missouri, College of Agriculture, Food and
             Natural Resources.
           </p>
-          <p class="mt-4 text-sm eem-footer-muted">Columbia, Missouri</p>
+          <!-- Contact block required by the Mizzou web guidelines: responsible unit,
+               physical address, email and phone (all from museumInfo.js) -->
+          <address class="eem-footer-contact mt-5 not-italic text-sm leading-relaxed">
+            <p class="font-bold text-white">{{ info.fullName }}</p>
+            <p>
+              <a
+                v-if="info.unitUrl"
+                :href="info.unitUrl"
+                target="_blank"
+                rel="noopener"
+                class="eem-footer-ul"
+                >{{ info.unit }}</a
+              ><template v-else>{{ info.unit }}</template>
+            </p>
+            <p>{{ info.address }}</p>
+            <p v-if="contactEmail">
+              Email: <a :href="`mailto:${contactEmail}`" class="eem-footer-ul">{{ contactEmail }}</a>
+            </p>
+            <p v-if="info.phone">
+              Phone: <a :href="`tel:${info.phone.replace(/[^0-9+]/g, '')}`" class="eem-footer-ul">{{ info.phone }}</a>
+            </p>
+          </address>
         </div>
 
         <nav
@@ -157,7 +178,60 @@
         </div>
       </div>
 
-      <div class="eem-footer-bottom mt-10 pt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <!-- Legal text required on every page by the Mizzou web guidelines
+           (brand.missouri.edu/apply-the-brand/web-digital/websites/content-guidelines) -->
+      <div class="eem-footer-legal mt-10 pt-6 text-xs leading-relaxed space-y-2">
+        <p>
+          <a
+            href="https://www.umsystem.edu/ums/hr/eeo"
+            target="_blank"
+            rel="noopener"
+            class="eem-footer-ul"
+            >Mizzou is an equal opportunity employer.</a
+          >
+        </p>
+        <p>
+          © Copyright {{ year }} by
+          <a
+            href="https://umsystem.edu/"
+            target="_blank"
+            rel="noopener"
+            class="eem-footer-ul"
+            >The Curators of the University of Missouri</a
+          >, a public corporation.
+        </p>
+        <ul class="flex flex-wrap gap-x-5 gap-y-1">
+          <li>
+            <a
+              href="https://missouri.edu/copyright/"
+              target="_blank"
+              rel="noopener"
+              class="eem-footer-ul"
+              >DMCA and other copyright information</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://missouri.edu/privacy/"
+              target="_blank"
+              rel="noopener"
+              class="eem-footer-ul"
+              >Privacy policy</a
+            >
+          </li>
+          <li>
+            <a
+              href="https://missouri.edu/digital-accessibility"
+              target="_blank"
+              rel="noopener"
+              class="eem-footer-ul"
+              >Accessibility</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="eem-footer-bottom mt-5 pt-4 text-xs">
         <p class="eem-footer-muted">
           Data in
           <a
@@ -184,7 +258,6 @@
             >Species File Group</a
           >
         </p>
-        <p class="eem-footer-muted">© {{ year }} Enns Entomology Museum · University of Missouri</p>
       </div>
     </div>
   </footer>
@@ -197,6 +270,8 @@ const mark = `${base_url || '/'}images/eem-logo-rev-vert.png`.replace('//', '/')
 const year = new Date().getFullYear()
 const gbifLogo = `${base_url || '/'}${info.gbif.logo || 'images/GBIF.png'}`.replace('//', '/')
 const colLogo = `${base_url || '/'}images/col-logo.png`.replace('//', '/')
+// Footer contact: the museum address, else the director's
+const contactEmail = info.email || info.director?.email || ''
 </script>
 
 <style scoped>
@@ -240,15 +315,31 @@ const colLogo = `${base_url || '/'}images/col-logo.png`.replace('//', '/')
   background: var(--eem-gold);
 }
 .eem-footer-label {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--eem-gold);
 }
-.eem-footer-muted {
-  color: #b8b3a8;
+/* Only white or gold text on black is an approved Mizzou combination */
+.eem-footer-muted,
+.eem-footer-contact {
+  color: #fff;
+}
+.eem-footer-legal {
+  border-top: 1px solid #333;
+  color: #fff;
+}
+/* Links in running text are underlined (Mizzou Digital Access guidelines) */
+.eem-footer .eem-footer-ul {
+  color: #fff !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.eem-footer .eem-footer-ul:hover,
+.eem-footer .eem-footer-ul:focus-visible {
+  color: var(--eem-gold) !important;
 }
 .eem-footer :deep(.eem-footer-link),
 .eem-footer .eem-footer-link {
@@ -263,7 +354,7 @@ const colLogo = `${base_url || '/'}images/col-logo.png`.replace('//', '/')
   border-bottom-color: currentColor;
 }
 .eem-footer-bottom {
-  border-top: 1px solid #2d2d2d;
+  border-top: 1px solid #333;
 }
 .eem-gbif-badge {
   display: inline-block;

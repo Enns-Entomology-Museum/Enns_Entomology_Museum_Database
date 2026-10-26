@@ -4,7 +4,7 @@
       ref="el"
       class="eem-hmap"
       :style="{ height }"
-      role="img"
+      role="region"
       :aria-label="`Map of ${sites.length} collecting localities`"
     />
 

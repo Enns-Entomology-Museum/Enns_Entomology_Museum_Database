@@ -4,7 +4,7 @@
       ref="el"
       class="eem-pmap"
       :style="{ height }"
-      role="img"
+      role="region"
       :aria-label="label"
     />
     <ul
@@ -67,7 +67,7 @@ const LIGHT = { museum: '#c48a0e', reported: '#2a78d6', other: '#1baf7a' }
 const DARK = { museum: '#b8860b', reported: '#3987e5', other: '#199e70' }
 const EMPTY_LIGHT = '#ece8de'
 const EMPTY_DARK = '#2c2b27'
-const RAMP = ['#f7e3a6', '#f1b82d', '#c48a0e', '#7a5406']
+const RAMP = ['#f7e3a6', '#fdb719', '#c48a0e', '#7a5406']
 
 const el = ref(null)
 const isDark = ref(false)

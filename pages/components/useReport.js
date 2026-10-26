@@ -188,13 +188,13 @@ function emailBody(html) {
     .replace(/<div class="ns-links">([\s\S]*?)<\/div>/g, (w, inner) =>
       inner.replace(
         /<a class="ns-linkcard" href="([^"]+)"[^>]*><span class="ns-linkcard-t">([\s\S]*?)<\/span><span class="ns-linkcard-u">[\s\S]*?<\/span><\/a>/g,
-        '<p style="margin:0 0 8px"><a href="$1" style="color:#8c640a;font-weight:bold">$2 →</a></p>'
+        '<p style="margin:0 0 8px"><a href="$1" style="color:#000000;font-weight:bold">$2 →</a></p>'
       )
     )
     .replace(/<img\b[^>]*src="([^"]+)"[^>]*>/gi, '<img src="$1" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:12px 0" alt="">')
     .replace(/<p>/g, '<p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#222">')
-    .replace(/<a /g, '<a style="color:#8c640a" ')
-    .replace(/<blockquote>/g, '<blockquote style="margin:16px 0;padding:4px 0 4px 14px;border-left:4px solid #f1b82d;font-style:italic;color:#333">')
+    .replace(/<a /g, '<a style="color:#000000" ')
+    .replace(/<blockquote>/g, '<blockquote style="margin:16px 0;padding:4px 0 4px 14px;border-left:4px solid #fdb719;font-style:italic;color:#333">')
     .replace(/<h2>/g, '<h3 style="font-family:Arial,sans-serif;font-size:17px;margin:18px 0 8px;color:#111">')
     .replace(/<\/h2>/g, '</h3>')
 }
@@ -209,14 +209,14 @@ export function emailHtml({ issue, data, note, siteUrl, info, specimen = null })
       (s) => `
       <tr><td style="padding:24px 28px 8px;border-top:1px solid #e5e0d4">
         ${s.cover ? `<a href="${site}#/news/${s.id}"><img src="${esc(s.cover.src)}" width="584" style="width:100%;max-width:584px;height:auto;display:block;margin:0 0 14px" alt="${esc(s.cover.alt)}"></a>` : ''}
-        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8c640a;font-weight:bold">${esc(s.type)} · ${esc(s.date)}</div>
+        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold">${esc(s.type)} · ${esc(s.date)}</div>
         <h2 style="font-family:Arial,sans-serif;font-size:21px;line-height:1.25;margin:6px 0 12px;color:#111"><a href="${site}#/news/${s.id}" style="color:#111;text-decoration:none">${esc(s.title)}</a></h2>
         <div style="font-family:Georgia,serif">${emailBody(s.body)}</div>
       </td></tr>`
     )
     .join('')
   const noteHtml = note
-    ? `<tr><td style="padding:22px 28px;background:#fdf6e0"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8c640a;font-weight:bold">From the director</div>${note
+    ? `<tr><td style="padding:22px 28px;background:#ffedcf"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold">From the director</div>${note
         .split(/\n\s*\n/)
         .map((p) => `<p style="font-family:Georgia,serif;margin:8px 0 0;font-size:15px;line-height:1.6;color:#222">${esc(p).replace(/\n/g, '<br>')}</p>`)
         .join('')}<p style="font-family:Arial,sans-serif;margin:10px 0 0;font-size:13px;color:#555">— ${esc(info.director.name)}, ${esc(info.director.role)}</p></td></tr>`
@@ -227,7 +227,7 @@ export function emailHtml({ issue, data, note, siteUrl, info, specimen = null })
     ...data.stories.map((s) => `${s.type}: ${s.title}`),
     'Get involved'
   ].filter(Boolean)
-  const contentsHtml = `<tr><td style="padding:22px 28px;border-bottom:1px solid #e5e0d4"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8c640a;font-weight:bold;margin-bottom:8px">In this issue</div><ol style="margin:0;padding-left:20px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#111">${contents.map((c) => `<li>${esc(c)}</li>`).join('')}</ol></td></tr>`
+  const contentsHtml = `<tr><td style="padding:22px 28px;border-bottom:1px solid #e5e0d4"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;margin-bottom:8px">In this issue</div><ol style="margin:0;padding-left:20px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#111">${contents.map((c) => `<li>${esc(c)}</li>`).join('')}</ol></td></tr>`
   const mMax = Math.max(1, ...(data.monthly || []).map((m) => m.n))
   const growth =
     typeof data.numbers.atStart === 'number' && typeof data.numbers.toDate === 'number'
@@ -241,7 +241,7 @@ export function emailHtml({ issue, data, note, siteUrl, info, specimen = null })
         .join(', ')}${countyList.length > 12 ? ` and ${countyList.length - 12} more` : ''}</div>`
     : ''
   const specimenHtml = specimen
-    ? `<tr><td style="padding:22px 28px;border-top:1px solid #e5e0d4"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8c640a;font-weight:bold;margin-bottom:10px">Specimen of the month</div><a href="${site}#/specimen?cat=${encodeURIComponent(specimen.cat)}"><img src="${esc(specimen.img)}" width="584" style="width:100%;max-width:584px;height:auto;display:block;margin:0 0 10px" alt=""></a><div style="font-family:Georgia,serif;font-size:17px;font-style:italic;color:#111">${esc(specimen.name)}</div><div style="font-family:Arial,sans-serif;font-size:13px;color:#555;margin-top:4px">${esc(specimen.caption)}</div></td></tr>`
+    ? `<tr><td style="padding:22px 28px;border-top:1px solid #e5e0d4"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;margin-bottom:10px">Specimen of the month</div><a href="${site}#/specimen?cat=${encodeURIComponent(specimen.cat)}"><img src="${esc(specimen.img)}" width="584" style="width:100%;max-width:584px;height:auto;display:block;margin:0 0 10px" alt=""></a><div style="font-family:Georgia,serif;font-size:17px;font-style:italic;color:#111">${esc(specimen.name)}</div><div style="font-family:Arial,sans-serif;font-size:13px;color:#555;margin-top:4px">${esc(specimen.caption)}</div></td></tr>`
     : ''
   const monthlyHtml = (data.monthly || []).length
     ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#111;margin:18px 0 6px">Specimens digitized per month</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${data.monthly
@@ -253,15 +253,15 @@ export function emailHtml({ issue, data, note, siteUrl, info, specimen = null })
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f2efe8">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2efe8"><tr><td align="center" style="padding:20px 10px">
 <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background:#ffffff">
-  <tr><td style="background:#000;padding:26px 28px;border-bottom:6px solid #f1b82d">
-    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#f1b82d;font-weight:bold">Newsletter · Issue ${issue.n} · ${esc(issue.label)}</div>
+  <tr><td style="background:#000;padding:26px 28px;border-bottom:6px solid #fdb719">
+    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#fdb719;font-weight:bold">Newsletter · Issue ${issue.n} · ${esc(issue.label)}</div>
     <div style="font-family:Arial,sans-serif;font-size:28px;font-weight:bold;color:#fff;margin-top:8px">Enns Entomology Museum</div>
     <div style="font-family:Arial,sans-serif;font-size:13px;color:#bbb;margin-top:4px">${esc(info.university)} · ${esc(info.city)}</div>
   </td></tr>
   ${contentsHtml}
   ${noteHtml}
   <tr><td style="padding:22px 28px">
-    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#8c640a;font-weight:bold;margin-bottom:10px">In ${esc(issue.label)}</div>
+    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;margin-bottom:10px">In ${esc(issue.label)}</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
       ${tile(data.numbers.specimens, 'specimens digitized')}${tile(data.numbers.species, 'species')}${tile(data.numbers.taxa, 'taxa added')}${tile(data.numbers.toDate, 'online in total')}
     </tr></table>
@@ -272,8 +272,8 @@ export function emailHtml({ issue, data, note, siteUrl, info, specimen = null })
   ${specimenHtml}
   ${stories || '<tr><td style="padding:20px 28px;font-family:Arial,sans-serif;color:#666">No news posts in this period.</td></tr>'}
   <tr><td style="background:#000;padding:22px 28px;font-family:Arial,sans-serif;font-size:13px;line-height:1.6;color:#ccc">
-    <a href="${site}" style="color:#f1b82d;font-weight:bold">Visit the museum online</a> ·
-    <a href="${site}#/donate" style="color:#f1b82d">Become a Friend of the Museum</a><br>
+    <a href="${site}" style="color:#fdb719;font-weight:bold">Visit the museum online</a> ·
+    <a href="${site}#/donate" style="color:#fdb719">Become a Friend of the Museum</a><br>
     ${esc(info.fullName)}, ${esc(info.college)}, ${esc(info.university)} · ${esc(info.city)}
     ${info.email || info.director.email ? `<br><a href="mailto:${esc(info.email || info.director.email)}" style="color:#ccc">${esc(info.email || info.director.email)}</a>` : ''}
   </td></tr>

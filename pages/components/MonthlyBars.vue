@@ -146,7 +146,7 @@ const ariaLabel = computed(() => `Specimens digitized per month: ${props.series.
   display: block;
 }
 .mb-val {
-  font: 600 11px 'Inter', system-ui, sans-serif;
+  font: 600 11px 'Open Sans', system-ui, sans-serif;
   fill: #6b665c;
   font-variant-numeric: tabular-nums;
 }
@@ -155,7 +155,7 @@ const ariaLabel = computed(() => `Specimens digitized per month: ${props.series.
   font-weight: 800;
 }
 .mb-month {
-  font: 500 11px 'Inter', system-ui, sans-serif;
+  font: 500 11px 'Open Sans', system-ui, sans-serif;
   fill: #6b665c;
 }
 .mb-month-on {
@@ -163,7 +163,7 @@ const ariaLabel = computed(() => `Specimens digitized per month: ${props.series.
   font-weight: 800;
 }
 .mb-year {
-  font: 500 9.5px 'Inter', system-ui, sans-serif;
+  font: 500 9.5px 'Open Sans', system-ui, sans-serif;
   fill: #9a9488;
 }
 .mb-note {

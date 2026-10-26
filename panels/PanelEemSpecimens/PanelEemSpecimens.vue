@@ -181,7 +181,7 @@ onMounted(async () => {
   text-transform: uppercase;
   padding: 0 0.35rem;
   background: #000;
-  color: #f1b82d;
+  color: #fdb719;
   align-self: center;
 }
 .eem-season {
@@ -205,7 +205,7 @@ onMounted(async () => {
   min-height: 2px;
 }
 .eem-season-bar.peak {
-  background: #f1b82d;
+  background: #fdb719;
 }
 .eem-season-col:has(.eem-season-bar[style*='height: 0%']) .eem-season-bar {
   background: var(--color-base-border, #ddd);
@@ -218,7 +218,7 @@ onMounted(async () => {
 }
 .eem-count {
   font-weight: 800;
-  background: #f1b82d;
+  background: #fdb719;
   color: #000;
   padding: 0.05rem 0.55rem;
   border-radius: 2px;
@@ -227,7 +227,7 @@ onMounted(async () => {
   font-family: ui-monospace, Menlo, monospace;
   font-size: 0.78rem;
   font-weight: 700;
-  background: #f1b82d;
+  background: #fdb719;
   color: #000;
   padding: 0.05rem 0.4rem;
 }

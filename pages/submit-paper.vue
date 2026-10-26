@@ -411,12 +411,12 @@ onMounted(async () => {
 .sf-input:focus {
   outline: none;
   border-color: var(--eem-gold);
-  box-shadow: 0 0 0 2px rgba(241, 184, 45, 0.35);
+  box-shadow: 0 0 0 2px rgba(253, 183, 25, 0.35);
 }
 .sf-check {
   width: 1rem;
   height: 1rem;
-  accent-color: #f1b82d;
+  accent-color: #fdb719;
 }
 .sf-error {
   padding: 0.6rem 0.8rem;

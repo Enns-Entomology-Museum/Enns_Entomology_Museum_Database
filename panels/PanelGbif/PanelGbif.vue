@@ -140,7 +140,7 @@ onBeforeUnmount(() => map?.remove())
   padding: 0.05rem 0.5rem;
   border-radius: 2px;
   background: #000;
-  color: #f1b82d;
+  color: #fdb719;
 }
 .eem-gbif-map {
   height: 280px;

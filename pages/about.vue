@@ -458,7 +458,7 @@ function initials(n = '') {
   place-items: center;
   background: var(--eem-gold);
   color: #000;
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 1.6rem;
 }
@@ -554,7 +554,7 @@ function initials(n = '') {
   border-radius: 999px;
   background: #000;
   color: var(--eem-gold);
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
 }

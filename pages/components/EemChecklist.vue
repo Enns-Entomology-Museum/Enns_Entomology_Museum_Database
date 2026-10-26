@@ -535,7 +535,7 @@ defineExpose({ counts })
 }
 .eem-src-gbif {
   background: transparent;
-  color: #4c9a2a;
+  color: var(--eem-ink);
   border: 1px solid #4c9a2a;
 }
 a.eem-src-gbif:hover {
@@ -543,7 +543,7 @@ a.eem-src-gbif:hover {
   color: #fff;
 }
 .eem-src-inat {
-  color: #2f7d4f;
+  color: var(--eem-ink);
   border: 1px dashed #2f7d4f;
 }
 a.eem-src-inat:hover {
@@ -594,7 +594,7 @@ a.eem-src-inat:hover {
   border-bottom: 1px solid var(--eem-rule);
 }
 .eem-ck-oname {
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.03em;

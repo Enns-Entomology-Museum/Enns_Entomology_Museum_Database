@@ -279,7 +279,7 @@ function downloadCsv() {
 }
 .ty-stats dd {
   margin-top: 0.4rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 2rem;
   font-variant-numeric: tabular-nums;

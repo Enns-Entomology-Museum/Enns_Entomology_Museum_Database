@@ -734,7 +734,7 @@ function downloadCsv() {
   padding: 0.18rem 0;
 }
 .sp-check input {
-  accent-color: #f1b82d;
+  accent-color: #fdb719;
 }
 .sp-tabs {
   display: flex;
@@ -792,7 +792,7 @@ function downloadCsv() {
   transition: background 0.12s;
 }
 .sp-table tbody tr:hover {
-  background: #fdf6e0;
+  background: #ffedcf;
 }
 :global(.dark) .sp-table tbody tr:hover {
   background: #26241d;

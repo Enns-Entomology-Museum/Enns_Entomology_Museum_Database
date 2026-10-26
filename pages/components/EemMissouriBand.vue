@@ -22,12 +22,12 @@
         <div>
           <dt class="eem-moband-label">Species recorded</dt>
           <dd class="eem-display text-4xl sm:text-5xl">{{ summary ? fmt(summary.speciesAll || summary.species) : '—' }}</dd>
-          <p class="text-xs mt-1 opacity-75">{{ summary?.speciesAll ? 'GBIF + iNaturalist' : 'GBIF records for Missouri' }}</p>
+          <dd class="text-xs mt-1 opacity-75">{{ summary?.speciesAll ? 'GBIF + iNaturalist' : 'GBIF records for Missouri' }}</dd>
         </div>
         <div>
           <dt class="eem-moband-label">In the museum</dt>
           <dd class="eem-display text-4xl sm:text-5xl">{{ mo.loaded ? fmt(museumSpecies) : '—' }}</dd>
-          <p class="text-xs mt-1 opacity-75">identified to species, from digitized specimens</p>
+          <dd class="text-xs mt-1 opacity-75">identified to species, from digitized specimens</dd>
         </div>
       </dl>
 

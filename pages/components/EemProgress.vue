@@ -206,7 +206,7 @@ function downloadCsv() {
   flex: 1;
   max-width: 1.4rem;
   min-height: 2px;
-  background: rgba(241, 184, 45, 0.45);
+  background: rgba(253, 183, 25, 0.45);
   border-radius: 2px 2px 0 0;
 }
 .pg-spark span.now {
@@ -257,13 +257,13 @@ function downloadCsv() {
 }
 .pg-stats dd {
   margin-top: 0.4rem;
-  font-family: 'Archivo', 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
   font-size: 2rem;
   font-variant-numeric: tabular-nums;
 }
 .pg-dd-note {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 0.8rem;
   font-weight: 500;
   color: var(--eem-ink-soft);
@@ -289,7 +289,7 @@ function downloadCsv() {
 .pg-bar {
   width: 70%;
   max-width: 3rem;
-  background: rgba(241, 184, 45, 0.6);
+  background: rgba(253, 183, 25, 0.6);
   border-radius: 4px 4px 0 0;
 }
 .pg-bar.now {

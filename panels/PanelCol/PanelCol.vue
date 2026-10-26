@@ -170,7 +170,7 @@ onMounted(async () => {
   width: auto;
 }
 .col-mark {
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 0.72rem;
   letter-spacing: 0.06em;
@@ -190,7 +190,7 @@ onMounted(async () => {
 }
 .col-badge .k {
   background: #000;
-  color: #f1b82d;
+  color: #fdb719;
   padding: 0.2rem 0.5rem 0.2rem 0.65rem;
   letter-spacing: 0.06em;
 }
@@ -203,7 +203,7 @@ onMounted(async () => {
 }
 .col-badge:hover .v,
 .col-badge:hover .go {
-  background: #f1b82d;
+  background: #fdb719;
   color: #000;
 }
 .col-badge.small {
@@ -223,7 +223,7 @@ onMounted(async () => {
   color: #fff;
 }
 .col-status.syn {
-  background: #f1b82d;
+  background: #fdb719;
   color: #000;
 }
 .col-rank {
@@ -240,7 +240,7 @@ onMounted(async () => {
   padding: 0.05rem 0.5rem;
   border-radius: 2px;
   background: #000;
-  color: #f1b82d;
+  color: #fdb719;
   vertical-align: 2px;
 }
 </style>

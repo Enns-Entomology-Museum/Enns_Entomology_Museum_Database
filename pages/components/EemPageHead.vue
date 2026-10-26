@@ -26,7 +26,7 @@ defineProps({
 <style scoped>
 .eem-page-head {
   background:
-    radial-gradient(circle at 90% 0%, rgba(241, 184, 45, 0.16), transparent 45%),
+    radial-gradient(circle at 90% 0%, rgba(253, 183, 25, 0.16), transparent 45%),
     #000;
   border-bottom: 6px solid var(--eem-gold);
 }

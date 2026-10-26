@@ -6,6 +6,11 @@ export default {
   college: 'College of Agriculture, Food and Natural Resources',
   city: 'Columbia, Missouri',
 
+  // Unit responsible for the website (shown in the footer, required by the Mizzou
+  // web guidelines). Add unitUrl to link it to the Division's website.
+  unit: 'Division of Plant Science & Technology',
+  unitUrl: '',
+
   // e.g. '1-87 Agriculture Building, 600 Hitt St, Columbia, MO 65211'
   // From the museum's old site (museum.insecta.missouri.edu/map.htm) — check it is still current
   address: 'Room 3-38, Agriculture Building, University of Missouri, Columbia, MO 65211',
@@ -16,8 +21,9 @@ export default {
   // Pin on the About page map (Agriculture Building, from OpenStreetMap — adjust if needed)
   location: { lat: 38.94285, lng: -92.32533 },
   mapUrl: 'https://www.openstreetmap.org/search?query=Agriculture%20Building%2C%20University%20of%20Missouri%2C%20Columbia',
-  // e.g. 'ennsmuseum@missouri.edu'
-  email: '',
+  // Contact email (footer, Visit and About pages). The museum has no general address.
+  email: 'davide.dalpos@missouri.edu',
+  // The museum has no phone line; leave empty and the footer simply omits it.
   phone: '',
   // e.g. 'Monday–Friday, 9 am – 4 pm, by appointment'
   hours: '',

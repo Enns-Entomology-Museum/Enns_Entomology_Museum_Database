@@ -428,7 +428,7 @@ function initials(n = '') {
   border-radius: 999px;
   background: #000;
   color: var(--eem-gold);
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 800;
 }
 .eem-taxon {
@@ -465,7 +465,7 @@ function initials(n = '') {
 }
 .eem-ppl-stats dd {
   margin: 0.3rem 0 0;
-  font-family: 'Archivo', Inter, system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-size: 2.2rem;
   font-weight: 900;
   line-height: 1.1;

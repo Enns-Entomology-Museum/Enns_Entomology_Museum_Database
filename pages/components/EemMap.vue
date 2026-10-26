@@ -3,7 +3,7 @@
     ref="el"
     class="eem-map"
     :style="{ height }"
-    role="img"
+    role="region"
     :aria-label="label"
   />
 </template>
@@ -39,7 +39,7 @@ function draw() {
       radius: 6,
       color: '#000',
       weight: 1.5,
-      fillColor: '#F1B82D',
+      fillColor: '#FDB719',
       fillOpacity: 0.9
     })
     if (p.html) m.bindPopup(p.html)

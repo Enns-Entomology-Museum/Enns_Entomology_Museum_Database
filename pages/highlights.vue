@@ -290,7 +290,7 @@ const collections = [
   place-items: center;
   background: var(--eem-gold);
   color: #000;
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2.2rem;
 }

@@ -212,12 +212,12 @@ const sections = [
   padding: 1.6rem 1.6rem 1.8rem;
 }
 .eem-section-num {
-  font-family: 'Archivo', system-ui, sans-serif;
+  font-family: 'Open Sans', system-ui, sans-serif;
   font-weight: 900;
   font-size: 2.4rem;
   line-height: 1;
-  color: var(--eem-gold);
-  -webkit-text-stroke: 1px #000;
+  /* gold text on light backgrounds is not an approved Mizzou combination */
+  color: var(--eem-gold-deep);
 }
 .eem-tick {
   flex-shrink: 0;
