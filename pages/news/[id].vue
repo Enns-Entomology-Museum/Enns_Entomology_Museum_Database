@@ -221,14 +221,19 @@ async function copyLink() {
   margin-top: -2.5rem;
 }
 .ns-figure img {
-  width: 100%;
-  max-height: 34rem;
-  object-fit: cover;
+  /* show the whole photo, never cropped: wide photos fill the width,
+     taller ones are capped in height and centred */
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 38rem;
+  margin: 0 auto;
   border-radius: 4px;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
 }
 .ns-figure figcaption {
   margin-top: 0.6rem;
+  text-align: center;
   font-size: 0.8rem;
   color: var(--eem-ink-soft);
 }
@@ -305,6 +310,25 @@ async function copyLink() {
   width: 100%;
   border-radius: 4px;
   margin: 1.4em 0 0.4em;
+}
+/* Side picture: in TaxonWorks write ![caption](https://…/photo.jpg "side")
+   — on wide screens it sits on the right and the text wraps around it */
+@media (min-width: 768px) {
+  .ns-body :deep(img[title='side']) {
+    float: right;
+    width: 42%;
+    margin: 0.3em 0 1em 1.6em;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  }
+}
+.ns-body :deep(.ns-links),
+.ns-body :deep(blockquote) {
+  clear: both;
+}
+.ns-body::after {
+  content: '';
+  display: block;
+  clear: both;
 }
 .ns-body :deep(strong) {
   font-weight: 700;
