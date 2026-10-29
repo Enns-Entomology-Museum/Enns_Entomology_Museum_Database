@@ -637,13 +637,20 @@ const printIt = () => window.print()
 
 const html = () => emailHtml({ issue: issue.value, data: data.value, note: note.value.trim(), siteUrl, info })
 
+// Plain-text copy (for mail programs that don't take HTML): tags removed, entities decoded
+function plainText(h) {
+  const el = document.createElement('div')
+  el.innerHTML = h.replace(/<(br|\/p|\/div|\/h[1-6]|\/tr|\/li)[^>]*>/gi, '\n')
+  return el.textContent.replace(/[ \t]+/g, ' ').replace(/\n\s*\n+/g, '\n\n').trim()
+}
+
 async function copyEmail() {
   const h = html()
   try {
     await navigator.clipboard.write([
       new ClipboardItem({
         'text/html': new Blob([h], { type: 'text/html' }),
-        'text/plain': new Blob([h.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ')], { type: 'text/plain' })
+        'text/plain': new Blob([plainText(h)], { type: 'text/plain' })
       })
     ])
     copied.value = true

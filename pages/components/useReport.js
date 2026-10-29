@@ -365,12 +365,21 @@ function emailBody(html) {
         '<p style="margin:0 0 8px"><a href="$1" style="color:#000000;font-weight:bold">$2 →</a></p>'
       )
     )
-    .replace(/<img\b[^>]*src="([^"]+)"[^>]*>/gi, '<img src="$1" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:12px 0" alt="">')
+    .replace(/<img\b[^>]*src="([^"]+)"[^>]*>/gi, '<img src="$1" width="760" style="width:100%;max-width:760px;height:auto;display:block;margin:12px 0" alt="">')
     .replace(/<p>/g, '<p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#222">')
     .replace(/<a /g, '<a style="color:#000000" ')
     .replace(/<blockquote>/g, '<blockquote style="margin:16px 0;padding:4px 0 4px 14px;border-left:4px solid #fdb719;font-style:italic;color:#333">')
     .replace(/<h2>/g, '<h3 style="font-family:Arial,sans-serif;font-size:17px;margin:18px 0 8px;color:#111">')
     .replace(/<\/h2>/g, '</h3>')
+}
+
+// A horizontal bar made of table cells: the one kind of chart every e-mail program
+// (Outlook included) draws. pct = 0–100
+function bar(pct, color, track = '#f2efe8') {
+  const p = Math.max(0, Math.min(100, Math.round(pct)))
+  const fill = p > 0 ? `<td width="${Math.max(1, p)}%" bgcolor="${color}" style="background:${color};height:12px;font-size:0;line-height:0">&nbsp;</td>` : ''
+  const rest = p < 100 ? `<td bgcolor="${track}" style="background:${track};height:12px;font-size:0;line-height:0">&nbsp;</td>` : ''
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse"><tr>${fill}${rest}</tr></table>`
 }
 
 export function emailHtml({ issue, data, note, siteUrl, info }) {
@@ -385,7 +394,7 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
   const title = (st, size) => `<h3 style="font-family:Arial,sans-serif;font-size:${size}px;line-height:1.25;margin:5px 0 8px;padding-bottom:7px;border-bottom:2px solid #000;color:#000"><a href="${url(st)}" style="color:#000;text-decoration:none">${esc(st.title)}</a></h3>`
   const card = (st) => `<td valign="top" width="50%" style="padding:0 6px 14px">
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd8cc;border-top:5px solid #fdb719"><tr><td style="padding:0">
-      ${st.cover ? `<a href="${url(st)}"><img src="${esc(st.cover.src)}" width="270" style="width:100%;max-width:270px;height:auto;display:block" alt="${esc(st.cover.alt)}"></a>` : ''}
+      ${st.cover ? `<a href="${url(st)}"><img src="${esc(st.cover.src)}" width="370" style="width:100%;max-width:370px;height:auto;display:block" alt="${esc(st.cover.alt)}"></a>` : ''}
       <div style="padding:12px 14px 14px">
         ${meta(st)}
         ${title(st, 17)}
@@ -402,7 +411,7 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
         <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000;font-weight:bold;margin:0 6px 12px">News from the museum</div>
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td style="padding:0 6px 14px">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#fff;border:1px solid #ddd8cc;border-top:5px solid #fdb719"><tr><td style="padding:0">
-            ${lead.cover ? `<a href="${url(lead)}"><img src="${esc(lead.cover.src)}" width="582" style="width:100%;max-width:582px;height:auto;display:block" alt="${esc(lead.cover.alt)}"></a>` : ''}
+            ${lead.cover ? `<a href="${url(lead)}"><img src="${esc(lead.cover.src)}" width="762" style="width:100%;max-width:762px;height:auto;display:block" alt="${esc(lead.cover.alt)}"></a>` : ''}
             <div style="padding:16px 18px 18px">
               ${meta(lead)}
               ${title(lead, 22)}
@@ -429,16 +438,16 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
     : ''
   const insect = data.insect
   const insectHtml = insect
-    ? `<tr><td style="padding:0;border-bottom:1px solid #e5e0d4">
-        ${insect.cover ? `<a href="${site}#/news/${insect.id}"><img src="${esc(insect.cover.src)}" width="640" style="width:100%;max-width:640px;height:auto;display:block;background:#f6f4ef" alt="${esc(insect.cover.alt || insect.name)}"></a>` : ''}
-        <div style="padding:20px 28px 22px;border-top:6px solid #fdb719">
+    ? `<tr><td bgcolor="#f6f4ef" style="padding:0;background:#f6f4ef;border-bottom:6px solid #000">
+        ${insect.cover ? `<a href="${site}#/news/${insect.id}"><img src="${esc(insect.cover.src)}" width="820" style="width:100%;max-width:820px;height:auto;display:block;background:#f6f4ef" alt="${esc(insect.cover.alt || insect.name)}"></a>` : ''}
+        <div style="padding:20px 28px 24px;border-top:6px solid #fdb719;background:#f6f4ef">
           <span style="display:inline-block;background:#000;color:#fdb719;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:4px 8px">Insect of the month</span>
           <h2 style="font-family:Arial,sans-serif;font-size:28px;line-height:1.15;margin:10px 0 4px;color:#000">${esc(insect.name)}</h2>
           ${insect.cover?.alt ? `<div style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:#6b665c;margin:0 0 14px">${esc(insect.cover.alt)}</div>` : ''}
           ${insect.quote ? `<div style="font-family:Georgia,serif;font-size:19px;line-height:1.4;font-style:italic;color:#000;border-left:5px solid #fdb719;padding:4px 0 4px 14px;margin:6px 0 16px">${esc(insect.quote)}</div>` : ''}
           ${
             insect.facts.length
-              ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;border:2px solid #000"><tr><td colspan="2" style="background:#000;color:#fdb719;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:6px 10px">Fact file</td></tr>${insect.facts
+              ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin:0 0 16px;border:2px solid #000;background:#ffffff"><tr><td colspan="2" style="background:#000;color:#fdb719;font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:2px;text-transform:uppercase;padding:6px 10px">Fact file</td></tr>${insect.facts
                   .map(
                     (f) => `<tr><td valign="top" style="width:150px;padding:7px 10px;border-top:1px solid #e5e0d4;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#000">${esc(f.label)}</td><td valign="top" style="padding:7px 10px;border-top:1px solid #e5e0d4;font-family:Arial,sans-serif;font-size:13px;color:#222">${f.html.replace(/<a /g, '<a style="color:#000" ')}</td></tr>`
                   )
@@ -450,14 +459,40 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
         </div>
       </td></tr>`
     : ''
+  // "In this issue": numbered entries, two per row; stories link to the full story online
+  const h0 = data.highlights
   const contents = [
-    insect ? `Insect of the month: ${insect.name}` : '',
-    `The numbers: ${num(data.numbers.specimens)} specimens digitized`,
-    data.highlights && (data.highlights.species.length || data.highlights.types.length || data.highlights.counties.length) ? 'New in the collection' : '',
-    ...data.stories.map((s) => `${s.type}: ${s.title}`),
-    'Get involved'
+    insect ? { kicker: 'Insect of the month', title: insect.name, href: `${site}#/news/${insect.id}` } : null,
+    { kicker: 'The numbers', title: `${num(data.numbers.specimens)} specimens digitized in ${issue.label}` },
+    h0 && (h0.species.length || h0.types.length || h0.counties.length)
+      ? {
+          kicker: 'New in the collection',
+          title: listOf(
+            [
+              h0.species.length ? `${h0.species.length} new species` : '',
+              h0.types.length ? `${h0.types.length} type specimen${h0.types.length === 1 ? '' : 's'}` : '',
+              h0.counties.length ? `${h0.counties.length} new county record${h0.counties.length === 1 ? '' : 's'}` : ''
+            ].filter(Boolean)
+          )
+        }
+      : null,
+    ...data.stories.map((st) => ({ kicker: st.type, title: st.title, href: `${site}#/news/${st.id}` })),
+    { kicker: 'Get involved', title: 'Visit, borrow, donate, become a Friend of the Museum', href: `${site}#/donate` }
   ].filter(Boolean)
-  const contentsHtml = `<tr><td style="padding:22px 28px;border-bottom:1px solid #e5e0d4"><div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;margin-bottom:8px">In this issue</div><ol style="margin:0;padding-left:20px;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#111">${contents.map((c) => `<li>${esc(c)}</li>`).join('')}</ol></td></tr>`
+  const entry = (c, i) =>
+    c
+      ? `<td valign="top" width="50%" style="padding:10px 12px 10px 0;border-bottom:1px solid #e5e0d4"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td valign="top" style="width:34px;font-family:Arial,sans-serif;font-size:24px;font-weight:bold;color:#fdb719;line-height:1">${i + 1}</td>
+          <td valign="top"><div style="font-family:Arial,sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#000;font-weight:bold">${esc(c.kicker)}</div>
+          <div style="font-family:Arial,sans-serif;font-size:14px;font-weight:bold;line-height:1.3;margin-top:2px">${c.href ? `<a href="${c.href}" style="color:#111;text-decoration:none">${esc(c.title)}</a>` : `<span style="color:#111">${esc(c.title)}</span>`}</div></td>
+        </tr></table></td>`
+      : '<td width="50%"></td>'
+  const rows = []
+  for (let i = 0; i < contents.length; i += 2) rows.push(`<tr>${entry(contents[i], i)}${entry(contents[i + 1], i + 1)}</tr>`)
+  const contentsHtml = `<tr><td style="padding:22px 28px 18px;border-bottom:1px solid #e5e0d4">
+      <div style="display:inline-block;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#000;font-weight:bold;border-bottom:3px solid #fdb719;padding-bottom:5px;margin-bottom:6px">In this issue</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${rows.join('')}</table>
+    </td></tr>`
   const mMax = Math.max(1, ...(data.monthly || []).map((m) => m.n))
   const growth =
     typeof data.numbers.atStart === 'number' && typeof data.numbers.toDate === 'number'
@@ -482,14 +517,14 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
         <div style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#111;margin:16px 0 6px">How complete are the records?</div>
         ${cl.quality
           .map(
-            (q) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 6px"><tr><td style="font-family:Arial,sans-serif;font-size:13px;color:#333;width:190px">${esc(q.label)}</td><td><div style="height:10px;background:#f2efe8"><div style="height:10px;width:${Math.max(1, q.pct)}%;background:#000"></div></div></td><td align="right" style="font-family:Arial,sans-serif;font-size:13px;font-weight:bold;width:48px">${q.pct}%</td></tr></table>`
+            (q) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 6px"><tr><td style="font-family:Arial,sans-serif;font-size:13px;color:#333;width:190px">${esc(q.label)}</td><td>${bar(q.pct, '#000000')}</td><td align="right" style="font-family:Arial,sans-serif;font-size:13px;font-weight:bold;width:48px">${q.pct}%</td></tr></table>`
           )
           .join('')}
         ${
           cl.decades.length
             ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#111;margin:16px 0 6px">When they were collected</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${cl.decades
                 .map(
-                  (d) => `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#555;width:56px;padding:2px 0">${d.label}</td><td style="padding:2px 6px"><div style="height:10px;width:${Math.max(1, Math.round((d.n / decMax) * 100))}%;background:#fdb719"></div></td><td align="right" style="font-family:Arial,sans-serif;font-size:12px;width:48px">${num(d.n)}</td></tr>`
+                  (d) => `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#555;width:56px;padding:2px 0">${d.label}</td><td style="padding:2px 6px">${bar((d.n / decMax) * 100, '#fdb719', '#ffffff')}</td><td align="right" style="font-family:Arial,sans-serif;font-size:12px;width:48px">${num(d.n)}</td></tr>`
                 )
                 .join('')}</table>`
             : ''
@@ -525,16 +560,25 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
           hlBlock(h.counties.length === 1 ? 'new Missouri county record' : 'new Missouri county records', h.countyGroups, (x) => x.county, h.counties.length)
         ].join('')}</tr></table></td></tr>`
       : ''
+  const oMax = Math.max(1, ...(data.orders || []).map((o) => o.n))
+  const ordersHtml = (data.orders || []).length
+    ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#111;margin:18px 0 6px">Digitized this period, by order</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${data.orders
+        .slice(0, 8)
+        .map(
+          (o) => `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#333;width:110px;padding:3px 0">${esc(o.name)}</td><td style="padding:3px 6px">${bar((o.n / oMax) * 100, '#fdb719', '#f2efe8')}</td><td align="right" style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;width:48px">${num(o.n)}</td></tr>`
+        )
+        .join('')}</table>`
+    : ''
   const monthlyHtml = (data.monthly || []).length
     ? `<div style="font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#111;margin:18px 0 6px">Specimens digitized per month</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0">${data.monthly
         .map(
-          (m) => `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#555;width:70px;padding:2px 0">${m.label} ${String(m.year).slice(2)}</td><td style="padding:2px 6px"><div style="height:10px;width:${Math.max(1, Math.round((m.n / mMax) * 100))}%;background:${m.inIssue ? '#c99412' : '#d6d2c8'}"></div></td><td align="right" style="font-family:Arial,sans-serif;font-size:12px;color:#111;width:56px;${m.inIssue ? 'font-weight:bold' : ''}">${num(m.n)}</td></tr>`
+          (m) => `<tr><td style="font-family:Arial,sans-serif;font-size:12px;color:#555;width:70px;padding:2px 0">${m.label} ${String(m.year).slice(2)}</td><td style="padding:2px 6px">${bar((m.n / mMax) * 100, m.inIssue ? '#c99412' : '#d6d2c8', '#ffffff')}</td><td align="right" style="font-family:Arial,sans-serif;font-size:12px;color:#111;width:56px;${m.inIssue ? 'font-weight:bold' : ''}">${num(m.n)}</td></tr>`
         )
         .join('')}</table>`
     : ''
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f2efe8">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2efe8"><tr><td align="center" style="padding:20px 10px">
-<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background:#ffffff">
+<table role="presentation" width="820" cellpadding="0" cellspacing="0" style="width:100%;max-width:820px;background:#ffffff">
   <tr><td style="background:#000;padding:24px 28px 20px">
     <a href="${site}"><img src="${site}images/eem-logo-rev-horiz.png" width="420" style="width:100%;max-width:420px;height:auto;display:block;border:0" alt="Enns Entomology Museum, University of Missouri"></a>
   </td></tr>
@@ -553,6 +597,7 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
     ${growth}
     ${monthlyHtml}
     ${countiesHtml}
+    ${ordersHtml}
   </td></tr>
   ${closerHtml}
   ${highlightsHtml}
