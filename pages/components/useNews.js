@@ -5,10 +5,13 @@
 // published at https://enns-entomology-museum.github.io/media/news/…).
 // A TaxonWorks image page also works, e.g. ![caption](https://sfg.taxonworks.org/images/1206702):
 // the site swaps in the image file itself.
+// No photo needed for a specimen: a story without its own image that mentions an EEM
+// catalog number (e.g. EEM000000447) uses that specimen's photo from TaxonWorks as cover.
 // The first image becomes the story's cover — on the home page, on the news list and
 // at the top of the story — and is not repeated inside the text. A story without
 // an image gets a cover in the museum's colours.
 import { makeAPIRequest } from '@/utils/request'
+import { findByCatalog } from './useEem.js'
 
 const TYPE_LABELS = {
   BlogPost: 'Story',
@@ -70,6 +73,19 @@ function linkCards(html = '') {
   })
 }
 
+// A link whose text is empty (TaxonWorks writes a pasted address as [](https://…)) gets
+// readable text: "specimen EEM000000447" for a specimen page, otherwise the web address
+function fillEmptyLinks(html = '') {
+  return String(html).replace(/<a ([^>]*?)href="([^"]+)"([^>]*)>\s*<\/a>/g, (w, a, href, b) => {
+    const url = decode(href)
+    const cat = (url.match(/[?&]cat=([^&#]+)/) || [])[1]
+    let text = url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')
+    if (cat) text = `specimen ${decodeURIComponent(cat)}`
+    else if (/#\/news\/\d+/.test(url)) text = 'the full story'
+    return `<a ${a}href="${href}"${b}>${text}</a>`
+  })
+}
+
 // "What this means: …" at the start of a paragraph → bold lead-in
 const leadIns = (html = '') => String(html).replace(/<p>([A-Z][^<:.]{2,40}):\s/g, '<p><strong>$1:</strong> ')
 
@@ -81,14 +97,15 @@ export function makeStory(n = {}) {
   return {
     id: n.id,
     title: n.title || '',
-    type: TYPE_LABELS[rawType] || rawType.replace(/([a-z])([A-Z])/g, '$1 $2'),
+    // posts titled "Insect of the month: …" are labelled as such everywhere
+    type: /^\s*insect of the month\b/i.test(n.title || '') ? 'Insect of the month' : TYPE_LABELS[rawType] || rawType.replace(/([a-z])([A-Z])/g, '$1 $2'),
     author: n.creator || '',
     iso: n.created_at,
     date: isNaN(created) ? '' : created.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
     shortDate: isNaN(created) ? '' : created.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     minutes: Math.max(1, Math.round(words / 220)),
     cover,
-    body: leadIns(linkCards(body)),
+    body: leadIns(linkCards(fillEmptyLinks(body))),
     excerpt: excerptOf(body)
   }
 }
@@ -111,7 +128,26 @@ function twImageUrl(src) {
   return twCache.get(id)
 }
 
+// The photo of the specimen named in a story (first EEM catalog number in the text)
+async function specimenCover(story) {
+  const m = textOf(story.body).match(/EEM\s?\d{6,9}/i)
+  if (!m) return null
+  const rec = await findByCatalog(m[0]).catch(() => null)
+  if (!rec || rec.dwc_occurrence_object_type !== 'CollectionObject') return null
+  const { data } = await makeAPIRequest
+    .get('/images', { params: { 'collection_object_id[]': rec.dwc_occurrence_object_id, per: 20, 'extend[]': ['depictions'] } })
+    .catch(() => ({ data: [] }))
+  const imgs = (Array.isArray(data) ? data : []).filter((im) => im.original || im.medium)
+  // prefer a photo of the specimen itself over a photo of its labels
+  const pick = imgs.find((im) => !(im.depictions || []).some((d) => /label/i.test(d.caption || ''))) || imgs[0]
+  if (!pick) return null
+  const name = rec.scientificName || [rec.genus, rec.specificEpithet].filter(Boolean).join(' ')
+  const place = [rec.stateProvince, rec.country].filter(Boolean).join(', ')
+  return { src: pick.original || pick.medium, alt: [name, place, rec.catalogNumber].filter(Boolean).join(' · '), title: '' }
+}
+
 async function resolveImages(story) {
+  if (!story.cover) story.cover = await specimenCover(story).catch(() => null)
   if (story.cover) story.cover.src = await twImageUrl(story.cover.src)
   const srcs = [...new Set([...story.body.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gi)].map((m) => decode(m[1])))]
   for (const src of srcs) {
