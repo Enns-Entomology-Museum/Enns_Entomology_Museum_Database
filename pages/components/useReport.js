@@ -579,12 +579,15 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f2efe8">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f2efe8"><tr><td align="center" style="padding:20px 10px">
 <table role="presentation" width="820" cellpadding="0" cellspacing="0" style="width:100%;max-width:820px;background:#ffffff">
-  <tr><td style="background:#000;padding:24px 28px 20px">
+  <tr><td bgcolor="#000000" style="background:#000000;padding:22px 28px 18px">
     <a href="${site}"><img src="${site}images/eem-logo-rev-horiz.png" width="420" style="width:100%;max-width:420px;height:auto;display:block;border:0" alt="Enns Entomology Museum, University of Missouri"></a>
   </td></tr>
-  <tr><td style="background:#fdb719;padding:8px 28px;font-family:Arial,sans-serif;font-size:12px;font-weight:bold;color:#000">
-    <span style="letter-spacing:3px;text-transform:uppercase">The Newsletter</span>
-    <span style="float:right">Issue ${issue.n} · ${esc(issue.label)}</span>
+  <tr><td bgcolor="#fdb719" style="background:#fdb719;padding:10px 28px 9px">
+    <!-- the newsletter name sits on the gold bar in black: it stays readable even in mail programs that drop colors -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td valign="bottom" style="font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.15;font-style:italic;color:#000000"><i>The Enns Report</i><br><span style="font-family:Arial,sans-serif;font-size:10px;line-height:1.6;font-style:normal;font-weight:bold;letter-spacing:2px;color:#000000">NEWSLETTER OF THE ENNS ENTOMOLOGY MUSEUM</span></td>
+      <td valign="bottom" align="right" style="font-family:Arial,sans-serif;font-size:11px;line-height:1.6;font-weight:bold;letter-spacing:1px;color:#000000;white-space:nowrap;padding-left:12px">ISSUE ${issue.n}<br>${esc(issue.label).toUpperCase()}</td>
+    </tr></table>
   </td></tr>
   ${insectHtml}
   ${noteHtml}

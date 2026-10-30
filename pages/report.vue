@@ -89,14 +89,19 @@
       class="rp-sheet"
     >
       <header class="rp-mast">
-        <img
-          :src="logo"
-          alt="Enns Entomology Museum, University of Missouri"
-          class="rp-mast-logo"
-        />
+        <div class="rp-mast-top">
+          <img
+            :src="logo"
+            alt="Enns Entomology Museum, University of Missouri"
+            class="rp-mast-logo"
+          />
+          <div class="rp-mast-name">
+            <p class="rp-mast-issue">Issue {{ issue.n }} · {{ issue.label }}</p>
+            <p class="rp-mast-title">The Enns Report</p>
+          </div>
+        </div>
         <div class="rp-mast-bar">
-          <p class="rp-mast-kicker">The Newsletter</p>
-          <p class="rp-mast-period">Issue {{ issue.n }} · {{ issue.label }}</p>
+          <p class="rp-mast-kicker">Newsletter of the Enns Entomology Museum</p>
         </div>
       </header>
 
@@ -548,7 +553,7 @@ const storyUrl = (s) => `${siteUrl.replace(/\/?$/, '/')}#/news/${s.id}`
 const LIMIT = 8
 
 useHead({
-  title: computed(() => `EEM Newsletter ${issue.value ? `— Issue ${issue.value.n}, ${issue.value.label}` : ''}`),
+  title: computed(() => `The Enns Report ${issue.value ? `— Issue ${issue.value.n}, ${issue.value.label}` : ''}`),
   meta: [{ name: 'robots', content: 'noindex, nofollow' }]
 })
 
@@ -663,7 +668,7 @@ async function copyEmail() {
 function downloadEmail() {
   const a = document.createElement('a')
   a.href = URL.createObjectURL(new Blob([html()], { type: 'text/html;charset=utf-8' }))
-  a.download = `EEM_newsletter_issue_${issue.value.n}.html`
+  a.download = `The_Enns_Report_issue_${issue.value.n}.html`
   a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
@@ -731,9 +736,41 @@ function downloadEmail() {
   background: #000;
   color: #fff;
 }
+/* the logo gives way to the newsletter name, so the name never runs off the edge */
 .rp-mast-logo {
-  width: min(100%, 30rem);
+  flex: 0 1 26rem;
+  min-width: 0;
+  width: 100%;
+  max-width: 26rem;
   height: auto;
+}
+.rp-mast-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+.rp-mast-name {
+  flex-shrink: 0;
+  text-align: right;
+}
+.rp-mast-issue {
+  font-family: 'Open Sans', system-ui, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  font-variant-numeric: tabular-nums;
+}
+.rp-mast-title {
+  margin-top: 0.15rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.1;
+  color: #fdb719;
 }
 .rp-mast-bar {
   display: flex;
@@ -750,12 +787,6 @@ function downloadEmail() {
   font-weight: 800;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-}
-.rp-mast-period {
-  font-family: 'Open Sans', system-ui, sans-serif;
-  font-weight: 800;
-  font-size: 0.95rem;
-  font-variant-numeric: tabular-nums;
 }
 
 /* Insect of the month: the front-page feature */
@@ -1426,6 +1457,18 @@ function downloadEmail() {
 @media (max-width: 640px) {
   .rp-sheet {
     margin: 1rem 0 2rem;
+  }
+  /* phones: the logo full width, the newsletter name under it */
+  .rp-mast-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+  .rp-mast-logo {
+    flex: none;
+  }
+  .rp-mast-name {
+    text-align: left;
   }
   .rp-mast,
   .rp-pad,
