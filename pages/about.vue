@@ -336,16 +336,17 @@ const kind = ref('all')
 
 const events = [
   { year: 1874, kind: 'milestone', img: '1874-riley.jpg', alt: 'Charles V. Riley examining a specimen', title: 'The museum is founded', text: 'Charles V. Riley, Missouri’s first State Entomologist, becomes the first curator of the collection.' },
-  { year: 1941, kind: 'gift', img: '1941-bock.jpg', alt: 'Box of papered beetles from the Bock collection', title: '300,000 beetles from G. W. Bock', text: 'A donation of papered beetles — many still in their original envelopes.' },
+  { year: 1941, kind: 'gift', img: '1941-bock.jpg', alt: 'Box of papered beetles from the Bock collection', title: '300,000 beetles from G. W. Bock', text: 'A donation of papered beetles that founded the museum’s Coleoptera section — many still in their original envelopes.' },
   { year: 1953, kind: 'people', img: '1953-enns.jpg', alt: 'Portrait of Wilbur R. Enns', title: 'Dr. Wilbur R. Enns, Director', text: 'Leads the museum for 25 years and shapes it into a research collection.' },
   { year: 1961, kind: 'gift', img: '1961-meiners.jpg', alt: 'Pinned moth with handwritten labels', title: '35,000 insects from E. P. Meiners', text: 'A large private collection, rich in Lepidoptera, joins the museum.' },
   { year: 1978, kind: 'people', img: '1978-yonke.jpg', alt: 'Portrait of Thomas Yonke', title: 'Dr. Thomas Yonke, Director', text: 'Directs the museum for 13 years.' },
   { year: 1980, kind: 'milestone', img: '1980-plaque.jpg', alt: 'Brass plaque reading Wilbur R. Enns Entomology Museum', contain: true, title: 'Renamed the Enns Entomology Museum', text: 'The collection takes the name of Wilbur R. Enns.' },
   { year: 1991, kind: 'people', img: '1991-sites.jpg', alt: 'Portrait of Robert Sites', title: 'Dr. Robert Sites, Director', text: 'Thirty-five years of leadership, with a strong focus on aquatic insects.' },
-  { year: 1996, kind: 'gift', img: null, big: '4.5M', title: '4.5 million aquatic insects from MDC', text: 'The Missouri Department of Conservation deposits its statewide aquatic invertebrate samples — the largest donation in the museum’s history.' },
+  { year: 1996, kind: 'gift', img: null, big: '4.5M', title: '4.5 million aquatic insects from MDC', text: 'The Missouri Department of Conservation deposits its statewide aquatic invertebrate samples — the largest acquisition in the museum’s history.' },
   { year: 2012, kind: 'gift', img: '2012-smart.jpg', alt: 'Drawer of spread moths', title: '5,880 Lepidoptera from Glen Smart', text: 'Moths and butterflies, carefully spread and labelled.' },
   { year: 2022, kind: 'gift', img: '2022-letsinger.jpg', alt: 'Drawer of tiger moths', title: '22,000 Lepidoptera from Rae Letsinger', text: 'One of the largest recent private donations.' },
-  { year: 2025, kind: 'gift', img: '2025-mccarty.jpg', alt: 'Pinned bumble bees in a drawer', title: '2,500 Ozark bees from Ken McCarty', text: 'A regional bee collection that anchors our pollinator work.' },
+  { year: 2025, kind: 'gift', img: null, big: '~12K', title: '~12,000 bees from Gerardo Camilo', text: 'The bee collection of his Saint Louis University bee lab.' },
+  { year: 2025, kind: 'gift', img: '2025-mccarty.jpg', alt: 'Pinned bees in a drawer', title: '6,719 bees from Ken McCarty', text: 'Native bees from the natural areas of Missouri State Parks.' },
   { year: 2026, kind: 'people', img: '2026-dalpos.jpg', alt: 'Portrait of Davide Dal Pos', title: 'Dr. Davide Dal Pos, Director', text: 'A new chapter: digitization and open data for the whole collection.' }
 ]
 const shownEvents = computed(() => (kind.value === 'all' ? events : events.filter((e) => e.kind === kind.value)))

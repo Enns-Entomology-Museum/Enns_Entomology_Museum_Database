@@ -111,8 +111,8 @@
         <div>
           <h2 class="eem-display text-2xl">Recent gifts</h2>
           <p class="mt-1 eem-muted">
-            Ken McCarty's 2,500 Ozark bees (2025), Rae Letsinger's 22,000 Lepidoptera (2022) and Glen Smart's 5,880
-            Lepidoptera (2012) are among the collections that joined the museum.
+            Gerardo Camilo's ~12,000 bees and Ken McCarty's 6,719 bees (both 2025), Rae Letsinger's 22,000 Lepidoptera
+            (2022) and Glen Smart's 5,880 Lepidoptera (2012) are among the collections that joined the museum.
           </p>
         </div>
         <RouterLink

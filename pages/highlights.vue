@@ -195,12 +195,13 @@ const primaries = computed(() =>
 )
 
 const collections = [
-  { year: '1941', number: '300,000', name: 'G. W. Bock beetles', text: 'Papered beetles, many still in their original envelopes.', img: '1941-bock.jpg', alt: 'Box of papered beetles' },
+  { year: '1941', number: '300,000', name: 'G. W. Bock beetles', text: 'Papered beetles that founded the Coleoptera section, many still in their original envelopes.', img: '1941-bock.jpg', alt: 'Box of papered beetles' },
   { year: '1961', number: '35,000', name: 'E. P. Meiners collection', text: 'A large private collection, rich in Lepidoptera.', img: '1961-meiners.jpg', alt: 'Pinned moth with old labels' },
   { year: '1996', number: '4.5 million', name: 'MDC aquatic insects', text: 'Statewide stream samples from the Missouri Department of Conservation, preserved in ethanol.', img: 'c-wet.jpg', alt: 'Shelves of vials of preserved aquatic insects' },
   { year: '2012', number: '5,880', name: 'Glen Smart Lepidoptera', text: 'Spread moths and butterflies.', img: '2012-smart.jpg', alt: 'Drawer of spread moths' },
   { year: '2022', number: '22,000', name: 'Rae Letsinger Lepidoptera', text: 'One of the largest recent private donations.', img: '2022-letsinger.jpg', alt: 'Drawer of tiger moths' },
-  { year: '2025', number: '2,500', name: 'Ken McCarty Ozark bees', text: 'Native bees from the Ozark prairies.', img: '2025-mccarty.jpg', alt: 'Drawer of pinned bumble bees' },
+  { year: '2025', number: '≈ 12,000', name: 'Gerardo Camilo bees', text: 'The bee collection of his Saint Louis University bee lab.' },
+  { year: '2025', number: '6,719', name: 'Ken McCarty bees', text: 'Native bees from the natural areas of Missouri State Parks.', img: '2025-mccarty.jpg', alt: 'Drawer of pinned bees' },
   { year: 'Special', number: '1,780', name: 'Fossil insects', text: 'Insect fossils in 19 drawers.', img: 'c-fossils.jpg', alt: 'Fossil slabs in a drawer' },
   { year: 'Special', number: '≈ 309', name: 'Insect galls', text: 'Galls on their host plants, in 24 drawers.', img: 'c-galls.jpg', alt: 'Leaves with insect galls' },
   { year: 'Special', number: '35,000', name: 'Microscope slides', text: 'Slide-mounted specimens in 442 boxes.', img: 'c-slides.jpg', alt: 'Cabinet of slide boxes' }
