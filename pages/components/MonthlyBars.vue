@@ -1,5 +1,8 @@
 <template>
-  <figure class="mb-chart">
+  <figure
+    class="mb-chart"
+    role="group"
+  >
     <figcaption class="mb-cap">
       <span class="mb-title">Specimens digitized per month</span>
       <span class="mb-key"><span class="mb-sw mb-sw-on" /> this issue <span class="mb-sw" /> earlier months</span>

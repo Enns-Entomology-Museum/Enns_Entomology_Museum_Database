@@ -1,5 +1,6 @@
 <template>
   <figure
+    role="group"
     v-if="paths.length"
     class="rc-chart"
   >

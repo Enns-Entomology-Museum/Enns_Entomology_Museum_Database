@@ -53,12 +53,13 @@ const legend = computed(() =>
 )
 const esc = (s) => String(s || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
-// People in the same town share one dot (2 decimals ≈ 1 km)
+// People in the same town share one dot (same city and country; otherwise within ≈ 1 km),
+// so dots do not overlap and each stays easy to click
 const places = computed(() => {
   const m = new Map()
   props.people.forEach((p) => {
     if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return
-    const k = `${p.lat.toFixed(2)},${p.lng.toFixed(2)}`
+    const k = p.city ? `${p.city.trim().toLowerCase()}|${p.country || ''}` : `${p.lat.toFixed(2)},${p.lng.toFixed(2)}`
     if (!m.has(k)) m.set(k, { lat: p.lat, lng: p.lng, place: [p.city, p.country].filter(Boolean).join(', '), people: [] })
     m.get(k).people.push(p)
   })
@@ -82,11 +83,13 @@ function draw() {
       const n = pl.people.length
       const r = Math.round(Math.min(30, 12 + Math.sqrt(n) * 5))
       const c = colorOf(pl.main)
+      // clickable area at least 24 × 24 px (WCAG 2.5.8), even when the dot itself is smaller
+      const t = Math.max(r, 24)
       const icon = L.divIcon({
         className: '',
-        html: `<span class="eem-ppl-dot${c ? '' : ' hollow'}" style="width:${r}px;height:${r}px;${c ? `background:${c};` : ''}">${n > 1 ? `<b>${n}</b>` : ''}</span>`,
-        iconSize: [r, r],
-        iconAnchor: [r / 2, r / 2]
+        html: `<span style="display:grid;place-items:center;width:${t}px;height:${t}px"><span class="eem-ppl-dot${c ? '' : ' hollow'}" style="width:${r}px;height:${r}px;${c ? `background:${c};` : ''}">${n > 1 ? `<b>${n}</b>` : ''}</span></span>`,
+        iconSize: [t, t],
+        iconAnchor: [t / 2, t / 2]
       })
       const list = pl.people.map((p) => `<li><b>${esc(p.name)}</b>${p.role ? `<span>${esc(p.role)}</span>` : ''}</li>`).join('')
       L.marker([pl.lat, pl.lng], { icon, riseOnHover: true, title: `${pl.place}: ${n}` })

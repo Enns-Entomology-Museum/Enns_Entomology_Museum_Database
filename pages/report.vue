@@ -27,7 +27,7 @@
       <div class="container mx-auto box-border px-4 py-6 flex flex-wrap items-end gap-4">
         <div>
           <p class="eem-kicker">Newsletter & report</p>
-          <h1 class="eem-display mt-2 text-2xl">Make an issue</h1>
+          <h2 class="eem-display mt-2 text-2xl">Make an issue</h2>
         </div>
         <label class="rp-field">
           <span>Issue</span>
@@ -97,7 +97,7 @@
           />
           <div class="rp-mast-name">
             <p class="rp-mast-issue">Issue {{ issue.n }} · {{ issue.label }}</p>
-            <p class="rp-mast-title">The Enns Report</p>
+            <h1 class="rp-mast-title">The Enns Report</h1>
           </div>
         </div>
         <div class="rp-mast-bar">
@@ -141,7 +141,7 @@
                 v-if="data.insect.facts.length"
                 class="rp-facts-box"
               >
-                <p class="rp-facts-head">Fact file</p>
+                <h3 class="rp-facts-head">Fact file</h3>
                 <dl>
                   <div
                     v-for="f in data.insect.facts"
@@ -206,7 +206,7 @@
             <div class="rp-letter-sign">
               <img
                 :src="directorPhoto"
-                alt=""
+                :alt="info.director.name"
               />
               <div>
                 <p class="rp-letter-name">{{ info.director.name }}</p>
@@ -216,7 +216,7 @@
           </section>
 
         <section class="rp-pad rp-contents">
-          <p class="rp-label">In this issue</p>
+          <h2 class="rp-label">In this issue</h2>
           <ol class="rp-clist">
             <li
               v-for="(c, i) in contents"
@@ -239,7 +239,7 @@
                 <img
                   v-if="c.img"
                   :src="c.img"
-                  alt=""
+                  :alt="c.title"
                   class="rp-cthumb"
                 />
               </a>
@@ -253,7 +253,7 @@
           id="rp-sec-numbers"
           class="rp-pad rp-numbers"
         >
-          <p class="rp-label">In {{ issue.label }}</p>
+          <h2 class="rp-label">In {{ issue.label }}</h2>
           <dl class="rp-stats">
             <div>
               <dt>Specimens digitized</dt>
@@ -302,7 +302,7 @@
             v-if="data.orders.length"
             class="rp-orders"
           >
-            <p class="rp-sublabel">Digitized this period, by order</p>
+            <h3 class="rp-sublabel">Digitized this period, by order</h3>
             <ul>
               <li
                 v-for="o in data.orders.slice(0, 8)"
@@ -322,7 +322,7 @@
           id="rp-sec-closer"
           class="rp-pad rp-closer"
         >
-          <p class="rp-label">A closer look at the {{ fmt(cl.total) }} specimens</p>
+          <h2 class="rp-label">A closer look at the {{ fmt(cl.total) }} specimens</h2>
 
           <ul class="rp-facts">
             <li><b>{{ fmt(cl.familyCount) }}</b> families</li>
@@ -333,7 +333,7 @@
 
           <div class="rp-closer-grid">
             <div>
-              <p class="rp-sublabel">How complete are the records?</p>
+              <h3 class="rp-sublabel">How complete are the records?</h3>
               <div
                 v-for="q in cl.quality"
                 :key="q.label"
@@ -359,7 +359,7 @@
 
             <div>
               <template v-if="cl.decades.length">
-                <p class="rp-sublabel">When they were collected</p>
+                <h3 class="rp-sublabel">When they were collected</h3>
                 <ul class="rp-dec">
                   <li
                     v-for="d in cl.decades"
@@ -392,10 +392,10 @@
           id="rp-sec-new"
           class="rp-pad rp-new"
         >
-          <p class="rp-label">New in the collection</p>
+          <h2 class="rp-label">New in the collection</h2>
           <div class="rp-new-grid">
             <div v-if="hl.species.length">
-              <p class="rp-new-head"><b>{{ hl.species.length }}</b> species new to our database</p>
+              <h3 class="rp-new-head"><b>{{ hl.species.length }}</b> species new to our database</h3>
               <ul>
                 <li
                   v-for="x in hl.species.slice(0, LIMIT)"
@@ -413,7 +413,7 @@
               </p>
             </div>
             <div v-if="hl.types.length">
-              <p class="rp-new-head"><b>{{ hl.types.length }}</b> type specimen{{ hl.types.length === 1 ? '' : 's' }} catalogued</p>
+              <h3 class="rp-new-head"><b>{{ hl.types.length }}</b> type specimen{{ hl.types.length === 1 ? '' : 's' }} catalogued</h3>
               <ul>
                 <li
                   v-for="x in hl.types.slice(0, LIMIT)"
@@ -431,7 +431,7 @@
               </p>
             </div>
             <div v-if="hl.counties.length">
-              <p class="rp-new-head"><b>{{ hl.counties.length }}</b> new Missouri county record{{ hl.counties.length === 1 ? '' : 's' }}</p>
+              <h3 class="rp-new-head"><b>{{ hl.counties.length }}</b> new Missouri county record{{ hl.counties.length === 1 ? '' : 's' }}</h3>
               <ul>
                 <li
                   v-for="x in hl.countyGroups.slice(0, LIMIT)"
@@ -460,7 +460,7 @@
           id="rp-sec-news"
           class="rp-pad rp-news"
         >
-          <p class="rp-label">News from the museum</p>
+          <h2 class="rp-label">News from the museum</h2>
           <article
             v-for="(s, i) in data.stories"
             :id="`rp-story-${s.id}`"
@@ -478,9 +478,9 @@
             /></a>
             <div class="rp-card-text">
               <p class="rp-meta">{{ s.type }} · {{ s.date }}</p>
-              <h2 class="rp-card-title">
+              <h3 class="rp-card-title">
                 <a :href="storyUrl(s)">{{ s.title }}</a>
-              </h2>
+              </h3>
               <p class="rp-card-excerpt">{{ shortText(s.body, i === 0 ? 420 : 210) }}</p>
               <a
                 :href="storyUrl(s)"
@@ -504,7 +504,7 @@
           class="rp-back"
         >
           <div>
-            <p class="rp-back-title">Get involved</p>
+            <h2 class="rp-back-title">Get involved</h2>
             <p>
               Visit, borrow specimens, donate a collection or become a Friend of the Museum:
               <b>{{ siteUrlShort }}</b>
