@@ -335,6 +335,7 @@ function groupOf(p) {
   if (p.staff || /technician|curator|collection manager/i.test(p.title || '')) return 'team'
   if (/research associate|collaborator/i.test(p.role || '')) return 'collab'
   // Students now; trained at the museum but now postdocs, faculty, etc. are former students
+  if (/former student/i.test(p.role || '')) return 'alumni'
   if (/undergraduate/i.test(p.careerStage || '')) return 'undergrads'
   if (/student/i.test(p.careerStage || '')) return 'grads' // Master's and Ph.D.
   if (/student|mentee/i.test(p.role || '')) return 'alumni'
