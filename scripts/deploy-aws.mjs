@@ -14,10 +14,14 @@
 // Options:
 //   --from-dist          use the local dist/ folder instead (after `npm run build`)
 //   --folder "<path>"    the OneDrive folder (otherwise read from deploy-aws.json, see below)
+//   --media "<path>"     the media repository with the news photos (default: ../media)
+//
+// News photos from the media repository are copied too (into media/ of the OneDrive folder), because
+// ennsmuseum.missouri.edu may not load files from GitHub.
 //
 // deploy-aws.json (next to package.json, not committed):  { "folder": "C:\\Users\\...\\ennsmuseum.missouri.edu" }
 import { createHash } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 
 const SITE = 'https://enns-entomology-museum.github.io/Enns_Entomology_Museum_Database/'
@@ -58,7 +62,7 @@ function fail() {
   process.exitCode = 1
 }
 
-async function main() {
+async function deploySite() {
   let manifest
   try {
     manifest = JSON.parse((await getText('site-manifest.json')).toString('utf8'))
@@ -108,6 +112,46 @@ async function main() {
     n++
   }
   console.log(`Done: ${n} files copied to ${folder}. OneDrive will upload them in the next minutes.`)
+}
+
+// News photos: the media repository (next to this one, or "media" in deploy-aws.json) → media/ in the
+// OneDrive folder. Only new or changed photos are copied; nothing is deleted.
+function deployMedia() {
+  let media = opt('--media')
+  if (!media && existsSync('deploy-aws.json')) media = JSON.parse(readFileSync('deploy-aws.json', 'utf8')).media
+  media = media || join('..', 'media')
+  if (!existsSync(media)) {
+    console.log(`\nNews photos: media folder not found (${media}); skipped.`)
+    return
+  }
+  const files = []
+  const walk = (dir, rel = '') => {
+    for (const name of readdirSync(dir)) {
+      if (name.startsWith('.') || name === 'README.md') continue
+      const p = join(dir, name)
+      if (statSync(p).isDirectory()) walk(p, rel + name + '/')
+      else files.push(rel + name)
+    }
+  }
+  walk(media)
+  const changed = files.filter((f) => {
+    const local = join(folder, 'media', ...f.split('/'))
+    return !existsSync(local) || sha(readFileSync(local)) !== sha(readFileSync(join(media, ...f.split('/'))))
+  })
+  console.log(`\nNews photos: ${files.length} in the media folder, ${changed.length} new or changed.`)
+  changed.forEach((f) => console.log('  media/' + f))
+  if (!changed.length || dryRun) return
+  for (const f of changed) {
+    const target = join(folder, 'media', ...f.split('/'))
+    mkdirSync(dirname(target), { recursive: true })
+    writeFileSync(target, readFileSync(join(media, ...f.split('/'))))
+  }
+  console.log(`Done: ${changed.length} photos copied.`)
+}
+
+async function main() {
+  await deploySite()
+  if (!process.exitCode) deployMedia()
 }
 
 await main()

@@ -11,7 +11,8 @@ The site is built by GitHub (as before) and published in two places:
 
 | Change | What to do |
 |---|---|
-| News (text in TaxonWorks, photos in the `media` repository) | Nothing: the site reads them live |
+| News text (TaxonWorks) | Nothing: the site reads it live |
+| News photo (new file in the `media` repository) | Push it as usual, then `npm run deploy:aws`: it copies the new photo (1 file save) |
 | Specimens, images, taxa in TaxonWorks | Nothing: read live |
 | Pages, design, fixes, monthly GBIF/iNaturalist data | Push to GitHub, wait for the Deploy action, then `npm run deploy:aws` |
 
@@ -41,6 +42,14 @@ Never drag folders into the OneDrive folder and never build or edit inside it: e
    ```
 
    Backslashes are written twice.
+
+## News photos
+
+Digital Service does not allow files of the site to come from GitHub, so on ennsmuseum.missouri.edu the
+news photos are served from the site itself (`media/news/…`). Nothing changes in how news is written: keep linking
+photos as `https://enns-entomology-museum.github.io/media/news/…` in TaxonWorks. The GitHub site shows them from
+GitHub; ennsmuseum.missouri.edu automatically uses its own copy, which `npm run deploy:aws` keeps up to date from
+the `media` folder next to this one (only new or changed photos are copied).
 
 ## Publishing
 

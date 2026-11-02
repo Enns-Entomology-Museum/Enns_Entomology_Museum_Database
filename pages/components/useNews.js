@@ -2,7 +2,8 @@
 //
 // Pictures: put an image in the news text (Markdown: ![caption](https://…/photo.jpg)).
 // News photos are kept in the separate media repository (github.com/Enns-Entomology-Museum/media,
-// published at https://enns-entomology-museum.github.io/media/news/…).
+// published at https://enns-entomology-museum.github.io/media/news/…); on ennsmuseum.missouri.edu
+// they are served from the site's own copy (see localMedia below).
 // A TaxonWorks image page also works, e.g. ![caption](https://sfg.taxonworks.org/images/1206702):
 // the site swaps in the image file itself.
 // No photo needed for a specimen: a story without its own image that mentions an EEM
@@ -89,9 +90,19 @@ function fillEmptyLinks(html = '') {
 // "What this means: …" at the start of a paragraph → bold lead-in
 const leadIns = (html = '') => String(html).replace(/<p>([A-Z][^<:.]{2,40}):\s/g, '<p><strong>$1:</strong> ')
 
+// News photos are linked from the media repository on GitHub Pages. On ennsmuseum.missouri.edu
+// (MU Digital Service, which may not load files from GitHub) the same photos are served from the
+// site itself: `npm run deploy:aws` copies the media folder to media/ next to index.html.
+const GITHUB_MEDIA = 'https://enns-entomology-museum.github.io/media/'
+function localMedia(html = '') {
+  if (typeof window === 'undefined' || /github\.io$/.test(window.location.hostname)) return html
+  const here = new URL('media/', window.location.href.split('#')[0]).href
+  return String(html).split(GITHUB_MEDIA).join(here)
+}
+
 export function makeStory(n = {}) {
   const created = new Date(n.created_at)
-  const { cover, body } = splitCover(n.body_html || '')
+  const { cover, body } = splitCover(localMedia(n.body_html || ''))
   const words = textOf(body).split(' ').filter(Boolean).length
   const rawType = String(n.type || 'News').split('::').pop()
   return {
