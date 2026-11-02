@@ -201,7 +201,7 @@ const collections = [
   { year: '2012', number: '5,880', name: 'Glen Smart Lepidoptera', text: 'Spread moths and butterflies.', img: '2012-smart.jpg', alt: 'Drawer of spread moths' },
   { year: '2022', number: '22,000', name: 'Rae Letsinger Lepidoptera', text: 'One of the largest recent private donations.', img: '2022-letsinger.jpg', alt: 'Drawer of tiger moths' },
   { year: '2025', number: '≈ 12,000', name: 'Gerardo Camilo bees', text: 'The bee collection of his Saint Louis University bee lab.' },
-  { year: '2025', number: '6,719', name: 'Ken McCarty bees', text: 'Native bees from the natural areas of Missouri State Parks.', img: '2025-mccarty.jpg', alt: 'Drawer of pinned bees' },
+  { year: '2025', number: '6,719', name: 'Ken McCarty bees', text: 'Bees from Missouri State Park natural areas and wild native environments in the Ozark, Ozark Border and Glaciated Plains regions.', img: '2025-mccarty.jpg', alt: 'Drawer of pinned bees' },
   { year: 'Special', number: '1,780', name: 'Fossil insects', text: 'Insect fossils in 19 drawers.', img: 'c-fossils.jpg', alt: 'Fossil slabs in a drawer' },
   { year: 'Special', number: '≈ 309', name: 'Insect galls', text: 'Galls on their host plants, in 24 drawers.', img: 'c-galls.jpg', alt: 'Leaves with insect galls' },
   { year: 'Special', number: '35,000', name: 'Microscope slides', text: 'Slide-mounted specimens in 442 boxes.', img: 'c-slides.jpg', alt: 'Cabinet of slide boxes' }

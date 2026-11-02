@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { computed, defineComponent, h, onMounted, reactive, ref } from 'vue'
+import { computed, defineComponent, h, onMounted, reactive, ref, shallowRef } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
@@ -83,7 +83,8 @@ useHead({ title: 'Taxonomic tree — Enns Entomology Museum' })
 const eem = useEem()
 const loading = ref(true)
 const filter = ref('')
-const nodes = ref(new Map())
+// plain (non-reactive) tree: it never changes after loading
+const nodes = shallowRef(new Map())
 const openSet = reactive(new Set())
 const otuByTaxon = ref(new Map())
 
@@ -110,9 +111,7 @@ onMounted(async () => {
         name: t.name,
         full: (t.cached || t.name || '').trim(),
         html: rankOf(t) === 'Species' || rankOf(t) === 'Subspecies' ? t.cached_html || `<i>${t.name}</i>` : ['Genus', 'Subgenus'].includes(rankOf(t)) ? `<i>${t.name}</i>` : t.name,
-        children: [],
-        own: 0,
-        total: 0
+        children: []
       })
     })
     map.forEach((n) => {
@@ -130,10 +129,13 @@ onMounted(async () => {
   }
 })
 
-// Specimen counts: attach each DwC record to the deepest matching name
+// Specimen counts: attach each DwC record to the deepest matching name.
+// Returns a new Map (id -> number of specimens in the group) and never writes to the tree:
+// writing counts onto reactive nodes inside a computed made Vue recompute it forever and froze the page.
 const counted = computed(() => {
   const map = nodes.value
-  if (!map.size) return map
+  const totals = new Map()
+  if (!map.size) return totals
   const byFull = new Map()
   map.forEach((n) => {
     if (!byFull.has(n.full)) byFull.set(n.full, n)
@@ -141,10 +143,7 @@ const counted = computed(() => {
     const plain = n.full.replace(/\s*\([^)]*\)/g, '').trim()
     if (plain !== n.full && !byFull.has(plain)) byFull.set(plain, n)
   })
-  map.forEach((n) => {
-    n.own = 0
-    n.total = 0
-  })
+  const own = new Map()
   eem.records.forEach((r) => {
     const keys = [
       [r.genus, r.specificEpithet].filter(Boolean).join(' '),
@@ -153,21 +152,25 @@ const counted = computed(() => {
       r.order
     ].filter(Boolean)
     const hit = keys.map((k) => byFull.get(k)).find(Boolean)
-    if (hit) hit.own++
+    if (hit) own.set(hit.id, (own.get(hit.id) || 0) + 1)
   })
-  function sum(n) {
-    n.total = n.own + n.children.reduce((a, c) => a + sum(c), 0)
-    return n.total
+  function sum(n, seen) {
+    if (seen.has(n.id)) return 0 // guard against a loop in the classification
+    seen.add(n.id)
+    const t = (own.get(n.id) || 0) + n.children.reduce((a, c) => a + sum(c, seen), 0)
+    totals.set(n.id, t)
+    return t
   }
+  const seen = new Set()
   map.forEach((n) => {
-    if (!map.get(n.parent)) sum(n)
+    if (!map.get(n.parent)) sum(n, seen)
   })
-  return map
+  return totals
 })
 
 // Start below the generic upper ranks (Root → Hexapoda)
 const roots = computed(() => {
-  const map = counted.value
+  const map = nodes.value
   let level = [...map.values()].filter((n) => !map.get(n.parent))
   while (level.length === 1 && HIDE.has(level[0].name)) level = level[0].children
   return level
@@ -180,7 +183,7 @@ const matches = computed(() => {
   nodes.value.forEach((n) => {
     if (n.full.toLowerCase().includes(q)) {
       let p = n
-      while (p) {
+      while (p && !keep.has(p.id)) {
         keep.add(p.id)
         p = nodes.value.get(p.parent)
       }
@@ -191,8 +194,8 @@ const matches = computed(() => {
 
 const summary = computed(() => {
   // only groups with digitized specimens, so the numbers match the home page
-  const map = counted.value
-  const count = (r) => [...map.values()].filter((n) => n.rank === r && n.total > 0).length
+  const totals = counted.value
+  const count = (r) => [...nodes.value.values()].filter((n) => n.rank === r && totals.get(n.id) > 0).length
   return `With specimens: ${count('Order')} orders · ${count('Family')} families · ${count('Genus')} genera · ${count('Species')} species`
 })
 
@@ -206,6 +209,7 @@ const TreeNode = defineComponent({
   setup(props) {
     return () => {
       const n = props.node
+      const total = counted.value.get(n.id) || 0
       const m = matches.value
       if (m && !m.has(n.id)) return null
       const kids = n.children.filter((c) => !m || m.has(c.id))
@@ -233,7 +237,7 @@ const TreeNode = defineComponent({
             ? h(RouterLink, { to: { name: 'otus-id-overview', params: { id: otu } }, class: 'eem-tn-name', innerHTML: n.html })
             : h('span', { class: 'eem-tn-name', innerHTML: n.html }),
           n.rank === 'Order' && ORDER_NAMES[n.name] ? h('span', { class: 'eem-tn-common' }, ORDER_NAMES[n.name]) : null,
-          n.total ? h('span', { class: 'eem-tn-count', title: `${n.total} digitized specimens` }, fmt(n.total)) : null
+          total ? h('span', { class: 'eem-tn-count', title: `${total} digitized specimens` }, fmt(total)) : null
         ]),
         kids.length && isOpen
           ? h(

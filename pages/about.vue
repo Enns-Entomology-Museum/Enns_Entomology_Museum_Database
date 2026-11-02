@@ -346,7 +346,7 @@ const events = [
   { year: 2012, kind: 'gift', img: '2012-smart.jpg', alt: 'Drawer of spread moths', title: '5,880 Lepidoptera from Glen Smart', text: 'Moths and butterflies, carefully spread and labelled.' },
   { year: 2022, kind: 'gift', img: '2022-letsinger.jpg', alt: 'Drawer of tiger moths', title: '22,000 Lepidoptera from Rae Letsinger', text: 'One of the largest recent private donations.' },
   { year: 2025, kind: 'gift', img: null, big: '~12K', title: '~12,000 bees from Gerardo Camilo', text: 'The bee collection of his Saint Louis University bee lab.' },
-  { year: 2025, kind: 'gift', img: '2025-mccarty.jpg', alt: 'Pinned bees in a drawer', title: '6,719 bees from Ken McCarty', text: 'Native bees from the natural areas of Missouri State Parks.' },
+  { year: 2025, kind: 'gift', img: '2025-mccarty.jpg', alt: 'Pinned bees in a drawer', title: '6,719 bees from Ken McCarty', text: 'Bees from Missouri State Park natural areas and wild native environments in the Ozark, Ozark Border and Glaciated Plains regions, surveyed 2016–2026.' },
   { year: 2026, kind: 'people', img: '2026-dalpos.jpg', alt: 'Portrait of Davide Dal Pos', title: 'Dr. Davide Dal Pos, Director', text: 'A new chapter: digitization and open data for the whole collection.' }
 ]
 const shownEvents = computed(() => (kind.value === 'all' ? events : events.filter((e) => e.kind === kind.value)))
