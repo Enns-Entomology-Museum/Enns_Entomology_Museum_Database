@@ -323,7 +323,9 @@ onMounted(async () => {
 
 const GROUPS = [
   { key: 'team', label: 'Museum team' },
-  { key: 'students', label: 'Students' },
+  { key: 'grads', label: 'Graduate students' },
+  { key: 'undergrads', label: 'Undergraduate students' },
+  { key: 'alumni', label: 'Former students' },
   { key: 'collab', label: 'Research associates & collaborators' },
   { key: 'former', label: 'Former staff & in memoriam' }
 ]
@@ -332,7 +334,10 @@ function groupOf(p) {
   if (p.historical) return 'former'
   if (p.staff || /technician|curator|collection manager/i.test(p.title || '')) return 'team'
   if (/research associate|collaborator/i.test(p.role || '')) return 'collab'
-  if (/student|mentee/i.test(`${p.role} ${p.careerStage}`)) return 'students'
+  // Students now; trained at the museum but now postdocs, faculty, etc. are former students
+  if (/undergraduate/i.test(p.careerStage || '')) return 'undergrads'
+  if (/student/i.test(p.careerStage || '')) return 'grads' // Master's and Ph.D.
+  if (/student|mentee/i.test(p.role || '')) return 'alumni'
   return 'collab'
 }
 
@@ -352,7 +357,7 @@ const stats = computed(() => {
     { label: 'People', value: ppl.length },
     { label: 'Institutions', value: inst.size },
     { label: 'Countries', value: countries.size },
-    { label: 'Students', value: ppl.filter((p) => groupOf(p) === 'students').length }
+    { label: 'Students', value: ppl.filter((p) => ['grads', 'undergrads'].includes(groupOf(p))).length }
   ]
 })
 const mapPeople = computed(() =>

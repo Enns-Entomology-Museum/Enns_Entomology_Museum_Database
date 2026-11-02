@@ -36,8 +36,8 @@ const props = defineProps({
 })
 
 // Three categorical slots, validated for colour-vision deficiency (light / dark)
-const LIGHT = { team: '#2a78d6', students: '#eb6834', collab: '#1baf7a' }
-const DARK = { team: '#3987e5', students: '#d95926', collab: '#199e70' }
+const LIGHT = { team: '#2a78d6', grads: '#eb6834', undergrads: '#d9a400', alumni: '#8a5cd0', collab: '#1baf7a' }
+const DARK = { team: '#3987e5', grads: '#d95926', undergrads: '#e0b21a', alumni: '#9b72e0', collab: '#199e70' }
 
 const el = ref(null)
 const isDark = ref(false)

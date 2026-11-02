@@ -626,8 +626,8 @@
     },
     {
       "name": "Ryn Kreitz",
-      "affiliation": "Univeristy of Missouri",
-      "careerStage": "Other",
+      "affiliation": "University of Missouri",
+      "careerStage": "Undergraduate student",
       "role": "Friend of the museum",
       "staff": false,
       "taxa": [
@@ -643,7 +643,7 @@
       "country": "United States",
       "lat": 38.9364147,
       "lng": -92.329703,
-      "title": "Research Technician",
+      "title": "",
       "orcid": "",
       "website": "",
       "note": ""
