@@ -20,7 +20,7 @@ function walk(dir, out = []) {
 const files = {}
 for (const p of walk(dist).sort()) {
   const rel = relative(dist, p).split(sep).join('/')
-  if (SKIP.has(rel)) continue
+  if (SKIP.has(rel) || rel.endsWith('/README.md')) continue
   const buf = readFileSync(p)
   files[rel] = { size: buf.length, sha256: createHash('sha256').update(buf).digest('hex') }
 }

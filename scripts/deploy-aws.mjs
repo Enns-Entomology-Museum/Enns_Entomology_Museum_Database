@@ -52,52 +52,62 @@ async function getText(path) {
   return Buffer.from(await res.arrayBuffer())
 }
 
-let manifest
-try {
-  manifest = JSON.parse((await getText('site-manifest.json')).toString('utf8'))
-} catch (e) {
-  console.error(`Could not read the list of files (site-manifest.json): ${e.message}\n` +
-    (fromDist ? 'Run `npm run build` and `npm run manifest` first.' : 'Has the GitHub Deploy action finished since the manifest was added?'))
-  process.exit(1)
+// Node on Windows can crash with "Assertion failed ... async.c" when process.exit() is called while
+// downloads are still closing, so the script ends by returning instead.
+function fail() {
+  process.exitCode = 1
 }
 
-const all = Object.entries(manifest.files)
-const changed = all.filter(([path, info]) => {
-  const local = join(folder, ...path.split('/'))
-  return !existsSync(local) || sha(readFileSync(local)) !== info.sha256
-})
-// index.html last, so it never points to files that are not there yet
-changed.sort(([a], [b]) => (a === 'index.html') - (b === 'index.html') || a.localeCompare(b))
-
-console.log(`Site built ${manifest.generated} — ${all.length} files, ${changed.length} new or changed.`)
-if (!changed.length) {
-  console.log('Nothing to copy: the OneDrive folder is up to date.')
-  process.exit(0)
-}
-changed.forEach(([path]) => console.log('  ' + path))
-console.log(`${changed.length} file saves: they count toward the 400 included each month (≈ $${(changed.length * COST_PER_FILE).toFixed(2)} if over).`)
-if (dryRun) {
-  console.log('Dry run: nothing copied. Run again without --dry-run to copy.')
-  process.exit(0)
-}
-
-let n = 0
-for (const [path, info] of changed) {
-  let buf
+async function main() {
+  let manifest
   try {
-    buf = await getText(path)
+    manifest = JSON.parse((await getText('site-manifest.json')).toString('utf8'))
   } catch (e) {
-    console.error(`\nCould not get ${path}: ${e.message}. Copied ${n} files so far; run again later (it continues where it stopped).`)
-    process.exit(1)
+    console.error(`Could not read the list of files (site-manifest.json): ${e.message}\n` +
+      (fromDist ? 'Run `npm run build` and `npm run manifest` first.' : 'Has the GitHub Deploy action finished since the manifest was added?'))
+    return fail()
   }
-  if (sha(buf) !== info.sha256) {
-    console.error(`\n${path} does not match the list (GitHub Pages is probably still updating). ` +
-      `Copied ${n} files so far; wait a few minutes and run again (it continues where it stopped).`)
-    process.exit(1)
+
+  const all = Object.entries(manifest.files).filter(([path]) => !path.endsWith('README.md'))
+  const changed = all.filter(([path, info]) => {
+    const local = join(folder, ...path.split('/'))
+    return !existsSync(local) || sha(readFileSync(local)) !== info.sha256
+  })
+  // index.html last, so it never points to files that are not there yet
+  changed.sort(([a], [b]) => (a === 'index.html') - (b === 'index.html') || a.localeCompare(b))
+
+  console.log(`Site built ${manifest.generated} — ${all.length} files, ${changed.length} new or changed.`)
+  if (!changed.length) {
+    console.log('Nothing to copy: the OneDrive folder is up to date.')
+    return
   }
-  const local = join(folder, ...path.split('/'))
-  mkdirSync(dirname(local), { recursive: true })
-  writeFileSync(local, buf)
-  n++
+  changed.forEach(([path]) => console.log('  ' + path))
+  console.log(`${changed.length} file saves: they count toward the 400 included each month (≈ $${(changed.length * COST_PER_FILE).toFixed(2)} if over).`)
+  if (dryRun) {
+    console.log('Dry run: nothing copied. Run again without --dry-run to copy.')
+    return
+  }
+
+  let n = 0
+  for (const [path, info] of changed) {
+    let buf
+    try {
+      buf = await getText(path)
+    } catch (e) {
+      console.error(`\nCould not get ${path}: ${e.message}. Copied ${n} files so far; run again later (it continues where it stopped).`)
+      return fail()
+    }
+    if (sha(buf) !== info.sha256) {
+      console.error(`\n${path} does not match the list (GitHub Pages is probably still updating). ` +
+        `Copied ${n} files so far; wait a few minutes and run again (it continues where it stopped).`)
+      return fail()
+    }
+    const local = join(folder, ...path.split('/'))
+    mkdirSync(dirname(local), { recursive: true })
+    writeFileSync(local, buf)
+    n++
+  }
+  console.log(`Done: ${n} files copied to ${folder}. OneDrive will upload them in the next minutes.`)
 }
-console.log(`Done: ${n} files copied to ${folder}. OneDrive will upload them in the next minutes.`)
+
+await main()
