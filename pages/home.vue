@@ -5,7 +5,7 @@
       <div class="container mx-auto box-border px-4 pt-14 pb-16 sm:pt-20 sm:pb-20 grid lg:grid-cols-12 gap-12 items-center">
         <div class="lg:col-span-7 min-w-0">
           <p class="eem-kicker !text-[color:var(--eem-gold)]">University of Missouri · Since 1874</p>
-          <h1 class="eem-display mt-5 text-white uppercase leading-[0.92] text-[2.3rem] min-[400px]:text-[2.7rem] sm:text-7xl lg:text-[5.4rem]">
+          <h1 class="eem-display mt-5 text-white uppercase leading-[0.92] text-[2.3rem] min-[400px]:text-[2.7rem] sm:text-7xl lg:text-[4.3rem] xl:text-[5.4rem]">
             Enns<br />
             <span class="text-[color:var(--eem-gold)]">Entomology</span><br />
             Museum
