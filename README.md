@@ -1,5 +1,7 @@
 # TaxonPages Template
 
+> **Publishing at ennsmuseum.missouri.edu (MU Digital Service, OneDrive → AWS):** see [AWS-HOSTING.md](AWS-HOSTING.md).
+
 A GitHub template for creating your own [TaxonPages](https://github.com/SpeciesFileGroup/taxonpages/tree/package) site. TaxonPages serves taxon pages using data from a TaxonWorks instance (and is designed to remain data-source agnostic).
 
 This repository is meant to be used directly from GitHub: click **Use this template**, edit a couple of configuration files in the browser, and GitHub Actions will build and publish your site to GitHub Pages — no local setup required.

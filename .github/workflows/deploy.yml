@@ -63,6 +63,11 @@ jobs:
       - name: Build public view
         run: npm run build
 
+      # List of the built files with checksums (dist/site-manifest.json), used by
+      # `npm run deploy:aws` to copy only new or changed files to ennsmuseum.missouri.edu.
+      - name: Write site manifest
+        run: node scripts/site-manifest.mjs
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

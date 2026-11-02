@@ -13,7 +13,9 @@
     "data:gbif": "node scripts/gbif-missouri.mjs",
     "data:inat": "node scripts/inat-missouri.mjs",
     "data:citations": "node scripts/eem-citations.mjs",
-    "data:loans": "node scripts/tw-loans.mjs"
+    "data:loans": "node scripts/tw-loans.mjs",
+    "manifest": "node scripts/site-manifest.mjs",
+    "deploy:aws": "node scripts/deploy-aws.mjs"
   },
   "dependencies": {
     "@sfgrp/taxonpages": "latest"

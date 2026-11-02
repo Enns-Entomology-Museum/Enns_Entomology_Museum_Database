@@ -22,5 +22,9 @@
 # enabled on GitHub Pages — otherwise reloading a taxon page directly in
 # the browser returns a 404.
 
-base_url: /Enns_Entomology_Museum_Database/
+# This site: "./" (relative). The same build then works on GitHub Pages
+# (enns-entomology-museum.github.io/Enns_Entomology_Museum_Database/) and on
+# https://ennsmuseum.missouri.edu (MU Digital Service, see AWS-HOSTING.md).
+# Works because hash_mode is on.
+base_url: ./
 hash_mode: true
