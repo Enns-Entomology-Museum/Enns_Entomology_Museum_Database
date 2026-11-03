@@ -105,7 +105,7 @@ function draw() {
 
 function setTiles() {
   if (tiles) tiles.remove()
-  const style = isDark.value ? 'Dark_Gray_Base' : 'World_Light_Gray_Base'
+  const style = isDark.value ? 'World_Dark_Gray_Base' : 'World_Light_Gray_Base'
   tiles = L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/${style}/MapServer/tile/{z}/{y}/{x}`, {
     attribution: 'Tiles &copy; Esri',
     maxZoom: 12

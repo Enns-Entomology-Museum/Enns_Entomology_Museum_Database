@@ -351,10 +351,12 @@ const GROUPS = [
   { key: 'undergrads', label: 'Undergraduate students' },
   { key: 'alumni', label: 'Former students' },
   { key: 'collab', label: 'Research associates & collaborators' },
-  { key: 'former', label: 'Former staff & in memoriam' }
+  { key: 'former', label: 'Former staff' },
+  { key: 'memoriam', label: 'In memoriam' }
 ]
 
 function groupOf(p) {
+  if (p.deceased) return 'memoriam'
   if (p.historical) return 'former'
   if (p.staff || /technician|curator|collection manager/i.test(p.title || '')) return 'team'
   if (/research associate|collaborator/i.test(p.role || '')) return 'collab'
