@@ -74,11 +74,15 @@
             v-if="total"
             class="eem-lib-split mt-5"
             role="img"
-            :aria-label="`${physical} physical copies, ${pdfOnly} PDF only, ${unknown} not yet marked`"
+            :aria-label="`${physical} physical copy only, ${both} physical copy and PDF, ${pdfOnly} PDF only, ${unknown} not yet marked`"
           >
             <span
               class="phys"
               :style="{ flex: physical }"
+            />
+            <span
+              class="both"
+              :style="{ flex: both }"
             />
             <span
               class="pdf"
@@ -92,7 +96,10 @@
           </div>
           <ul class="mt-4 space-y-1.5 text-sm">
             <li class="flex items-center gap-2">
-              <i class="eem-lib-dot phys" />Physical copy <b class="ml-auto">{{ physical }}</b>
+              <i class="eem-lib-dot phys" />Physical copy only <b class="ml-auto">{{ physical }}</b>
+            </li>
+            <li class="flex items-center gap-2">
+              <i class="eem-lib-dot both" />Physical copy and PDF <b class="ml-auto">{{ both }}</b>
             </li>
             <li class="flex items-center gap-2">
               <i class="eem-lib-dot pdf" />PDF only <b class="ml-auto">{{ pdfOnly }}</b>
@@ -186,7 +193,8 @@
               aria-label="Format"
             >
               <option value="">All formats</option>
-              <option value="phys">Physical copy</option>
+              <option value="phys">Physical copy only</option>
+              <option value="both">Physical copy and PDF</option>
               <option value="pdf">PDF only</option>
             </select>
           </div>
@@ -201,7 +209,7 @@
             <span
               class="eem-lib-fmt"
               :class="s.format"
-              >{{ s.format === 'phys' ? 'Shelf' : s.format === 'pdf' ? 'PDF' : '—' }}</span
+              >{{ s.format === 'phys' ? 'Shelf' : s.format === 'pdf' ? 'PDF' : s.format === 'both' ? 'Shelf + PDF' : '—' }}</span
             >
             <div class="min-w-0 flex-1">
               <p
@@ -254,11 +262,14 @@ import { fmt as num } from './components/useEem.js'
 useHead({ title: 'Library — Enns Entomology Museum' })
 
 // Tags and identifiers used in TaxonWorks for the library
-const PHYSICAL_TAG = 'physical copy'
-const PDF_TAG = 'only pdf'
+// Format tags, matched loosely: "Physical copy", "PDF", "Only PDF", "PDF and physical copy"...
+const IS_PHYS_TAG = /physical|\bshelf\b|\bprint(ed)?\b/i
+const IS_PDF_TAG = /\bpdf\b/i
+const IS_PDF_ONLY_TAG = /\bpdf\b.*\bonly\b|\bonly\b.*\bpdf\b/i
+const isFormatTag = (t) => IS_PHYS_TAG.test(t) || IS_PDF_TAG.test(t)
 // Tags that are not taxonomic groups: library format, and the Research page's
 // "Uses EEM specimens" (see pages/research.vue)
-const NOT_GROUPS = [PHYSICAL_TAG, PDF_TAG, 'uses eem specimens']
+const NOT_GROUPS = ['uses eem specimens']
 const LIB_PREFIX = /^EEM\.LIB/i
 
 const sources = shallowRef([])
@@ -314,8 +325,10 @@ const items = computed(() =>
     const tags = tagsBySource.value.get(s.id) || []
     const lower = tags.map((t) => t.toLowerCase())
     const libId = (s.identifiers || []).map((i) => i.value || i.cached || '').find((v) => LIB_PREFIX.test(v)) || ''
-    const isPdf = lower.includes(PDF_TAG)
-    const isPhys = lower.includes(PHYSICAL_TAG) || (!!libId && !isPdf)
+    const pdfOnlyTag = tags.some((t) => IS_PDF_ONLY_TAG.test(t))
+    const isPdf = tags.some((t) => IS_PDF_TAG.test(t))
+    // A library number (EEM.LIB…) means a copy on the shelf, unless tagged "PDF only"
+    const isPhys = !pdfOnlyTag && (tags.some((t) => IS_PHYS_TAG.test(t)) || !!libId)
     return {
       id: s.id,
       citation: s.cached || s.object_tag || s.title || '',
@@ -323,8 +336,8 @@ const items = computed(() =>
       type: s.bibtex_type || 'other',
       doi: (s.doi || '').trim(),
       libId,
-      format: isPhys ? 'phys' : isPdf ? 'pdf' : '',
-      groups: tags.filter((t) => !NOT_GROUPS.includes(t.toLowerCase())).sort()
+      format: isPhys && isPdf ? 'both' : isPhys ? 'phys' : isPdf ? 'pdf' : '',
+      groups: tags.filter((t) => !isFormatTag(t) && !NOT_GROUPS.includes(t.toLowerCase())).sort((a, b) => a.localeCompare(b))
     }
   })
     // Only library holdings: references added just for nomenclature carry no format tag
@@ -334,12 +347,13 @@ const items = computed(() =>
 const total = computed(() => items.value.length)
 const physical = computed(() => items.value.filter((i) => i.format === 'phys').length)
 const pdfOnly = computed(() => items.value.filter((i) => i.format === 'pdf').length)
-const unknown = computed(() => total.value - physical.value - pdfOnly.value)
+const both = computed(() => items.value.filter((i) => i.format === 'both').length)
+const unknown = computed(() => total.value - physical.value - pdfOnly.value - both.value)
 
 const groups = computed(() => {
   const m = new Map()
   items.value.forEach((i) => i.groups.forEach((g) => m.set(g, (m.get(g) || 0) + 1)))
-  return [...m.entries()].map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+  return [...m.entries()].map(([name, n]) => ({ name, n })).sort((a, b) => a.name.localeCompare(b.name))
 })
 // Tree of group tags (parent found via Catalogue of Life)
 const parents = shallowRef(new Map())
@@ -373,9 +387,9 @@ const tree = computed(() => {
   const build = (n) => ({
     name: n,
     n: titlesUnder(n, kids).size,
-    children: (kids.get(n) || []).map(build).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+    children: (kids.get(n) || []).map(build).sort((a, b) => a.name.localeCompare(b.name))
   })
-  return (kids.get(null) || []).map(build).sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+  return (kids.get(null) || []).map(build).sort((a, b) => a.name.localeCompare(b.name))
 })
 
 const flatTree = computed(() => {
@@ -439,7 +453,7 @@ const oldest = computed(() => {
 
 const stats = computed(() => [
   { label: 'Titles', value: num(total.value), note: 'catalogued so far' },
-  { label: 'Physical copies', value: num(physical.value), note: 'on the shelves' },
+  { label: 'Physical copies', value: num(physical.value + both.value), note: `on the shelves, ${num(both.value)} also as PDF` },
   { label: 'PDF only', value: num(pdfOnly.value), note: 'digital copies' },
   { label: 'Groups covered', value: num(groups.value.length), note: 'taxonomic tags' },
   { label: 'Years spanned', value: oldest.value ? `${oldest.value}–${Math.max(...items.value.map((i) => i.year || 0))}` : '—', note: 'publication dates' }
@@ -541,6 +555,9 @@ const shown = computed(() => {
 .pdf {
   background: var(--eem-gold);
 }
+.both {
+  background: linear-gradient(90deg, #000 50%, var(--eem-gold) 50%);
+}
 .unk {
   background: var(--eem-rule);
 }
@@ -603,6 +620,11 @@ const shown = computed(() => {
 .eem-lib-fmt.pdf {
   background: var(--eem-gold);
   color: #000;
+}
+.eem-lib-fmt.both {
+  background: #000;
+  color: var(--eem-gold);
+  box-shadow: inset 0 -3px 0 var(--eem-gold);
 }
 .eem-lib-id {
   font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
