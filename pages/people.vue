@@ -18,6 +18,23 @@
         </div>
       </dl>
 
+      <div
+        v-if="!loading && muDepts.length"
+        class="mt-6"
+      >
+        <p class="eem-kicker">Across the University of Missouri</p>
+        <p class="mt-2 text-sm eem-muted">People from {{ muDepts.length }} MU {{ muDepts.length === 1 ? 'department work' : 'departments work' }} with the collection.</p>
+        <ul class="mt-3 flex flex-wrap gap-2">
+          <li
+            v-for="d in muDepts"
+            :key="d.name"
+            class="eem-dept"
+          >
+            {{ d.name }} <span>{{ d.n }}</span>
+          </li>
+        </ul>
+      </div>
+
       <div class="mt-10 grid lg:grid-cols-12 gap-8 items-start">
         <div class="lg:col-span-4">
           <p class="eem-kicker">Our network</p>
@@ -128,7 +145,14 @@
                   >
                     In memoriam · {{ p.born || '?' }}–{{ p.died || '?' }}
                   </p>
-                  <p class="text-sm mt-0.5">{{ cleanAff(p.affiliation) }}</p>
+                  <p class="text-sm mt-0.5">
+                    {{ cleanAff(p.affiliation) }}<span
+                      v-if="deptOf(p)"
+                      class="eem-muted"
+                    >
+                      · {{ deptOf(p) }}</span
+                    >
+                  </p>
                   <p
                     v-if="p.note"
                     class="text-sm mt-2 italic leading-snug"
@@ -358,6 +382,7 @@ const stats = computed(() => {
     { label: 'People', value: ppl.length },
     { label: 'Institutions', value: inst.size },
     { label: 'Countries', value: countries.size },
+    { label: 'MU departments', value: muDepts.value.length },
     { label: 'Students', value: ppl.filter((p) => ['grads', 'undergrads'].includes(groupOf(p))).length }
   ]
 })
@@ -381,6 +406,28 @@ const updated = computed(() => {
 })
 
 const cleanAff = (a = '') => a.replace(/University of missouri/i, 'University of Missouri').replace(/ - Columbia$/, '')
+
+// Department, written the same way for everyone ("Plant Sciences", "Plant Science" -> one department)
+function deptOf(p) {
+  const d = (p.department || '').trim()
+  if (!d) return ''
+  if (/plant/i.test(d)) return 'Plant Science and Technology'
+  if (/biolog/i.test(d)) return 'Biological Sciences'
+  return d
+}
+// MU departments reached by the network, most people first
+const muDepts = computed(() => {
+  const count = {}
+  data.value.people
+    .filter((p) => !p.historical && /university of misso/i.test(p.affiliation || ''))
+    .forEach((p) => {
+      const d = deptOf(p)
+      if (d) count[d] = (count[d] || 0) + 1
+    })
+  return Object.entries(count)
+    .map(([name, n]) => ({ name, n }))
+    .sort((a, b) => b.n - a.n || a.name.localeCompare(b.name))
+})
 
 function initials(n = '') {
   return n
@@ -453,8 +500,32 @@ function initials(n = '') {
 }
 @media (min-width: 768px) {
   .eem-ppl-stats {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+@media (min-width: 1024px) {
+  .eem-ppl-stats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+.eem-dept {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.65rem;
+  border: 1.5px solid var(--eem-ink);
+  border-radius: 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--eem-card);
+}
+.eem-dept span {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0 0.4rem;
+  background: var(--eem-gold);
+  color: #000;
+  border-radius: 2px;
 }
 .eem-ppl-stats > div {
   padding: 1rem 1.25rem;
