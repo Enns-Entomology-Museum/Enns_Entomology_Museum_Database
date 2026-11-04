@@ -73,56 +73,67 @@
           <div
             v-if="total"
             class="eem-lib-split mt-5"
-            role="img"
-            :aria-label="`${physical} physical copy only, ${both} physical copy and PDF, ${pdfOnly} PDF only, ${unknown} not yet marked`"
           >
-            <span
-              class="phys"
-              :style="{ flex: physical }"
-            />
-            <span
-              class="both"
-              :style="{ flex: both }"
-            />
-            <span
-              class="pdf"
-              :style="{ flex: pdfOnly }"
-            />
-            <span
-              v-if="unknown"
-              class="unk"
-              :style="{ flex: unknown }"
+            <button
+              v-for="f in formats"
+              v-show="f.n"
+              :key="f.key"
+              type="button"
+              :class="[f.key, { dim: fmt && fmt !== f.key }]"
+              :style="{ flex: f.n }"
+              :title="`${f.label}: ${f.n} (${pct(f.n)})`"
+              :aria-label="`${f.label}: ${f.n} titles. Show them`"
+              @click="pick('fmt', f.key)"
             />
           </div>
-          <ul class="mt-4 space-y-1.5 text-sm">
-            <li class="flex items-center gap-2">
-              <i class="eem-lib-dot phys" />Physical copy only <b class="ml-auto">{{ physical }}</b>
-            </li>
-            <li class="flex items-center gap-2">
-              <i class="eem-lib-dot both" />Physical copy and PDF <b class="ml-auto">{{ both }}</b>
-            </li>
-            <li class="flex items-center gap-2">
-              <i class="eem-lib-dot pdf" />PDF only <b class="ml-auto">{{ pdfOnly }}</b>
-            </li>
+          <ul class="mt-4 space-y-1 text-sm">
             <li
-              v-if="unknown"
-              class="flex items-center gap-2"
+              v-for="f in formats"
+              v-show="f.n || f.key !== 'unk'"
+              :key="f.key"
             >
-              <i class="eem-lib-dot unk" />Not yet marked <b class="ml-auto">{{ unknown }}</b>
+              <button
+                type="button"
+                class="eem-lib-row"
+                :class="{ on: fmt === f.key }"
+                :aria-pressed="fmt === f.key"
+                :disabled="!f.n || f.key === 'unk'"
+                @click="pick('fmt', f.key)"
+              >
+                <i
+                  class="eem-lib-dot"
+                  :class="f.key"
+                />{{ f.label }}
+                <span class="ml-auto eem-muted text-xs">{{ pct(f.n) }}</span>
+                <b class="w-10 text-right">{{ f.n }}</b>
+              </button>
             </li>
           </ul>
+          <p class="text-xs eem-muted mt-3">Click a format to list its titles.</p>
         </div>
 
         <!-- Type -->
         <div class="eem-card p-6">
           <p class="eem-kicker">Type</p>
-          <ul class="mt-3 space-y-1.5 text-sm">
+          <ul class="mt-3 space-y-1 text-sm">
             <li
               v-for="t in types"
               :key="t.name"
-              class="flex justify-between gap-3"
             >
-              <span>{{ t.name }}</span><b>{{ t.n }}</b>
+              <button
+                type="button"
+                class="eem-lib-row eem-lib-typerow"
+                :class="{ on: typ === t.name }"
+                :aria-pressed="typ === t.name"
+                @click="pick('typ', t.name)"
+              >
+                <span
+                  class="eem-lib-typebar"
+                  :style="{ width: (t.n / typeMax) * 100 + '%' }"
+                />
+                <span class="relative">{{ t.name }}</span>
+                <b class="relative ml-auto">{{ t.n }}</b>
+              </button>
             </li>
           </ul>
         </div>
@@ -135,29 +146,45 @@
           <p class="eem-kicker">Publication date</p>
           <div
             class="eem-lib-decades mt-4"
-            role="img"
-            :aria-label="decades.map((d) => `${d.name}: ${d.n}`).join(', ')"
+            role="group"
+            aria-label="Titles per decade of publication"
           >
-            <div
+            <button
               v-for="d in decades"
               :key="d.name"
+              type="button"
               class="eem-lib-dec"
-              :title="`${d.name}: ${d.n} titles`"
+              :class="{ on: dec === d.d, dim: dec !== null && dec !== d.d }"
+              :disabled="!d.n"
+              :title="`${d.name}: ${d.n} title${d.n === 1 ? '' : 's'}`"
+              :aria-label="`${d.name}: ${d.n} titles`"
+              :aria-pressed="dec === d.d"
+              @click="pick('dec', d.d)"
             >
+              <span
+                v-if="d.n"
+                class="eem-lib-dec-n"
+                >{{ d.n }}</span
+              >
               <span
                 class="eem-lib-dec-bar"
                 :style="{ height: d.h + '%' }"
               />
               <span class="eem-lib-dec-lab">{{ d.short }}</span>
-            </div>
+            </button>
           </div>
-          <p class="text-xs eem-muted mt-3">Oldest title: {{ oldest || '—' }}</p>
+          <p class="text-xs eem-muted mt-3">
+            Oldest title: {{ oldest || '—' }} · Busiest decade: {{ busiest || '—' }} · Click a bar to list its titles.
+          </p>
         </div>
       </div>
     </section>
 
     <!-- Titles -->
-    <section class="border-t eem-rule bg-[color:var(--eem-paper-2)]">
+    <section
+      ref="titlesEl"
+      class="border-t eem-rule bg-[color:var(--eem-paper-2)]"
+    >
       <div class="container mx-auto box-border px-4 py-14">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -166,14 +193,24 @@
               Titles <span class="eem-muted text-xl">{{ shown.length }}</span>
             </h2>
             <p
-              v-if="group"
-              class="text-sm mt-1"
+              v-if="activeFilters.length"
+              class="text-sm mt-2 flex flex-wrap items-center gap-1.5"
             >
-              Showing <b>{{ group }}</b> ·
+              Showing
+              <button
+                v-for="f in activeFilters"
+                :key="f.key"
+                type="button"
+                class="eem-lib-chip"
+                :aria-label="`Remove filter ${f.label}`"
+                @click="clearFilter(f.key)"
+              >
+                {{ f.label }} <span aria-hidden="true">×</span>
+              </button>
               <button
                 type="button"
-                class="eem-link"
-                @click="group = ''"
+                class="eem-link ml-1"
+                @click="clearAll"
               >
                 show all
               </button>
@@ -280,6 +317,16 @@ const loaded = ref(false)
 const group = ref('')
 const q = ref('')
 const fmt = ref('')
+const typ = ref('') // publication type (Journal articles, Books, …)
+const dec = ref(null) // decade, e.g. 1950
+const titlesEl = ref(null)
+
+// Clicking a stat filters the list below (click again to undo) and brings the list into view
+function pick(which, value) {
+  const r = { fmt, typ, dec }[which]
+  r.value = r.value === value ? (which === 'dec' ? null : '') : value
+  if (r.value !== '' && r.value !== null) titlesEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 
 async function getAll(path, params) {
   const out = []
@@ -424,6 +471,16 @@ const types = computed(() => {
   })
   return [...m.entries()].map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n)
 })
+const typeMax = computed(() => Math.max(1, ...types.value.map((t) => t.n)))
+const typeOf = (i) => TYPE_NAMES[i.type] || 'Other'
+const FORMAT_LABELS = { phys: 'Physical copy only', both: 'Physical copy and PDF', pdf: 'PDF only', unk: 'Not yet marked' }
+const formats = computed(() => [
+  { key: 'phys', label: FORMAT_LABELS.phys, n: physical.value },
+  { key: 'both', label: FORMAT_LABELS.both, n: both.value },
+  { key: 'pdf', label: FORMAT_LABELS.pdf, n: pdfOnly.value },
+  { key: 'unk', label: FORMAT_LABELS.unk, n: unknown.value }
+])
+const pct = (n) => (total.value ? `${Math.round((n / total.value) * 100)}%` : '')
 
 const decades = computed(() => {
   const ys = items.value.map((i) => i.year).filter((y) => y > 1500)
@@ -441,11 +498,16 @@ const decades = computed(() => {
   const long = out.length > 10
   const first = out[0].d
   return out.map(({ d, n }) => ({
+    d,
     name: `${d}s`,
     short: !long ? `’${String(d).slice(2)}` : d % 50 === 0 || d === first ? String(d) : '',
     n,
     h: n ? Math.max(5, (n / max) * 100) : 0
   }))
+})
+const busiest = computed(() => {
+  const top = [...decades.value].sort((a, b) => b.n - a.n)[0]
+  return top && top.n ? top.name : ''
 })
 const oldest = computed(() => {
   const ys = items.value.map((i) => i.year).filter((y) => y > 1500)
@@ -460,11 +522,32 @@ const stats = computed(() => [
   { label: 'Years spanned', value: oldest.value ? `${oldest.value}–${Math.max(...items.value.map((i) => i.year || 0))}` : '—', note: 'publication dates' }
 ])
 
+const activeFilters = computed(() =>
+  [
+    group.value && { key: 'group', label: group.value },
+    fmt.value && { key: 'fmt', label: FORMAT_LABELS[fmt.value] },
+    typ.value && { key: 'typ', label: typ.value },
+    dec.value !== null && { key: 'dec', label: `${dec.value}s` }
+  ].filter(Boolean)
+)
+function clearFilter(key) {
+  if (key === 'dec') dec.value = null
+  else ({ group, fmt, typ })[key].value = ''
+}
+function clearAll() {
+  group.value = ''
+  fmt.value = ''
+  typ.value = ''
+  dec.value = null
+}
+
 const shown = computed(() => {
   const term = q.value.trim().toLowerCase()
   return items.value
     .filter((i) => !groupIds.value || groupIds.value.has(i.id))
     .filter((i) => !fmt.value || i.format === fmt.value)
+    .filter((i) => !typ.value || typeOf(i) === typ.value)
+    .filter((i) => dec.value === null || (i.year && Math.floor(i.year / 10) * 10 === dec.value))
     .filter((i) => !term || i.citation.replace(/<[^>]+>/g, '').toLowerCase().includes(term))
     .sort((a, b) => a.citation.replace(/<[^>]+>/g, '').localeCompare(b.citation.replace(/<[^>]+>/g, '')))
 })
@@ -542,6 +625,71 @@ const shown = computed(() => {
   height: 1.1rem;
   gap: 2px;
 }
+.eem-lib-split button {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.eem-lib-split button:hover,
+.eem-lib-split button:focus-visible {
+  outline: 2px solid var(--eem-ink);
+  outline-offset: 1px;
+}
+.eem-lib-split .dim {
+  opacity: 0.3;
+}
+.eem-lib-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.3rem 0.45rem;
+  border-radius: 4px;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.eem-lib-row:hover:not(:disabled) {
+  background: var(--eem-paper-2);
+}
+.eem-lib-row.on {
+  background: var(--eem-ink);
+  color: var(--eem-paper);
+}
+.eem-lib-row.on .eem-muted {
+  color: inherit;
+  opacity: 0.75;
+}
+.eem-lib-row:disabled {
+  cursor: default;
+}
+.eem-lib-typebar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--eem-gold);
+  opacity: 0.25;
+}
+.eem-lib-row.on .eem-lib-typebar {
+  opacity: 0.45;
+}
+.eem-lib-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--eem-ink);
+  color: var(--eem-gold);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.eem-lib-chip:hover {
+  opacity: 0.85;
+}
 .eem-lib-split span,
 .eem-lib-dot {
   display: inline-block;
@@ -567,7 +715,8 @@ const shown = computed(() => {
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
   gap: 3px;
-  height: 6rem;
+  height: 7rem;
+  padding-top: 1.1rem; /* room for the count shown above a bar */
   align-items: end;
 }
 .eem-lib-dec {
@@ -575,6 +724,49 @@ const shown = computed(() => {
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
+  position: relative;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.eem-lib-dec:disabled {
+  cursor: default;
+}
+.eem-lib-dec.dim {
+  opacity: 0.35;
+}
+.eem-lib-dec:hover .eem-lib-dec-bar,
+.eem-lib-dec.on .eem-lib-dec-bar {
+  background: var(--eem-ink);
+}
+.eem-lib-dec:focus-visible {
+  outline: 2px solid var(--eem-ink);
+  outline-offset: 2px;
+}
+/* the count appears above the bar on hover (and stays on the selected decade) */
+.eem-lib-dec-n {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%);
+  padding: 0 0.3rem;
+  border-radius: 3px;
+  background: var(--eem-ink);
+  color: var(--eem-gold);
+  font-size: 0.65rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s;
+  z-index: 1;
+}
+.eem-lib-dec:hover .eem-lib-dec-n,
+.eem-lib-dec:focus-visible .eem-lib-dec-n,
+.eem-lib-dec.on .eem-lib-dec-n {
+  opacity: 1;
 }
 .eem-lib-dec-bar {
   display: block;
