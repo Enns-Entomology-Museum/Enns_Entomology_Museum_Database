@@ -115,6 +115,12 @@
                 :key="p.key"
                 class="py-3"
               >
+                <p
+                  v-if="p.citation"
+                  class="leading-snug rs-citation"
+                  v-html="p.citation"
+                />
+                <template v-else>
                 <p class="text-sm eem-muted">{{ authorsOf(p) }}</p>
                 <p class="mt-0.5 font-semibold leading-snug">
                   <a
@@ -127,10 +133,11 @@
                   >
                   <template v-else>{{ p.title }}</template>
                 </p>
+                </template>
                 <p class="mt-1 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <i v-if="p.journal">{{ p.journal }}</i>
+                  <i v-if="p.journal && !p.citation">{{ p.journal }}</i>
                   <a
-                    v-if="p.doi"
+                    v-if="p.doi && !(p.citation || '').includes(p.doi)"
                     :href="`https://doi.org/${p.doi}`"
                     target="_blank"
                     rel="noopener"
@@ -246,6 +253,7 @@
 
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { linkify } from './components/linkify.js'
 import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
 import EemPageHead from './components/EemPageHead.vue'
@@ -315,6 +323,8 @@ async function loadConfirmed() {
         journal: String(s.journal || s.booktitle || '').replace(/<[^>]+>/g, ''),
         doi: s.doi || '',
         url: s.doi ? `https://doi.org/${s.doi}` : s.url || '',
+        // the full reference as written in TaxonWorks (all authors, volume, pages), links clickable
+        citation: linkify(s.cached || ''),
         confirmed: true
       }
     })
@@ -526,6 +536,9 @@ function downloadCsv() {
   font-size: 1.3rem;
   padding-bottom: 0.3rem;
   border-bottom: 3px solid var(--eem-gold);
+}
+.rs-citation :deep(a) {
+  word-break: break-all;
 }
 .rs-title {
   color: var(--eem-ink);

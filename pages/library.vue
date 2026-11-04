@@ -257,6 +257,7 @@ import { useHead } from '@unhead/vue'
 import { makeAPIRequest } from '@/utils/request'
 import EemPageHead from './components/EemPageHead.vue'
 import { parentsOf } from './components/libraryGroups.js'
+import { linkify } from './components/linkify.js'
 import { fmt as num } from './components/useEem.js'
 
 useHead({ title: 'Library — Enns Entomology Museum' })
@@ -331,7 +332,7 @@ const items = computed(() =>
     const isPhys = !pdfOnlyTag && (tags.some((t) => IS_PHYS_TAG.test(t)) || !!libId)
     return {
       id: s.id,
-      citation: s.cached || s.object_tag || s.title || '',
+      citation: linkify(s.cached || s.object_tag || s.title || ''),
       year: s.year || null,
       type: s.bibtex_type || 'other',
       doi: (s.doi || '').trim(),
@@ -625,6 +626,9 @@ const shown = computed(() => {
   background: #000;
   color: var(--eem-gold);
   box-shadow: inset 0 -3px 0 var(--eem-gold);
+}
+.eem-lib-item :deep(a) {
+  word-break: break-all;
 }
 .eem-lib-id {
   font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
