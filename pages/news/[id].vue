@@ -316,10 +316,18 @@ async function copyLink() {
 @media (min-width: 768px) {
   .ns-body :deep(img[title='side']) {
     float: right;
-    width: 42%;
+    width: 38%;
+    /* tall phone photos are cropped so they stay beside their own section */
+    max-height: 20rem;
+    object-fit: cover;
     margin: 0.3em 0 1em 1.6em;
     box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
   }
+}
+/* a new section always starts below the previous section's side photo */
+.ns-body :deep(h2),
+.ns-body :deep(h3) {
+  clear: both;
 }
 .ns-body :deep(.ns-links),
 .ns-body :deep(blockquote) {
