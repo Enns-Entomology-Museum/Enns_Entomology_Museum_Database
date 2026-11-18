@@ -47,7 +47,6 @@
 
       <div
         v-else
-        class="eem-card p-3 sm:p-5"
       >
         <ul
           class="eem-tree"
@@ -59,6 +58,7 @@
             :key="n.id"
             :node="n"
             :depth="0"
+            :max="rootMax"
           />
         </ul>
       </div>
@@ -120,9 +120,9 @@ onMounted(async () => {
     })
     map.forEach((n) => n.children.sort((a, b) => a.name.localeCompare(b.name)))
     nodes.value = map
-    // open orders by default
+    // start with only the orders showing, all closed: open one to see its families
     map.forEach((n) => {
-      if (['Class', 'Order'].includes(n.rank) || HIDE.has(n.name)) openSet.add(n.id)
+      if (n.rank === 'Class' || HIDE.has(n.name)) openSet.add(n.id)
     })
   } finally {
     loading.value = false
@@ -199,13 +199,15 @@ const summary = computed(() => {
   return `With specimens: ${count('Order')} orders · ${count('Family')} families · ${count('Genus')} genera · ${count('Species')} species`
 })
 
+const rootMax = computed(() => Math.max(1, ...roots.value.map((n) => counted.value.get(n.id) || 0)))
+
 function setAll(v) {
   nodes.value.forEach((n) => (v ? openSet.add(n.id) : !HIDE.has(n.name) && n.rank !== 'Class' && openSet.delete(n.id)))
 }
 
 const TreeNode = defineComponent({
   name: 'TreeNode',
-  props: { node: Object, depth: Number },
+  props: { node: Object, depth: Number, max: { type: Number, default: 1 } },
   setup(props) {
     return () => {
       const n = props.node
@@ -217,33 +219,41 @@ const TreeNode = defineComponent({
       const otu = otuByTaxon.value.get(n.id)
       const major = MAJOR.includes(n.rank)
       const hit = m && filter.value && n.full.toLowerCase().includes(filter.value.trim().toLowerCase())
+      const kidsMax = Math.max(1, ...kids.map((c) => counted.value.get(c.id) || 0))
 
-      return h('li', { role: 'treeitem', 'aria-expanded': kids.length ? String(isOpen) : undefined, class: 'eem-tn' }, [
+      return h('li', { role: 'treeitem', 'aria-expanded': kids.length ? String(isOpen) : undefined, class: ['eem-tn', { top: props.depth === 0, open: isOpen && kids.length }] }, [
         h('div', { class: ['eem-tn-row', { major, hit }] }, [
           kids.length
             ? h(
                 'button',
                 {
                   type: 'button',
-                  class: 'eem-tn-toggle',
+                  class: ['eem-tn-toggle', { open: isOpen }],
                   'aria-label': `${isOpen ? 'Collapse' : 'Expand'} ${n.full}`,
                   onClick: () => (openSet.has(n.id) ? openSet.delete(n.id) : openSet.add(n.id))
                 },
-                isOpen ? '−' : '+'
+                [h('svg', { viewBox: '0 0 16 16', 'aria-hidden': 'true' }, [h('path', { d: 'M6 3.5 10.5 8 6 12.5' })])]
               )
             : h('span', { class: 'eem-tn-leaf', 'aria-hidden': 'true' }),
-          h('span', { class: 'eem-tn-rank' }, n.rank),
-          otu
-            ? h(RouterLink, { to: { name: 'otus-id-overview', params: { id: otu } }, class: 'eem-tn-name', innerHTML: n.html })
-            : h('span', { class: 'eem-tn-name', innerHTML: n.html }),
-          n.rank === 'Order' && ORDER_NAMES[n.name] ? h('span', { class: 'eem-tn-common' }, ORDER_NAMES[n.name]) : null,
-          total ? h('span', { class: 'eem-tn-count', title: `${total} digitized specimens` }, fmt(total)) : null
+          h('span', { class: 'eem-tn-label' }, [
+            otu
+              ? h(RouterLink, { to: { name: 'otus-id-overview', params: { id: otu } }, class: 'eem-tn-name', innerHTML: n.html })
+              : h('span', { class: 'eem-tn-name', innerHTML: n.html }),
+            h('span', { class: 'eem-tn-rank' }, n.rank),
+            n.rank === 'Order' && ORDER_NAMES[n.name] ? h('span', { class: 'eem-tn-common' }, ORDER_NAMES[n.name]) : null
+          ]),
+          total
+            ? h('span', { class: 'eem-tn-bar', 'aria-hidden': 'true' }, [
+                h('span', { style: { width: Math.max(2, (100 * total) / props.max) + '%' } })
+              ])
+            : h('span', { class: 'eem-tn-bar empty', 'aria-hidden': 'true' }),
+          h('span', { class: 'eem-tn-count', title: `${total} digitized specimens` }, total ? fmt(total) : '—')
         ]),
         kids.length && isOpen
           ? h(
               'ul',
               { role: 'group', class: 'eem-tn-kids' },
-              kids.map((c) => h(TreeNode, { key: c.id, node: c, depth: props.depth + 1 }))
+              kids.map((c) => h(TreeNode, { key: c.id, node: c, depth: props.depth + 1, max: kidsMax }))
             )
           : null
       ])
@@ -256,15 +266,17 @@ const TreeNode = defineComponent({
 .eem-tree-filter {
   flex: 1 1 18rem;
   max-width: 28rem;
-  border: 2px solid #000;
-  border-radius: 2px;
-  padding: 0.55rem 0.9rem;
+  border: 1.5px solid var(--eem-rule);
+  border-radius: 999px;
+  padding: 0.6rem 1.1rem;
   background: var(--eem-card);
   color: var(--eem-ink);
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .eem-tree-filter:focus {
   border-color: var(--eem-gold);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--eem-gold) 25%, transparent);
 }
 .eem-tree :deep(ul),
 .eem-tree {
@@ -272,17 +284,57 @@ const TreeNode = defineComponent({
   margin: 0;
   padding: 0;
 }
+
+/* each order is its own rounded block */
+.eem-tree {
+  display: grid;
+  gap: 0.6rem;
+}
+.eem-tree :deep(.eem-tn.top) {
+  border-radius: 14px;
+  background: var(--eem-card);
+  box-shadow: 0 0 0 1px var(--eem-rule);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease;
+}
+.eem-tree :deep(.eem-tn.top.open) {
+  box-shadow: 0 0 0 1px var(--eem-rule), 0 16px 34px -26px rgb(0 0 0 / 0.45);
+}
+.eem-tree :deep(.eem-tn.top > .eem-tn-row) {
+  padding: 0.8rem 1rem;
+}
+.eem-tree :deep(.eem-tn.top.open > .eem-tn-row) {
+  background: color-mix(in srgb, var(--eem-gold) 12%, transparent);
+}
+.eem-tree :deep(.eem-tn.top > .eem-tn-row .eem-tn-name) {
+  font-size: 1.08rem;
+}
+.eem-tree :deep(.eem-tn.top > .eem-tn-kids) {
+  margin: 0.4rem 0.75rem 0.75rem 1.65rem;
+}
+
 .eem-tree :deep(.eem-tn-kids) {
-  margin-left: 1.05rem;
-  padding-left: 0.9rem;
-  border-left: 1px dashed var(--eem-rule);
+  margin-left: 0.95rem;
+  padding-left: 0.85rem;
+  border-left: 1px solid var(--eem-rule);
+}
+.eem-tree :deep(.eem-tn-kids > li) {
+  animation: eem-tn-in 0.25s ease both;
+}
+@keyframes eem-tn-in {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
 }
 .eem-tree :deep(.eem-tn-row) {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr) minmax(4rem, 9rem) 4.5rem;
   align-items: center;
-  gap: 0.55rem;
-  padding: 0.3rem 0.35rem;
-  border-radius: 2px;
+  gap: 0.7rem;
+  padding: 0.38rem 0.6rem;
+  border-radius: 10px;
+  transition: background 0.2s ease;
 }
 .eem-tree :deep(.eem-tn-row:hover) {
   background: var(--eem-paper-2);
@@ -291,25 +343,39 @@ const TreeNode = defineComponent({
   background: color-mix(in srgb, var(--eem-gold) 25%, transparent);
 }
 .eem-tree :deep(.eem-tn-toggle) {
-  width: 1.35rem;
-  height: 1.35rem;
-  flex-shrink: 0;
+  width: 1.6rem;
+  height: 1.6rem;
   display: grid;
   place-items: center;
-  border: 1.5px solid var(--eem-ink);
-  border-radius: 2px;
-  font-weight: 800;
-  line-height: 1;
-  font-size: 0.95rem;
+  border-radius: 50%;
+  border: 1px solid var(--eem-rule);
+  background: var(--eem-card);
+  color: var(--eem-ink);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+.eem-tree :deep(.eem-tn-toggle svg) {
+  width: 0.85rem;
+  height: 0.85rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.25s ease;
 }
 .eem-tree :deep(.eem-tn-toggle:hover) {
+  border-color: var(--eem-gold);
+}
+.eem-tree :deep(.eem-tn-toggle.open) {
   background: var(--eem-gold);
   border-color: var(--eem-gold);
   color: #000;
 }
+.eem-tree :deep(.eem-tn-toggle.open svg) {
+  transform: rotate(90deg);
+}
 .eem-tree :deep(.eem-tn-leaf) {
-  width: 1.35rem;
-  flex-shrink: 0;
+  width: 1.6rem;
   display: grid;
   place-items: center;
 }
@@ -317,44 +383,71 @@ const TreeNode = defineComponent({
   content: '';
   width: 6px;
   height: 6px;
-  background: var(--eem-rule);
+  border-radius: 50%;
+  background: var(--eem-gold);
 }
-.eem-tree :deep(.eem-tn-rank) {
-  width: 6.2rem;
-  flex-shrink: 0;
-  font-size: 0.66rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--eem-ink-soft);
+.eem-tree :deep(.eem-tn-label) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.55rem;
+  min-width: 0;
 }
 .eem-tree :deep(.eem-tn-name) {
   min-width: 0;
   color: var(--eem-ink) !important;
+  background-image: linear-gradient(var(--eem-gold), var(--eem-gold));
+  background-size: 0 2px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  transition: background-size 0.25s ease;
 }
 .eem-tree :deep(a.eem-tn-name:hover) {
-  text-decoration: underline;
-  text-decoration-color: var(--eem-gold);
-  text-decoration-thickness: 2px;
+  background-size: 100% 2px;
 }
 .eem-tree :deep(.major .eem-tn-name) {
   font-weight: 700;
+}
+.eem-tree :deep(.eem-tn-rank) {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--eem-ink-soft);
 }
 .eem-tree :deep(.eem-tn-common) {
   font-size: 0.85rem;
   color: var(--eem-ink-soft);
 }
-.eem-tree :deep(.eem-tn-count) {
-  margin-left: auto;
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 0.05rem 0.45rem;
+.eem-tree :deep(.eem-tn-bar) {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--eem-paper-2);
+  overflow: hidden;
+}
+.eem-tree :deep(.eem-tn-bar.empty) {
+  background: transparent;
+}
+.eem-tree :deep(.eem-tn-bar span) {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
   background: var(--eem-gold);
-  color: #000;
-  border-radius: 2px;
+  transition: width 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.eem-tree :deep(.eem-tn-count) {
+  text-align: right;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--eem-ink);
 }
 @media (max-width: 640px) {
-  .eem-tree :deep(.eem-tn-rank) {
+  .eem-tree :deep(.eem-tn-row) {
+    grid-template-columns: 1.6rem minmax(0, 1fr) 3.5rem;
+  }
+  .eem-tree :deep(.eem-tn-rank),
+  .eem-tree :deep(.eem-tn-bar) {
     display: none;
   }
 }
