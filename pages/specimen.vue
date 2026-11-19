@@ -180,7 +180,7 @@
                 <pre
                   v-for="l in labels"
                   :key="l.key"
-                  :class="['eem-paperlabel', { red: l.red }]"
+                  :class="['eem-paperlabel', l.color && `c-${l.color}`]"
                   :title="l.title"
                   >{{ l.text }}</pre
                 >
@@ -485,7 +485,8 @@ const coId = computed(() =>
 )
 
 // ── Label transcriptions (TaxonWorks "buffered" fields) ──────────────────
-// A blank line separates physical labels; "[Red label]" marks a red one.
+// A blank line separates physical labels. A first line like "[Red label]" or
+// "[Yellow label]" gives the paper colour; no bracket means a white label.
 const rawLabels = ref({})
 async function loadLabels() {
   rawLabels.value = {}
@@ -502,6 +503,13 @@ async function loadLabels() {
     rawLabels.value = {}
   }
 }
+// Colour words we recognise in "[… label]" (British and US spellings)
+const LABEL_COLORS = {
+  red: 'red', yellow: 'yellow', green: 'green', blue: 'blue', pink: 'pink',
+  orange: 'orange', purple: 'purple', violet: 'purple', grey: 'grey', gray: 'grey',
+  brown: 'brown', beige: 'beige', cream: 'beige', black: 'black', white: null
+}
+const LABEL_COLOR_RE = /^\[\s*([a-z]+)\s+label\s*\]\s*/i
 const KIND = { event: 'Collecting event label', det: 'Determination label', other: 'Other label' }
 const labels = computed(() =>
   Object.entries(rawLabels.value).flatMap(([kind, text]) =>
@@ -510,12 +518,13 @@ const labels = computed(() =>
       .map((t) => t.split('\n').map((l) => l.trimEnd()).join('\n').trim())
       .filter(Boolean)
       .map((t, i) => {
-        const red = /^\[red label\]/i.test(t)
+        const m = t.match(LABEL_COLOR_RE)
+        const color = m ? LABEL_COLORS[m[1].toLowerCase()] || null : null
         return {
           key: `${kind}-${i}`,
-          red,
-          title: red ? `${KIND[kind]} (red)` : KIND[kind],
-          text: t.replace(/^\[red label\]\s*/i, '')
+          color, // null = white
+          title: color ? `${KIND[kind]} (${m[1].toLowerCase()})` : KIND[kind],
+          text: color ? t.slice(m[0].length) : t
         }
       })
   )
@@ -1024,12 +1033,22 @@ useHead({
 .eem-paperlabel:nth-child(odd) {
   transform: rotate(-0.5deg);
 }
-.eem-paperlabel.red {
+.eem-paperlabel.c-red {
   background: #f4c9c4;
   border-color: #d99a93;
   color: #3a0d0a;
-  font-weight: 700;
+  font-weight: 700; /* red = type label */
 }
+.eem-paperlabel.c-yellow { background: #fbf0a8; border-color: #ddcb6a; color: #3a3208; }
+.eem-paperlabel.c-green { background: #cfe8c6; border-color: #9cc48f; color: #16300f; }
+.eem-paperlabel.c-blue { background: #c9dcf2; border-color: #92b2d8; color: #0e2440; }
+.eem-paperlabel.c-pink { background: #f7d3e4; border-color: #dda4bf; color: #3e0f24; }
+.eem-paperlabel.c-orange { background: #f8d2a8; border-color: #dda871; color: #3d2006; }
+.eem-paperlabel.c-purple { background: #ddd0ee; border-color: #b19fd0; color: #25143d; }
+.eem-paperlabel.c-grey { background: #e2e2de; border-color: #bdbdb6; color: #222; }
+.eem-paperlabel.c-brown { background: #dcc6aa; border-color: #b39874; color: #2e1d0b; }
+.eem-paperlabel.c-beige { background: #f1e6cc; border-color: #d6c59c; color: #2e2510; }
+.eem-paperlabel.c-black { background: #1f1f1f; border-color: #000; color: #f4f1e8; }
 .eem-nophoto {
   display: flex;
   flex-direction: column;
