@@ -103,13 +103,21 @@ async function loadVisits(from, to) {
   if (!r.ok) return null
   const d = await r.json()
   if (!d.byMonth) return null
-  const out = { visits: 0, people: 0, outreach: { events: 0, people: 0 }, byType: {}, groups: [] }
+  const out = { visits: 0, people: 0, outreach: { events: 0, people: 0 }, byType: {}, groups: [], use: { sessions: 0, people: 0, days: 0, institutions: 0, byResource: {}, byUser: {} } }
   for (const [month, b] of Object.entries(d.byMonth)) {
     if (month < from.slice(0, 7) || month > to.slice(0, 7)) continue
     out.visits += b.visits
     out.people += b.visitors
     out.outreach.events += b.outreach?.events || 0
     out.outreach.people += b.outreach?.people || 0
+    if (b.use) {
+      out.use.sessions += b.use.sessions
+      out.use.people += b.use.people
+      out.use.days += b.use.days
+      out.use.institutions += b.use.institutions
+      for (const [k, n] of Object.entries(b.use.byResource || {})) out.use.byResource[k] = (out.use.byResource[k] || 0) + n
+      for (const [k, n] of Object.entries(b.use.byUser || {})) out.use.byUser[k] = (out.use.byUser[k] || 0) + n
+    }
     for (const [type, t] of Object.entries(b.byType || {})) {
       const x = (out.byType[type] ||= { type, visits: 0, people: 0 })
       x.visits += t.visits
@@ -126,8 +134,12 @@ async function loadVisits(from, to) {
   out.byType.forEach((t, i) => { t.color = VISIT_COLORS[i % VISIT_COLORS.length] })
   const y = to.slice(0, 4)
   const yb = d.byYear?.[y]
-  out.year = yb ? { year: y, visits: yb.visits, people: yb.visitors } : null
-  return out.visits || out.outreach.events ? out : null
+  out.year = yb ? { year: y, visits: yb.visits, people: yb.visitors, useDays: yb.use?.days || 0, usePeople: yb.use?.people || 0 } : null
+  const sortEntries = (o) => Object.entries(o).map(([name, n]) => ({ name, n })).sort((a, b) => b.n - a.n)
+  out.use.resources = sortEntries(out.use.byResource)
+  out.use.users = sortEntries(out.use.byUser)
+  if (!out.use.sessions) out.use = null
+  return out.visits || out.outreach.events || out.use ? out : null
 }
 
 export async function loadIssue({ from, to }) {
@@ -669,6 +681,12 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
         ${data.visits.outreach.events ? `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><b>Outreach</b><br><span style="color:#555;font-size:13px">${num(data.visits.outreach.events)} event(s) · ${num(data.visits.outreach.people)} people</span></div>` : ''}
       </td>
     </tr></table>
+    ${data.visits.use ? `<div style="background:#000;color:#fff;font-family:Arial,sans-serif;padding:14px 16px;margin-top:14px">
+      <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#fdb719;font-weight:bold">Using the museum's facilities</div>
+      <div style="font-size:16px;margin-top:6px"><b style="font-size:26px;color:#fdb719">${num(data.visits.use.days)}</b> day${data.visits.use.days === 1 ? '' : 's'} of use · <b>${num(data.visits.use.people)}</b> ${data.visits.use.people === 1 ? 'person' : 'people'}${data.visits.use.institutions > 1 ? ` from ${num(data.visits.use.institutions)} institutions` : ''}</div>
+      <div style="font-size:13px;color:#ddd;margin-top:6px">${data.visits.use.resources.map((r) => `${esc(r.name)} (${r.n})`).join(' · ')}</div>
+      <div style="font-size:12px;color:#aaa;margin-top:4px">${data.visits.use.users.map((u) => `${esc(u.name)}: ${u.n}`).join(' · ')}</div>
+    </div>` : ''}
     ${data.visits.groups.length ? data.visits.groups.map((g) => `<div style="font-family:Arial,sans-serif;font-size:13px;color:#111;background:#f6f4ef;border-left:4px solid #000;padding:8px 12px;margin-top:10px"><span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6b665c">${esc(g.type)} · ${esc(g.date)}</span><br><b>${esc(g.name)}</b>${g.audience ? ` — ${esc(g.audience)}` : ''}${g.activity ? `<br><span style="color:#555">${esc(g.activity)}</span>` : ''}</div>`).join('') : ''}
   </td></tr>` : ''}
   ${closerHtml}

@@ -340,7 +340,10 @@
           class="rp-pad rp-visits"
         >
           <h2 class="rp-label">Who came to the museum</h2>
-          <div class="rp-v-grid">
+          <div
+            v-if="data.visits.visits || data.visits.outreach.events"
+            class="rp-v-grid"
+          >
             <div class="rp-v-big">
               <b>{{ fmt(data.visits.people) }}</b>
               <span>{{ data.visits.people === 1 ? 'person' : 'people' }} came to the collection</span>
@@ -382,6 +385,27 @@
               </ul>
             </div>
           </div>
+          <!-- They used the museum: facilities (imaging, microscopes, specimens) -->
+          <div
+            v-if="data.visits.use"
+            class="rp-v-use"
+          >
+            <p class="rp-v-use-k">Using the museum's facilities</p>
+            <div class="rp-v-use-main">
+              <p class="rp-v-use-big">
+                <b>{{ fmt(data.visits.use.days) }}</b> day{{ data.visits.use.days === 1 ? '' : 's' }} of use
+                <span>· {{ fmt(data.visits.use.people) }} {{ data.visits.use.people === 1 ? 'person' : 'people' }}<template v-if="data.visits.use.institutions > 1"> from {{ fmt(data.visits.use.institutions) }} institutions</template></span>
+              </p>
+              <ul class="rp-v-use-res">
+                <li
+                  v-for="r in data.visits.use.resources"
+                  :key="r.name"
+                >{{ r.name }} <b>{{ r.n }}</b></li>
+              </ul>
+            </div>
+            <p class="rp-v-use-who">{{ data.visits.use.users.map((u) => `${u.name}: ${u.n}`).join(' · ') }}<template v-if="data.visits.year && data.visits.year.useDays"> · {{ fmt(data.visits.year.useDays) }} days so far in {{ data.visits.year.year }}</template></p>
+          </div>
+
           <div
             v-if="data.visits.groups.length"
             class="rp-v-groups"
@@ -747,7 +771,7 @@ const contents = computed(() => {
       id: 'rp-sec-visits',
       kicker: 'Who came to the museum',
       title: `${fmt(d.visits.visits)} visit${d.visits.visits === 1 ? '' : 's'}, ${fmt(d.visits.people)} people`,
-      text: visitLines(d.visits).join(' · ')
+      text: [visitLines(d.visits).join(' · '), d.visits.use ? `${fmt(d.visits.use.days)} day(s) of facility use` : ''].filter(Boolean).join(' · ')
     })
   }
   const h = d.highlights
@@ -1939,6 +1963,75 @@ function downloadEmail() {
   }
   .rp-v-big b {
     font-size: 3rem;
+  }
+}
+
+.rp-v-use {
+  margin-top: 1.2rem;
+  background: #000;
+  color: #fff;
+  padding: 0.9rem 1.1rem;
+}
+.rp-v-use p {
+  margin: 0;
+}
+.rp-v-use-k {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #fdb719;
+}
+.rp-v-use-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem 1.2rem;
+  margin-top: 0.35rem;
+}
+.rp-v-use-big {
+  font-size: 1.05rem;
+}
+.rp-v-use-big b {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #fdb719;
+}
+.rp-v-use-big span {
+  color: #ddd;
+}
+.rp-v-use-res {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rp-v-use-res li {
+  border: 1px solid #fdb719;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.78rem;
+}
+.rp-v-use-res b {
+  color: #fdb719;
+  margin-left: 0.2rem;
+}
+.rp-v-use-who {
+  margin-top: 0.4rem !important;
+  font-size: 0.78rem;
+  color: #aaa;
+}
+@media print {
+  .rp-v-use {
+    background: #fff;
+    color: #000;
+    border: 2px solid #000;
+  }
+  .rp-v-use-big span,
+  .rp-v-use-who {
+    color: #333;
   }
 }
 </style>
