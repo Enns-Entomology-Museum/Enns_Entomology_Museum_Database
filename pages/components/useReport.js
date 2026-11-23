@@ -93,13 +93,50 @@ export async function loadMonthly(from, to, count = 12) {
   return months.map((mo, i) => ({ ...mo, n: counts[i] ?? 0 }))
 }
 
+// Visits to the museum: counts from the visit log of the museum network (public file, counts only;
+// groups are named only when they agreed to appear on the public map).
+// one colour per kind of visit (largest first): museum gold, black, olive, sand
+export const VISIT_COLORS = ['#fdb719', '#1a1a1a', '#8a7f5c', '#cbbd8f']
+const VISITS_URL = 'https://enns-museum-community.netlify.app/visits-public.json'
+async function loadVisits(from, to) {
+  const r = await fetch(VISITS_URL, { cache: 'no-store' })
+  if (!r.ok) return null
+  const d = await r.json()
+  if (!d.byMonth) return null
+  const out = { visits: 0, people: 0, outreach: { events: 0, people: 0 }, byType: {}, groups: [] }
+  for (const [month, b] of Object.entries(d.byMonth)) {
+    if (month < from.slice(0, 7) || month > to.slice(0, 7)) continue
+    out.visits += b.visits
+    out.people += b.visitors
+    out.outreach.events += b.outreach?.events || 0
+    out.outreach.people += b.outreach?.people || 0
+    for (const [type, t] of Object.entries(b.byType || {})) {
+      const x = (out.byType[type] ||= { type, visits: 0, people: 0 })
+      x.visits += t.visits
+      x.people += t.visitors
+    }
+  }
+  for (const p of d.places || []) {
+    for (const v of p.visits || []) {
+      if (v.date >= from && v.date <= to) out.groups.push({ name: p.name, city: p.city, date: v.date, type: v.type, total: v.total, audience: v.audience, activity: v.activity, outreach: v.outreach })
+    }
+  }
+  out.groups.sort((a, b) => a.date.localeCompare(b.date))
+  out.byType = Object.values(out.byType).sort((a, b) => b.people - a.people)
+  out.byType.forEach((t, i) => { t.color = VISIT_COLORS[i % VISIT_COLORS.length] })
+  const y = to.slice(0, 4)
+  const yb = d.byYear?.[y]
+  out.year = yb ? { year: y, visits: yb.visits, people: yb.visitors } : null
+  return out.visits || out.outreach.events ? out : null
+}
+
 export async function loadIssue({ from, to }) {
   const dayBefore = (iso) => {
     const d = new Date(`${iso}T12:00:00Z`)
     d.setUTCDate(d.getUTCDate() - 1)
     return d.toISOString().slice(0, 10)
   }
-  const [news, specimens, toDate, taxa, images, types, records, monthly, atStart, before] = await Promise.all([
+  const [news, specimens, toDate, taxa, images, types, records, monthly, atStart, before, visits] = await Promise.all([
     fetchNews(100).catch(() => []),
     total('/collection_objects', created(from, to)),
     total('/collection_objects', created('2000-01-01', to)),
@@ -112,7 +149,8 @@ export async function loadIssue({ from, to }) {
       .catch(() => []),
     loadMonthly(from, to).catch(() => []),
     total('/collection_objects', created('2000-01-01', dayBefore(from))),
-    allRecords(created('2000-01-01', dayBefore(from)))
+    allRecords(created('2000-01-01', dayBefore(from))),
+    loadVisits(from, to).catch(() => null)
   ])
 
   const inPeriod = (iso) => {
@@ -124,7 +162,8 @@ export async function loadIssue({ from, to }) {
   // The latest one in the period goes on the front page; it is not repeated with the stories.
   const insectPosts = inIssue.filter((n) => isInsectPost(n.title))
   const insect = insectPosts.length ? toInsect(insectPosts[insectPosts.length - 1]) : null
-  const stories = inIssue.filter((n) => !isInsectPost(n.title))
+  // newest first (the Report page lets the editor pick which one leads the issue)
+  const stories = inIssue.filter((n) => !isInsectPost(n.title)).reverse()
 
   // What was digitized: by order, species, counties
   const byOrder = new Map()
@@ -162,7 +201,8 @@ export async function loadIssue({ from, to }) {
     orders,
     monthly,
     highlights,
-    closer
+    closer,
+    visits
   }
 }
 
@@ -382,6 +422,19 @@ function bar(pct, color, track = '#f2efe8') {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse"><tr>${fill}${rest}</tr></table>`
 }
 
+// "6 walk-in visits (11 people) · 1 university class (6 people)"
+export function visitLines(v) {
+  if (!v) return []
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`
+  return v.byType.map((t) => {
+    const label = String(t.type).toLowerCase()
+    const what = /class/.test(label) ? plural(t.visits, label, label.replace(/class$/, 'classes'))
+      : /walk-in/.test(label) ? plural(t.visits, 'walk-in visit', 'walk-in visits')
+      : plural(t.visits, `${label} visit`, `${label} visits`)
+    return `${what} (${plural(t.people, 'person', 'people')})`
+  })
+}
+
 export function emailHtml({ issue, data, note, siteUrl, info }) {
   const site = siteUrl.replace(/\/?$/, '/')
   const num = (v) => (typeof v === 'number' ? v.toLocaleString('en-US') : '—')
@@ -464,6 +517,7 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
   const contents = [
     insect ? { kicker: 'Insect of the month', title: insect.name, href: `${site}#/news/${insect.id}` } : null,
     { kicker: 'The numbers', title: `${num(data.numbers.specimens)} specimens digitized in ${issue.label}` },
+    ...(data.visits ? [{ kicker: 'Who came to the museum', title: `${num(data.visits.visits)} visit${data.visits.visits === 1 ? '' : 's'}, ${num(data.visits.people)} people` }] : []),
     h0 && (h0.species.length || h0.types.length || h0.counties.length)
       ? {
           kicker: 'New in the collection',
@@ -602,6 +656,21 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
     ${countiesHtml}
     ${ordersHtml}
   </td></tr>
+  ${data.visits ? `<tr><td style="padding:6px 28px 22px">
+    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;padding-bottom:8px;border-bottom:3px solid #000;margin-bottom:14px">Who came to the museum</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+      <td valign="top" width="42%" style="padding-right:16px">
+        <div style="font-family:Arial,sans-serif;font-size:54px;line-height:1;font-weight:900;color:#000">${num(data.visits.people)}</div>
+        <div style="font-family:Arial,sans-serif;font-size:15px;font-weight:bold;color:#000;margin-top:4px">${data.visits.people === 1 ? 'person' : 'people'} came to the collection</div>
+        <div style="font-family:Arial,sans-serif;font-size:13px;color:#555;margin-top:4px">in ${num(data.visits.visits)} visit${data.visits.visits === 1 ? '' : 's'}${data.visits.year ? ` · ${num(data.visits.year.people)} so far in ${data.visits.year.year}` : ''}</div>
+      </td>
+      <td valign="top" style="border-left:4px solid #fdb719;padding-left:16px">
+        ${data.visits.byType.map((t) => `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><span style="color:${t.color};font-size:18px">&#9679;</span> <b>${esc(t.type)}</b><br><span style="color:#555;font-size:13px">${num(t.visits)} visit${t.visits === 1 ? '' : 's'} · ${num(t.people)} ${t.people === 1 ? 'person' : 'people'}</span></div>`).join('')}
+        ${data.visits.outreach.events ? `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><b>Outreach</b><br><span style="color:#555;font-size:13px">${num(data.visits.outreach.events)} event(s) · ${num(data.visits.outreach.people)} people</span></div>` : ''}
+      </td>
+    </tr></table>
+    ${data.visits.groups.length ? data.visits.groups.map((g) => `<div style="font-family:Arial,sans-serif;font-size:13px;color:#111;background:#f6f4ef;border-left:4px solid #000;padding:8px 12px;margin-top:10px"><span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6b665c">${esc(g.type)} · ${esc(g.date)}</span><br><b>${esc(g.name)}</b>${g.audience ? ` — ${esc(g.audience)}` : ''}${g.activity ? `<br><span style="color:#555">${esc(g.activity)}</span>` : ''}</div>`).join('') : ''}
+  </td></tr>` : ''}
   ${closerHtml}
   ${highlightsHtml}
   ${stories || '<tr><td style="padding:20px 28px;font-family:Arial,sans-serif;color:#666">No news posts in this period.</td></tr>'}

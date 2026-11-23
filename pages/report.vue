@@ -76,9 +76,26 @@
             placeholder="A few lines about this issue: what happened, what's next, a thank-you…"
           />
         </label>
+        <label
+          v-if="data && data.stories.length > 1"
+          class="rp-note-field mt-3"
+        >
+          <span>Lead story (shown first and big; the others follow, newest first)</span>
+          <select v-model="leadId">
+            <option value="">Most recent story</option>
+            <option
+              v-for="s in data.stories"
+              :key="s.id"
+              :value="String(s.id)"
+            >
+              {{ s.date }} · {{ s.title }}
+            </option>
+          </select>
+        </label>
         <p class="text-xs eem-muted mt-2">
           Stories are the news posts published in TaxonWorks during the period; numbers are what was added to the
-          database in the same months. To change a story, edit it in TaxonWorks and reload.
+          database in the same months. To change a story, edit it in TaxonWorks and reload. The lead story
+          is shown first and big; the others follow, newest first.
         </p>
       </div>
     </section>
@@ -316,6 +333,76 @@
           </div>
         </section>
 
+        <!-- Who came to the museum (visit log of the museum network) -->
+        <section
+          v-if="data.visits"
+          id="rp-sec-visits"
+          class="rp-pad rp-visits"
+        >
+          <h2 class="rp-label">Who came to the museum</h2>
+          <div class="rp-v-grid">
+            <div class="rp-v-big">
+              <b>{{ fmt(data.visits.people) }}</b>
+              <span>{{ data.visits.people === 1 ? 'person' : 'people' }} came to the collection</span>
+              <small>in {{ fmt(data.visits.visits) }} visit{{ data.visits.visits === 1 ? '' : 's' }}<template v-if="data.visits.year"> · {{ fmt(data.visits.year.people) }} so far in {{ data.visits.year.year }}</template></small>
+            </div>
+            <div class="rp-v-right">
+              <!-- one figure per visitor (each figure = several people when there are many) -->
+              <div
+                class="rp-v-people"
+                :aria-label="visitLines(data.visits).join(', ')"
+              >
+                <svg
+                  v-for="(c, k) in visitFigures"
+                  :key="k"
+                  viewBox="0 0 12 20"
+                  class="rp-v-fig"
+                  :style="{ color: c }"
+                  aria-hidden="true"
+                ><circle cx="6" cy="4" r="3.4" fill="currentColor" /><path d="M1 19v-6.5C1 9.5 3 8 6 8s5 1.5 5 4.5V19z" fill="currentColor" /></svg>
+              </div>
+              <p
+                v-if="visitPer > 1"
+                class="rp-v-scale"
+              >each figure = {{ visitPer }} people</p>
+              <ul class="rp-v-legend">
+                <li
+                  v-for="t in data.visits.byType"
+                  :key="t.type"
+                >
+                  <i :style="{ background: t.color }" />
+                  <b>{{ t.type }}</b>
+                  <span>{{ fmt(t.visits) }} visit{{ t.visits === 1 ? '' : 's' }} · {{ fmt(t.people) }} {{ t.people === 1 ? 'person' : 'people' }}</span>
+                </li>
+                <li v-if="data.visits.outreach.events">
+                  <i class="rp-v-out" />
+                  <b>Outreach</b>
+                  <span>{{ fmt(data.visits.outreach.events) }} event(s) · {{ fmt(data.visits.outreach.people) }} people</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div
+            v-if="data.visits.groups.length"
+            class="rp-v-groups"
+          >
+            <div
+              v-for="g in data.visits.groups"
+              :key="g.name + g.date"
+              class="rp-v-group"
+            >
+              <p class="rp-v-gk">{{ g.type }} · {{ g.date }}</p>
+              <p class="rp-v-gn">
+                <b>{{ g.name }}</b><template v-if="g.audience"> — {{ g.audience }}</template>
+              </p>
+              <p
+                v-if="g.activity"
+                class="rp-v-ga"
+              >{{ g.activity }}</p>
+            </div>
+          </div>
+        </section>
+
         <!-- A closer look at what was digitized -->
         <section
           v-if="cl"
@@ -456,13 +543,13 @@
 
         <!-- Stories: short versions, each with a link to the full story online -->
         <section
-          v-if="data.stories.length"
+          v-if="stories.length"
           id="rp-sec-news"
           class="rp-pad rp-news"
         >
           <h2 class="rp-label">News from the museum</h2>
           <article
-            v-for="(s, i) in data.stories"
+            v-for="(s, i) in stories"
             :id="`rp-story-${s.id}`"
             :key="s.id"
             class="rp-card"
@@ -491,7 +578,7 @@
           </article>
         </section>
         <p
-          v-if="!data.stories.length"
+          v-if="!stories.length"
           class="rp-pad eem-muted"
         >
           No news posts were published in this period. Write them in TaxonWorks (Project → News) and they will appear
@@ -527,7 +614,7 @@ import { computed, ref, watch } from 'vue'
 import { useHead } from '@unhead/vue'
 import info from './components/museumInfo.js'
 import { fmt } from './components/useEem.js'
-import { emailHtml, issues, listOf, loadIssue, shortText } from './components/useReport.js'
+import { emailHtml, issues, listOf, loadIssue, shortText, visitLines } from './components/useReport.js'
 import MonthlyBars from './components/MonthlyBars.vue'
 import ReportCountyMap from './components/ReportCountyMap.vue'
 
@@ -581,6 +668,41 @@ watch(
   { immediate: true }
 )
 
+// Lead story: chosen per issue (remembered in this browser); default = the most recent one
+const leadKey = computed(() => `eem-report-lead-${issue.value?.key}`)
+const leadId = ref('')
+watch(
+  leadKey,
+  (k) => {
+    try {
+      leadId.value = localStorage.getItem(k) || ''
+    } catch {
+      leadId.value = ''
+    }
+  },
+  { immediate: true }
+)
+watch(leadId, (v) => {
+  try {
+    if (v) localStorage.setItem(leadKey.value, v)
+    else localStorage.removeItem(leadKey.value)
+  } catch {}
+})
+// visitor figures: one per person, at most 60 (then each figure stands for several people)
+const visitPer = computed(() => Math.max(1, Math.ceil((data.value?.visits?.people || 0) / 60)))
+const visitFigures = computed(() => {
+  const v = data.value?.visits
+  if (!v) return []
+  const out = []
+  for (const t of v.byType) for (let k = 0; k < Math.round(t.people / visitPer.value); k++) out.push(t.color)
+  return out
+})
+const stories = computed(() => {
+  const all = data.value?.stories || []
+  const lead = all.find((s) => String(s.id) === leadId.value)
+  return lead ? [lead, ...all.filter((s) => s !== lead)] : all
+})
+
 // The director's note is kept in this browser, per issue, until printed
 const noteKey = computed(() => `eem-report-note-${issue.value?.key}`)
 const note = ref('')
@@ -620,6 +742,14 @@ const contents = computed(() => {
     title: `${fmt(d.numbers.specimens)} specimens digitized in ${issue.value.label}`,
     text: `${fmt(d.numbers.toDate)} specimens online in total · digitization month by month`
   })
+  if (d.visits) {
+    out.push({
+      id: 'rp-sec-visits',
+      kicker: 'Who came to the museum',
+      title: `${fmt(d.visits.visits)} visit${d.visits.visits === 1 ? '' : 's'}, ${fmt(d.visits.people)} people`,
+      text: visitLines(d.visits).join(' · ')
+    })
+  }
   const h = d.highlights
   if (h && (h.species.length || h.types.length || h.counties.length)) {
     const bits = [
@@ -630,7 +760,7 @@ const contents = computed(() => {
     out.push({ id: 'rp-sec-new', kicker: 'New in the collection', title: listOf(bits), text: '' })
   }
 
-  for (const s of d.stories) out.push({ id: `rp-story-${s.id}`, kicker: s.type, title: s.title, text: s.excerpt, img: s.cover?.src || '' })
+  for (const s of stories.value) out.push({ id: `rp-story-${s.id}`, kicker: s.type, title: s.title, text: s.excerpt, img: s.cover?.src || '' })
   out.push({ id: 'rp-sec-back', kicker: 'Get involved', title: 'Visit, borrow, donate, become a Friend of the Museum', text: '' })
   return out
 })
@@ -640,7 +770,7 @@ function goTo(id) {
 
 const printIt = () => window.print()
 
-const html = () => emailHtml({ issue: issue.value, data: data.value, note: note.value.trim(), siteUrl, info })
+const html = () => emailHtml({ issue: issue.value, data: { ...data.value, stories: stories.value }, note: note.value.trim(), siteUrl, info })
 
 // Plain-text copy (for mail programs that don't take HTML): tags removed, entities decoded
 function plainText(h) {
@@ -709,7 +839,8 @@ function downloadEmail() {
   font-weight: 700;
   color: var(--eem-ink-soft);
 }
-.rp-note-field textarea {
+.rp-note-field textarea,
+.rp-note-field select {
   width: 100%;
   padding: 0.6rem 0.8rem;
   border: 2px solid var(--eem-rule);
@@ -1690,6 +1821,124 @@ function downloadEmail() {
   .rp-cnum {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+}
+
+/* Who came to the museum */
+.rp-v-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 1.5rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+.rp-v-big b {
+  display: block;
+  font-size: 4.2rem;
+  line-height: 0.95;
+  font-weight: 900;
+  color: #000;
+}
+.rp-v-big span {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.rp-v-big small {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #6b665c;
+}
+.rp-v-right {
+  border-left: 5px solid #fdb719;
+  padding-left: 1.1rem;
+}
+.rp-v-people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 4px;
+}
+.rp-v-fig {
+  width: 20px;
+  height: 33px;
+}
+.rp-v-scale {
+  margin: 0.3rem 0 0;
+  font-size: 0.72rem;
+  color: #6b665c;
+}
+.rp-v-legend {
+  list-style: none;
+  margin: 0.8rem 0 0;
+  padding: 0;
+}
+.rp-v-legend li {
+  display: grid;
+  grid-template-columns: 0.8rem auto 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-top: 1px solid #e5e0d4;
+  font-size: 0.88rem;
+}
+.rp-v-legend li:first-child {
+  border-top: 0;
+}
+.rp-v-legend i {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 2px;
+}
+.rp-v-legend .rp-v-out {
+  background: repeating-linear-gradient(45deg, #000 0 2px, #fdb719 2px 4px);
+}
+.rp-v-legend span {
+  justify-self: end;
+  color: #6b665c;
+  font-size: 0.8rem;
+}
+.rp-v-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+}
+.rp-v-group {
+  background: #f6f4ef;
+  border-left: 4px solid #000;
+  padding: 0.55rem 0.8rem;
+}
+.rp-v-group p {
+  margin: 0;
+}
+.rp-v-gk {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6b665c;
+}
+.rp-v-gn {
+  font-size: 0.9rem;
+  margin-top: 0.15rem !important;
+}
+.rp-v-ga {
+  font-size: 0.8rem;
+  color: #555;
+}
+@media (max-width: 640px) {
+  .rp-v-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media print {
+  .rp-visits {
+    break-inside: avoid;
+  }
+  .rp-v-big b {
+    font-size: 3rem;
   }
 }
 </style>

@@ -94,8 +94,10 @@ const leadIns = (html = '') => String(html).replace(/<p>([A-Z][^<:.]{2,40}):\s/g
 // (MU Digital Service, which may not load files from GitHub) the same photos are served from the
 // site itself: `npm run deploy:aws` copies the media folder to media/ next to index.html.
 const GITHUB_MEDIA = 'https://enns-entomology-museum.github.io/media/'
+// Only there: on GitHub Pages and on localhost (npm run dev, the Report page) the photos stay on
+// GitHub, because a local dev server has no media/ folder (and the Report e-mail needs public URLs).
 function localMedia(html = '') {
-  if (typeof window === 'undefined' || /github\.io$/.test(window.location.hostname)) return html
+  if (typeof window === 'undefined' || !/(^|\.)missouri\.edu$/.test(window.location.hostname)) return html
   const here = new URL('media/', window.location.href.split('#')[0]).href
   return String(html).split(GITHUB_MEDIA).join(here)
 }
