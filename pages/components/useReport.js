@@ -118,7 +118,8 @@ async function loadVisits(from, to) {
       for (const [k, n] of Object.entries(b.use.byResource || {})) out.use.byResource[k] = (out.use.byResource[k] || 0) + n
       for (const [k, n] of Object.entries(b.use.byUser || {})) out.use.byUser[k] = (out.use.byUser[k] || 0) + n
     }
-    for (const [type, t] of Object.entries(b.byType || {})) {
+    // outreach types are counted under "outreach" (we went to them), not as visitors
+    for (const [type, t] of Object.entries(b.byType || {}).filter(([type]) => !/^Outreach/.test(type))) {
       const x = (out.byType[type] ||= { type, visits: 0, people: 0 })
       x.visits += t.visits
       x.people += t.visitors
