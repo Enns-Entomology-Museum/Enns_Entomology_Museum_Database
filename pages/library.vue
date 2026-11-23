@@ -306,8 +306,8 @@ const IS_PDF_TAG = /\bpdf\b/i
 const IS_PDF_ONLY_TAG = /\bpdf\b.*\bonly\b|\bonly\b.*\bpdf\b/i
 const isFormatTag = (t) => IS_PHYS_TAG.test(t) || IS_PDF_TAG.test(t)
 // Tags that are not taxonomic groups: library format, and the Research page's
-// "Uses EEM specimens" (see pages/research.vue)
-const NOT_GROUPS = ['uses eem specimens']
+// "Uses EEM specimens" and "Uses EEM facilities" (see pages/research.vue)
+const NOT_GROUPS = ['uses eem specimens', 'uses eem facilities']
 const LIB_PREFIX = /^EEM\.LIB/i
 
 const sources = shallowRef([])

@@ -167,6 +167,27 @@
             Nothing matches.
           </p>
 
+          <!-- Research that used the museum's facilities (imaging, microscopes), not its specimens -->
+          <div
+            v-if="facility.length"
+            class="mt-12"
+          >
+            <h2 class="rs-year">Research using our facilities</h2>
+            <p class="mt-1 text-sm eem-muted">Studies that used the museum's imaging systems or microscopes, not its specimens.</p>
+            <ul class="mt-2 divide-y divide-[color:var(--eem-rule)]">
+              <li
+                v-for="p in facility"
+                :key="p.key"
+                class="py-3"
+              >
+                <p
+                  class="leading-snug rs-citation"
+                  v-html="p.citation"
+                />
+              </li>
+            </ul>
+          </div>
+
           <p class="mt-10 text-xs eem-muted leading-relaxed">
             “Not yet checked” lists publications whose full text mentions the Enns Entomology Museum or the codens
             UMRM and UMC (University of Missouri, Columbia), found automatically in OpenAlex and Europe PMC<template v-if="updated"> (updated {{ updated }})</template>. They are
@@ -265,6 +286,8 @@ useHead({ title: 'Research using the collection — Enns Entomology Museum' })
 
 // Sources in TaxonWorks tagged with this keyword are shown as "Confirmed"
 const CONFIRM_KEYWORD = 'Uses EEM specimens'
+// …and with this one, listed apart as research that used the museum's facilities
+const FACILITY_KEYWORD = 'Uses EEM facilities'
 const ACK = 'We thank the Enns Entomology Museum, University of Missouri (EEM), for the loan of specimens.'
 const grscicoll = `https://scientific-collections.gbif.org/collection/${info.gbif.grscicollKey}`
 const CODE_TEXT = `EEM — Enns Entomology Museum, University of Missouri, Columbia, Missouri, USA (${grscicoll})`
@@ -278,6 +301,7 @@ const FILTERS = [
 const loading = ref(true)
 const searchingLive = ref(false)
 const items = ref([])
+const facility = ref([])
 const updated = ref('')
 const q = ref('')
 const filter = ref('all')
@@ -307,10 +331,12 @@ async function loadFile(file) {
 }
 
 // Sources tagged in TaxonWorks
-async function loadConfirmed() {
+let termsPromise = null
+async function loadTagged(keyword) {
   try {
-    const { data: terms } = await makeAPIRequest.get('/controlled_vocabulary_terms', { params: { per: 1000 } })
-    const kw = (terms || []).find((t) => t.type === 'Keyword' && norm(t.name) === norm(CONFIRM_KEYWORD))
+    termsPromise ||= makeAPIRequest.get('/controlled_vocabulary_terms', { params: { per: 1000 } })
+    const { data: terms } = await termsPromise
+    const kw = (terms || []).find((t) => t.type === 'Keyword' && norm(t.name) === norm(keyword))
     if (!kw) return []
     const { data } = await makeAPIRequest.get('/sources', { params: { 'keyword_id_and[]': kw.id, in_project: true, per: 1000 } })
     return (data || []).map((s) => {
@@ -334,7 +360,7 @@ async function loadConfirmed() {
 }
 
 onMounted(async () => {
-  const [file, confirmed] = await Promise.all([loadFile('eem-citations.json'), loadConfirmed()])
+  const [file, confirmed, used] = await Promise.all([loadFile('eem-citations.json'), loadTagged(CONFIRM_KEYWORD), loadTagged(FACILITY_KEYWORD)])
   let found = file?.items || null
   updated.value = file?.updated || ''
   if (!found) {
@@ -355,6 +381,11 @@ onMounted(async () => {
     const k = keyOf(p)
     map.set(k, { ...(map.get(k) || {}), ...p, authors: map.get(k)?.authors?.length ? map.get(k).authors : p.authors, confirmed: true })
   })
+  // facility papers go in their own list, not among the specimen papers
+  used.forEach((p) => map.delete(keyOf(p)))
+  facility.value = used
+    .map((p) => ({ ...p, key: keyOf(p) }))
+    .sort((a, b) => (b.year || 0) - (a.year || 0) || a.title.localeCompare(b.title))
   items.value = [...map.values()].map((p) => ({ ...p, key: keyOf(p) }))
   loading.value = false
 })
