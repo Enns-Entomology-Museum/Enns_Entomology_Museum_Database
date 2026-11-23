@@ -53,3 +53,5 @@ header_links:
         link: /about
       - label: People & community
         link: /people
+      - label: Find an expert
+        link: /experts

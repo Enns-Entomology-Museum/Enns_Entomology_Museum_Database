@@ -427,6 +427,36 @@
           </div>
         </section>
 
+        <!-- Our network grew: who joined the collaboration network in the period -->
+        <section
+          v-if="data.network"
+          id="rp-sec-network"
+          class="rp-pad rp-network"
+        >
+          <h2 class="rp-label">Our network grew</h2>
+          <p class="rp-net-lead">
+            <b>{{ fmt(data.network.joined.length) }}</b> new {{ data.network.joined.length === 1 ? 'collaborator' : 'collaborators' }}<template v-if="data.network.newInstitutions"> from <b>{{ fmt(data.network.newInstitutions) }}</b> new {{ data.network.newInstitutions === 1 ? 'institution' : 'institutions' }}</template>
+            <span>· {{ fmt(data.network.total) }} people in {{ fmt(data.network.countries) }} countries in total</span>
+          </p>
+          <ul class="rp-net-list">
+            <li
+              v-for="p in data.network.joined"
+              :key="p.name + p.affiliation"
+            >
+              <b>{{ p.name || p.affiliation }}</b>
+              <span v-if="p.name && p.affiliation">{{ p.affiliation }}<template v-if="p.country"> · {{ p.country }}</template></span>
+              <i v-if="p.taxa.length || p.families">{{ [p.taxa.join(', '), p.families].filter(Boolean).join(' · ') }}</i>
+            </li>
+          </ul>
+          <p class="rp-small">
+            <a
+              href="https://enns-museum-community.netlify.app"
+              target="_blank"
+              rel="noopener"
+            >See the collaboration network map →</a>
+          </p>
+        </section>
+
         <!-- A closer look at what was digitized -->
         <section
           v-if="cl"
@@ -766,6 +796,14 @@ const contents = computed(() => {
     title: `${fmt(d.numbers.specimens)} specimens digitized in ${issue.value.label}`,
     text: `${fmt(d.numbers.toDate)} specimens online in total · digitization month by month`
   })
+  if (d.network) {
+    out.push({
+      id: 'rp-sec-network',
+      kicker: 'Our network grew',
+      title: `${fmt(d.network.joined.length)} new ${d.network.joined.length === 1 ? 'collaborator' : 'collaborators'}`,
+      text: `${fmt(d.network.total)} people in ${fmt(d.network.countries)} countries`
+    })
+  }
   if (d.visits) {
     out.push({
       id: 'rp-sec-visits',
@@ -2032,6 +2070,51 @@ function downloadEmail() {
   .rp-v-use-big span,
   .rp-v-use-who {
     color: #333;
+  }
+}
+
+/* Our network grew */
+.rp-net-lead {
+  margin: 0.8rem 0 0;
+  font-size: 1.05rem;
+}
+.rp-net-lead b {
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+.rp-net-lead span {
+  color: #6b665c;
+  font-size: 0.9rem;
+}
+.rp-net-list {
+  list-style: none;
+  margin: 0.8rem 0 0.6rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.5rem;
+}
+.rp-net-list li {
+  border-left: 4px solid #fdb719;
+  padding: 0.35rem 0.7rem;
+  background: #f6f4ef;
+}
+.rp-net-list b,
+.rp-net-list span,
+.rp-net-list i {
+  display: block;
+}
+.rp-net-list span {
+  font-size: 0.8rem;
+  color: #444;
+}
+.rp-net-list i {
+  font-size: 0.78rem;
+  color: #8c640a;
+}
+@media print {
+  .rp-network {
+    break-inside: avoid;
   }
 }
 </style>

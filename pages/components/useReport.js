@@ -142,13 +142,37 @@ async function loadVisits(from, to) {
   return out.visits || out.outreach.events || out.use ? out : null
 }
 
+// Who joined the museum's collaboration network in the period (public list of the network site)
+const NETWORK_URL = 'https://enns-museum-community.netlify.app/associates-public.json'
+async function loadNetwork(from, to) {
+  const r = await fetch(NETWORK_URL, { cache: 'no-store' })
+  if (!r.ok) return null
+  const d = await r.json()
+  const living = (d.people || []).filter((p) => !p.historical && p.added)
+  const inst = (p) => String(p.affiliation || '').trim().toLowerCase()
+  const before = living.filter((p) => p.added < from)
+  const joined = living.filter((p) => p.added >= from && p.added <= to)
+  if (!joined.length) return null
+  const known = new Set(before.map(inst).filter(Boolean))
+  const newInst = new Set(joined.map(inst).filter((i) => i && !known.has(i)))
+  const countries = new Set(living.filter((p) => p.added <= to).map((p) => String(p.country || '').toLowerCase()).filter(Boolean))
+  return {
+    joined: joined
+      .map((p) => ({ name: p.name || '', affiliation: p.affiliation || '', country: p.country || '', taxa: p.taxa || [], families: p.families || '' }))
+      .sort((a, b) => (a.name || a.affiliation).localeCompare(b.name || b.affiliation)),
+    newInstitutions: newInst.size,
+    total: living.filter((p) => p.added <= to).length,
+    countries: countries.size,
+  }
+}
+
 export async function loadIssue({ from, to }) {
   const dayBefore = (iso) => {
     const d = new Date(`${iso}T12:00:00Z`)
     d.setUTCDate(d.getUTCDate() - 1)
     return d.toISOString().slice(0, 10)
   }
-  const [news, specimens, toDate, taxa, images, types, records, monthly, atStart, before, visits] = await Promise.all([
+  const [news, specimens, toDate, taxa, images, types, records, monthly, atStart, before, visits, network] = await Promise.all([
     fetchNews(100).catch(() => []),
     total('/collection_objects', created(from, to)),
     total('/collection_objects', created('2000-01-01', to)),
@@ -162,7 +186,8 @@ export async function loadIssue({ from, to }) {
     loadMonthly(from, to).catch(() => []),
     total('/collection_objects', created('2000-01-01', dayBefore(from))),
     allRecords(created('2000-01-01', dayBefore(from))),
-    loadVisits(from, to).catch(() => null)
+    loadVisits(from, to).catch(() => null),
+    loadNetwork(from, to).catch(() => null)
   ])
 
   const inPeriod = (iso) => {
@@ -214,7 +239,8 @@ export async function loadIssue({ from, to }) {
     monthly,
     highlights,
     closer,
-    visits
+    visits,
+    network
   }
 }
 
@@ -529,6 +555,7 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
   const contents = [
     insect ? { kicker: 'Insect of the month', title: insect.name, href: `${site}#/news/${insect.id}` } : null,
     { kicker: 'The numbers', title: `${num(data.numbers.specimens)} specimens digitized in ${issue.label}` },
+    ...(data.network ? [{ kicker: 'Our network grew', title: `${num(data.network.joined.length)} new ${data.network.joined.length === 1 ? 'collaborator' : 'collaborators'}` }] : []),
     ...(data.visits ? [{ kicker: 'Who came to the museum', title: `${num(data.visits.visits)} visit${data.visits.visits === 1 ? '' : 's'}, ${num(data.visits.people)} people` }] : []),
     h0 && (h0.species.length || h0.types.length || h0.counties.length)
       ? {
@@ -688,6 +715,12 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
       <div style="font-size:12px;color:#aaa;margin-top:4px">${data.visits.use.users.map((u) => `${esc(u.name)}: ${u.n}`).join(' · ')}</div>
     </div>` : ''}
     ${data.visits.groups.length ? data.visits.groups.map((g) => `<div style="font-family:Arial,sans-serif;font-size:13px;color:#111;background:#f6f4ef;border-left:4px solid #000;padding:8px 12px;margin-top:10px"><span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6b665c">${esc(g.type)} · ${esc(g.date)}</span><br><b>${esc(g.name)}</b>${g.audience ? ` — ${esc(g.audience)}` : ''}${g.activity ? `<br><span style="color:#555">${esc(g.activity)}</span>` : ''}</div>`).join('') : ''}
+  </td></tr>` : ''}
+  ${data.network ? `<tr><td style="padding:6px 28px 22px">
+    <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#000000;font-weight:bold;padding-bottom:8px;border-bottom:3px solid #000;margin-bottom:12px">Our network grew</div>
+    <div style="font-family:Arial,sans-serif;font-size:15px;color:#111"><b style="font-size:26px">${num(data.network.joined.length)}</b> new ${data.network.joined.length === 1 ? 'collaborator' : 'collaborators'}${data.network.newInstitutions ? ` from <b>${num(data.network.newInstitutions)}</b> new ${data.network.newInstitutions === 1 ? 'institution' : 'institutions'}` : ''} · ${num(data.network.total)} people in ${num(data.network.countries)} countries in total</div>
+    <div style="font-family:Arial,sans-serif;font-size:13px;color:#333;margin-top:10px;line-height:1.6">${data.network.joined.map((p) => `<b>${esc(p.name || p.affiliation)}</b>${p.name && p.affiliation ? `, ${esc(p.affiliation)}` : ''}${p.taxa.length ? ` <span style="color:#8c640a">(${esc(p.taxa.join(', '))})</span>` : ''}`).join('<br>')}</div>
+    <div style="font-family:Arial,sans-serif;font-size:13px;margin-top:10px"><a href="https://enns-museum-community.netlify.app" style="color:#000;font-weight:bold">See the network map →</a></div>
   </td></tr>` : ''}
   ${closerHtml}
   ${highlightsHtml}
