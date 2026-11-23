@@ -706,14 +706,14 @@ export function emailHtml({ issue, data, note, siteUrl, info }) {
       </td>
       <td valign="top" style="border-left:4px solid #fdb719;padding-left:16px">
         ${data.visits.byType.map((t) => `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><span style="color:${t.color};font-size:18px">&#9679;</span> <b>${esc(t.type)}</b><br><span style="color:#555;font-size:13px">${num(t.visits)} visit${t.visits === 1 ? '' : 's'} · ${num(t.people)} ${t.people === 1 ? 'person' : 'people'}</span></div>`).join('')}
-        ${data.visits.outreach.events ? `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><b>Outreach</b><br><span style="color:#555;font-size:13px">${num(data.visits.outreach.events)} event(s) · ${num(data.visits.outreach.people)} people</span></div>` : ''}
+        ${data.visits.outreach.events ? `<div style="font-family:Arial,sans-serif;font-size:14px;color:#111;margin:2px 0 8px"><span style="color:#b0562b;font-size:18px">&#9679;</span> <b>Outreach</b><br><span style="color:#555;font-size:13px">${num(data.visits.outreach.events)} event(s) · ${num(data.visits.outreach.people)} people</span></div>` : ''}
       </td>
     </tr></table>
     ${data.visits.use ? `<div style="background:#000;color:#fff;font-family:Arial,sans-serif;padding:14px 16px;margin-top:14px">
       <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#fdb719;font-weight:bold">Using the museum's facilities</div>
-      <div style="font-size:16px;margin-top:6px"><b style="font-size:26px;color:#fdb719">${num(data.visits.use.days)}</b> day${data.visits.use.days === 1 ? '' : 's'} of use · <b>${num(data.visits.use.people)}</b> ${data.visits.use.people === 1 ? 'person' : 'people'}${data.visits.use.institutions > 1 ? ` from ${num(data.visits.use.institutions)} institutions` : ''}</div>
-      <div style="font-size:13px;color:#ddd;margin-top:6px">${data.visits.use.resources.map((r) => `${esc(r.name)} (${r.n})`).join(' · ')}</div>
-      <div style="font-size:12px;color:#aaa;margin-top:4px">${data.visits.use.users.map((u) => `${esc(u.name)}: ${u.n}`).join(' · ')}</div>
+      <div style="font-size:16px;margin-top:6px"><b style="font-size:26px;color:#fdb719">${num(data.visits.use.people)}</b> ${data.visits.use.people === 1 ? 'researcher used' : 'researchers used'} our facilities${data.visits.use.institutions ? ` · from ${num(data.visits.use.institutions)} ${data.visits.use.institutions === 1 ? 'institution' : 'institutions'}` : ''}</div>
+      <div style="font-size:13px;color:#ddd;margin-top:6px">${data.visits.use.resources.map((r) => esc(r.name)).join(' · ')}</div>
+      <div style="font-size:12px;color:#aaa;margin-top:4px">${data.visits.use.users.map((u) => `${esc(u.name)} (${u.n})`).join(' · ')}</div>
     </div>` : ''}
     ${data.visits.groups.length ? data.visits.groups.map((g) => `<div style="font-family:Arial,sans-serif;font-size:13px;color:#111;background:#f6f4ef;border-left:4px solid #000;padding:8px 12px;margin-top:10px"><span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#6b665c">${esc(g.type)} · ${esc(g.date)}</span><br><b>${esc(g.name)}</b>${g.audience ? ` — ${esc(g.audience)}` : ''}${g.activity ? `<br><span style="color:#555">${esc(g.activity)}</span>` : ''}</div>`).join('') : ''}
   </td></tr>` : ''}

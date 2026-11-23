@@ -364,6 +364,20 @@
                   aria-hidden="true"
                 ><circle cx="6" cy="4" r="3.4" fill="currentColor" /><path d="M1 19v-6.5C1 9.5 3 8 6 8s5 1.5 5 4.5V19z" fill="currentColor" /></svg>
               </div>
+              <!-- outreach: people we reached elsewhere, in their own colour (rust) on a second row -->
+              <div
+                v-if="outreachFigures"
+                class="rp-v-people rp-v-people-out"
+                :aria-label="`${data.visits.outreach.people} people reached through outreach`"
+              >
+                <svg
+                  v-for="k in outreachFigures"
+                  :key="'o' + k"
+                  viewBox="0 0 12 20"
+                  class="rp-v-fig"
+                  aria-hidden="true"
+                ><circle cx="6" cy="4" r="3.4" fill="#b0562b" /><path d="M1 19v-6.5C1 9.5 3 8 6 8s5 1.5 5 4.5V19z" fill="#b0562b" /></svg>
+              </div>
               <p
                 v-if="visitPer > 1"
                 class="rp-v-scale"
@@ -379,8 +393,8 @@
                 </li>
                 <li v-if="data.visits.outreach.events">
                   <i class="rp-v-out" />
-                  <b>Outreach</b>
-                  <span>{{ fmt(data.visits.outreach.events) }} event(s) · {{ fmt(data.visits.outreach.people) }} people</span>
+                  <b>Outreach <small>(we went to them)</small></b>
+                  <span>{{ fmt(data.visits.outreach.events) }} {{ data.visits.outreach.events === 1 ? 'event' : 'events' }} · {{ fmt(data.visits.outreach.people) }} people</span>
                 </li>
               </ul>
             </div>
@@ -393,17 +407,17 @@
             <p class="rp-v-use-k">Using the museum's facilities</p>
             <div class="rp-v-use-main">
               <p class="rp-v-use-big">
-                <b>{{ fmt(data.visits.use.days) }}</b> day{{ data.visits.use.days === 1 ? '' : 's' }} of use
-                <span>· {{ fmt(data.visits.use.people) }} {{ data.visits.use.people === 1 ? 'person' : 'people' }}<template v-if="data.visits.use.institutions > 1"> from {{ fmt(data.visits.use.institutions) }} institutions</template></span>
+                <b>{{ fmt(data.visits.use.people) }}</b> {{ data.visits.use.people === 1 ? 'researcher used' : 'researchers used' }} our facilities
+                <span v-if="data.visits.use.institutions">from {{ fmt(data.visits.use.institutions) }} {{ data.visits.use.institutions === 1 ? 'institution' : 'institutions' }}<template v-if="data.visits.year && data.visits.year.usePeople"> · {{ fmt(data.visits.year.usePeople) }} so far in {{ data.visits.year.year }}</template></span>
               </p>
               <ul class="rp-v-use-res">
                 <li
                   v-for="r in data.visits.use.resources"
                   :key="r.name"
-                >{{ r.name }} <b>{{ r.n }}</b></li>
+                >{{ r.name }}</li>
               </ul>
             </div>
-            <p class="rp-v-use-who">{{ data.visits.use.users.map((u) => `${u.name}: ${u.n}`).join(' · ') }}<template v-if="data.visits.year && data.visits.year.useDays"> · {{ fmt(data.visits.year.useDays) }} days so far in {{ data.visits.year.year }}</template></p>
+            <p class="rp-v-use-who">{{ data.visits.use.users.map((u) => `${u.name} (${u.n})`).join(' · ') }}</p>
           </div>
 
           <div
@@ -743,7 +757,8 @@ watch(leadId, (v) => {
   } catch {}
 })
 // visitor figures: one per person, at most 60 (then each figure stands for several people)
-const visitPer = computed(() => Math.max(1, Math.ceil((data.value?.visits?.people || 0) / 60)))
+const visitPer = computed(() => Math.max(1, Math.ceil(((data.value?.visits?.people || 0) + (data.value?.visits?.outreach?.people || 0)) / 60)))
+const outreachFigures = computed(() => Math.round((data.value?.visits?.outreach?.people || 0) / visitPer.value))
 const visitFigures = computed(() => {
   const v = data.value?.visits
   if (!v) return []
@@ -809,7 +824,7 @@ const contents = computed(() => {
       id: 'rp-sec-visits',
       kicker: 'Who came to the museum',
       title: `${fmt(d.visits.visits)} visit${d.visits.visits === 1 ? '' : 's'}, ${fmt(d.visits.people)} people`,
-      text: [visitLines(d.visits).join(' · '), d.visits.use ? `${fmt(d.visits.use.days)} day(s) of facility use` : ''].filter(Boolean).join(' · ')
+      text: [visitLines(d.visits).join(' · '), d.visits.use ? `${fmt(d.visits.use.people)} used our facilities` : ''].filter(Boolean).join(' · ')
     })
   }
   const h = d.highlights
@@ -1954,7 +1969,12 @@ function downloadEmail() {
   border-radius: 2px;
 }
 .rp-v-legend .rp-v-out {
-  background: repeating-linear-gradient(45deg, #000 0 2px, #fdb719 2px 4px);
+  background: #b0562b;
+}
+.rp-v-people-out {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed #cbbd8f;
 }
 .rp-v-legend span {
   justify-self: end;
@@ -2037,7 +2057,9 @@ function downloadEmail() {
   color: #fdb719;
 }
 .rp-v-use-big span {
-  color: #ddd;
+  display: block;
+  color: #ccc;
+  font-size: 0.85rem;
 }
 .rp-v-use-res {
   display: flex;
