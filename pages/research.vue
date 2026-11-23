@@ -167,27 +167,6 @@
             Nothing matches.
           </p>
 
-          <!-- Research that used the museum's facilities (imaging, microscopes), not its specimens -->
-          <div
-            v-if="facility.length"
-            class="mt-12"
-          >
-            <h2 class="rs-year">Research using our facilities</h2>
-            <p class="mt-1 text-sm eem-muted">Studies that used the museum's imaging systems or microscopes, not its specimens.</p>
-            <ul class="mt-2 divide-y divide-[color:var(--eem-rule)]">
-              <li
-                v-for="p in facility"
-                :key="p.key"
-                class="py-3"
-              >
-                <p
-                  class="leading-snug rs-citation"
-                  v-html="p.citation"
-                />
-              </li>
-            </ul>
-          </div>
-
           <p class="mt-10 text-xs eem-muted leading-relaxed">
             “Not yet checked” lists publications whose full text mentions the Enns Entomology Museum or the codens
             UMRM and UMC (University of Missouri, Columbia), found automatically in OpenAlex and Europe PMC<template v-if="updated"> (updated {{ updated }})</template>. They are
@@ -204,6 +183,24 @@
 
       <!-- Side: how to cite -->
       <aside class="lg:col-span-4 space-y-5">
+        <!-- Research that used the museum's facilities (imaging, microscopes), not its specimens -->
+        <div
+          v-if="facility.length"
+          class="eem-card p-6"
+        >
+          <p class="eem-kicker">Not with our specimens</p>
+          <h3 class="eem-display text-xl mt-3">Research using our facilities</h3>
+          <p class="mt-2 text-sm eem-muted">Studies that used the museum's imaging systems or microscopes.</p>
+          <ul class="mt-3 space-y-3">
+            <li
+              v-for="p in facility"
+              :key="p.key"
+              class="text-sm leading-snug rs-citation"
+              v-html="p.citation"
+            />
+          </ul>
+        </div>
+
         <div class="eem-card p-6 eem-accent-t lg:sticky lg:top-6">
           <p class="eem-kicker">Using our specimens?</p>
           <h3 class="eem-display text-xl mt-3">How to cite the collection</h3>
